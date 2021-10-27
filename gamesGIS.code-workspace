@@ -1,13 +1,5 @@
 {
 	"folders": [
-		// {
-		// 	"name": "frontend",
-		// 	"path": "./client/"
-		// },
-		// {
-		// 	"name": "backend",
-		// 	"path": "./server/"
-		// },
 		{
 			"path": "."
 		}
