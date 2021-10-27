@@ -1,0 +1,29 @@
+{
+  "name": "gamesgis",
+  "version": "1.0.0",
+  "description": "Service providing aliases with geolocation for game Escape from tarkov",
+  "main": "./server/dist/index.js",
+  "scripts": {
+    "postinstall": "cd client && npm install && cd ../server && npm install",
+
+    "build": "npm run build-client && npm run copy-spa-to-server && npm run build-server",
+    "start-server": "cd server && npm run start",
+
+    "build-client": "cd client && npm run build",
+    "build-server": "pushd server && npm run build",
+    "copy-spa-to-server": "copyfiles -u 2 -V ./client/build/**/*.* server/dist/spa"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/committing-on-master/gamesGIS.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/committing-on-master/gamesGIS/issues"
+  },
+  "homepage": "https://github.com/committing-on-master/gamesGIS#readme",
+  "dependencies": {
+    "copyfiles": "^2.4.1"
+  }
+}
