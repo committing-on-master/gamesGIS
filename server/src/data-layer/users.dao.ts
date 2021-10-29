@@ -1,6 +1,6 @@
-import { CreateUserDto } from '../dto/create.user.dto';
-import { PatchUserDto } from '../dto/patch.user.dto';
-import { PutUserDto } from '../dto/put.user.dto';
+import { CreateUserDto } from '../domain-layer/users/models/create.user.dto';
+import { PatchUserDto } from '../domain-layer/users/models/patch.user.dto';
+import { PutUserDto } from '../domain-layer/users/models/put.user.dto';
 
 import { nanoid as nanoId } from "nanoid"
 import debug from "debug";

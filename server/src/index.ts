@@ -6,8 +6,8 @@ import * as http from "http";
 import * as winston from "winston";
 import * as expressWinston from "express-winston";
 
-import { CommonRoutesConfig } from "./common/common.routes.config";
-import { UsersRoutes } from "./users/users.routes.config";
+import { CommonRoutesConfig } from "./controllers/common.routes.config";
+import { UsersRoutes } from "./controllers/users/users.routes.config";
 import debug from "debug";
 
 // Загрузили конфигу в глобальную переменную process

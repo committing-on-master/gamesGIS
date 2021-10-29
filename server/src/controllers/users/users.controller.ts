@@ -1,8 +1,8 @@
 // we import express to add types to the request/response objects from our controller functions
-import express from 'express';
+import express from "express";
 
 // we import our newly created user services
-import usersService from '../services/users.service';
+import usersService from "../../domain-layer/users/users.service";
 
 // we import the argon2 library for password hashing
 import argon2 from 'argon2';
