@@ -44,9 +44,7 @@ const loggerOptions: expressWinston.LoggerOptions = {
     )
 }
 
-if (process.env.RUNTIME || process.env.RUNTIME === "PRODUCTION") {
-    loggerOptions.meta = false;
-}
+loggerOptions.meta = (process.env.RUNTIME === "DEBUG") ? true : false;
 
 app.use(expressWinston.logger(loggerOptions));
 
