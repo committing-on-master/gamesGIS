@@ -23,4 +23,4 @@ Content-Type: application/json
     "firstName": "Marcoss",
     "lastName": "Silva",
     "permissionLevel": 8
-}'
+}

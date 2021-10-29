@@ -1,5 +1,5 @@
 import express from 'express';
-import userService from '../services/users.service';
+import userService from '../../domain-layer/users/users.service';
 import debug from 'debug';
 
 const log: debug.IDebugger = debug('app:users-controller');

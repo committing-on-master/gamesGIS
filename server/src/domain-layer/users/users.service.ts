@@ -1,10 +1,10 @@
-import UsersDao from '../daos/users.dao';
-import { CRUD } from '../../common/interfaces/crud.interface';
-import { CreateUserDto } from '../dto/create.user.dto';
-import { PutUserDto } from '../dto/put.user.dto';
-import { PatchUserDto } from '../dto/patch.user.dto';
+import UsersDao from '../../data-layer/users.dao';
+// import { CRUD } from '../../common/interfaces/crud.interface';
+import { CreateUserDto } from './models/create.user.dto';
+import { PutUserDto } from './models/put.user.dto';
+import { PatchUserDto } from './models/patch.user.dto';
 
-class UsersService implements CRUD {
+class UsersService {
     async create(resource: CreateUserDto) {
         return UsersDao.addUser(resource);
     }
