@@ -1,10 +1,11 @@
 import UsersDao from '../../data-layer/users.dao';
-// import { CRUD } from '../../common/interfaces/crud.interface';
 import { CreateUserDto } from './models/create.user.dto';
 import { PutUserDto } from './models/put.user.dto';
 import { PatchUserDto } from './models/patch.user.dto';
 
 class UsersService {
+    constructor() {
+    }
     async create(resource: CreateUserDto) {
         return UsersDao.addUser(resource);
     }
@@ -34,4 +35,4 @@ class UsersService {
     }
 }
 
-export default new UsersService();
+export { UsersService };

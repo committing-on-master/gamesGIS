@@ -1,69 +1,36 @@
 import dotenv from "dotenv";
-import express from "express";
-import path from "path";
-import * as http from "http";
-
-import * as winston from "winston";
+import winston from "winston";
 import * as expressWinston from "express-winston";
 
-import { CommonRoutesConfig } from "./controllers/common.routes.config";
-import { UsersRoutes } from "./controllers/users/users.routes.config";
-import debug from "debug";
+import { GisApplication } from "./gis.application";
+
+const loggerOptions: winston.LoggerOptions = {
+    level: 'info',
+    format: winston.format.combine(winston.format.colorize({all: true}), winston.format.json()),
+    // defaultMeta: { service: 'user-service' },
+    transports: [
+        new winston.transports.Console({format: winston.format.simple()})
+
+        // - Write all logs with level `error` and below to `error.log`
+        // new winston.transports.File({ filename: 'error.log', level: 'error' }),
+
+        // - Write all logs with level `info` and below to `combined.log`
+        // new winston.transports.File({ filename: 'combined.log' }),
+    ],
+}
+
+const logger: winston.Logger = winston.createLogger(loggerOptions);
 
 // Загрузили конфигу в глобальную переменную process
 dotenv.config( {path: "./config/.env"} );
 
-// Крутим логгер
+const port = Number.parseInt(process.env.PORT ?? "3000");
 
+const gisApp = new GisApplication(logger, port);
 
-// Стартуем express.js
-const app: express.Application = express();
-const server: http.Server = http.createServer(app);
-const port = process.env.PORT || 3000;
-const routes: Array<CommonRoutesConfig> = [];
+gisApp.start();
 
-// дебатабельная хуйня, покрути повнимательнее
-const debugLog: debug.IDebugger = debug("app");
-
-// Конфигурируем наш експресс.жс сервер
-
-// here we are adding middleware to parse all incoming requests as JSON 
-app.use(express.json());
-
-// вот это вот не точно, но скорее всего придется для SPA отдельный express.js поднимать, поэтому оставим пока так
-// import cors from "cors";
-// app.use(cors());
-
-// winston логгер суем в экспресс
-const loggerOptions: expressWinston.LoggerOptions = {
-    transports: [new winston.transports.Console()],
-    format: winston.format.combine(
-        winston.format.json(),
-        winston.format.prettyPrint(),
-        winston.format.colorize({all: true})
-    )
-}
-
-loggerOptions.meta = (process.env.RUNTIME === "DEBUG") ? true : false;
-
-app.use(expressWinston.logger(loggerOptions));
-
-// Добавляем роуты
-routes.push(new UsersRoutes(app));
-
-const runningMessage = `Server running at http://localhost:${port}`;
-
-// TODO: не уверен в использовании статики и api на одном экспрессе
-// Возможно имеет смысл попробовать запилить проксю
-app.use(express.static(__dirname + "/spa"));
-app.get("/", (request: express.Request, response: express.Response) => {
-    response.sendFile(path.resolve(__dirname, "spa/index.html"));
+process.on("SIGINT", () => {
+    gisApp.stop();
+    process.exit(0);
 });
-
-// Запускаем сервер
-server.listen(port, () => {
-    routes.forEach((route: CommonRoutesConfig) => {
-        debugLog(`Routes configured for ${route.getName()}`);
-    })
-    console.log(runningMessage);
-})

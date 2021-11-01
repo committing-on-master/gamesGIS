@@ -1,39 +1,48 @@
 import { CommonRoutesConfig } from '../common.routes.config';
-import UsersController from './users.controller';
-import UsersMiddleware from './users.middleware';
+import { UsersController } from './users.controller';
+import { UsersMiddleware } from './users.middleware';
 import express from 'express';
+import { inject, injectable, singleton } from 'tsyringe';
 
+@injectable()
 export class UsersRoutes extends CommonRoutesConfig {
-    constructor(app: express.Application) {
+    readonly usersMiddleware: UsersMiddleware;
+    readonly usersController: UsersController;
+
+    constructor(@inject("ExpressJsApp") app: express.Application, usersMiddleware: UsersMiddleware, usersController: UsersController) {
         super(app, 'UsersRoutes');
+        this.usersController = usersController;
+        this.usersMiddleware = usersMiddleware;
+
+        this.configureRoutes();
     }
 
     configureRoutes(): express.Application {
         this.app
             .route(`/users`)
-            .get(UsersController.listUsers)
+            .get(this.usersController.listUsers)
             .post(
-                UsersMiddleware.validateRequiredUserBodyFields,
-                UsersMiddleware.validateSameEmailDoesntExist,
-                UsersController.createUser
+                this.usersMiddleware.validateRequiredUserBodyFields,
+                this.usersMiddleware.validateSameEmailDoesntExist,
+                this.usersController.createUser
             );
 
-        this.app.param(`userId`, UsersMiddleware.extractUserId);
+        this.app.param(`userId`, this.usersMiddleware.extractUserId);
         this.app
             .route(`/users/:userId`)
-            .all(UsersMiddleware.validateUserExists)
-            .get(UsersController.getUserById)
-            .delete(UsersController.removeUser);
+            .all(this.usersMiddleware.validateUserExists)
+            .get(this.usersController.getUserById)
+            .delete(this.usersController.removeUser);
 
         this.app.put(`/users/:userId`, [
-            UsersMiddleware.validateRequiredUserBodyFields,
-            UsersMiddleware.validateSameEmailBelongToSameUser,
-            UsersController.put,
+            this.usersMiddleware.validateRequiredUserBodyFields,
+            this.usersMiddleware.validateSameEmailBelongToSameUser,
+            this.usersController.put,
         ]);
 
         this.app.patch(`/users/:userId`, [
-            UsersMiddleware.validatePatchEmail,
-            UsersController.patch,
+            this.usersMiddleware.validatePatchEmail,
+            this.usersController.patch,
         ]);
 
         return this.app;

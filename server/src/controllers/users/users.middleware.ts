@@ -1,9 +1,22 @@
 import express from 'express';
-import userService from '../../domain-layer/users/users.service';
-import debug from 'debug';
+import { DomainLayer } from '../../domain-layer/domain.layer';
+import { injectable, singleton } from 'tsyringe';
 
-const log: debug.IDebugger = debug('app:users-controller');
+@injectable()
 class UsersMiddleware {
+    readonly domainLayer: DomainLayer;
+
+    constructor(domainLayer: DomainLayer) {
+        this.domainLayer = domainLayer;
+
+        // методы уходят в мидлварю экспресса, биндим this
+        this.validateSameEmailDoesntExist = this.validateSameEmailDoesntExist.bind(this);
+        this.validateSameEmailBelongToSameUser = this.validateSameEmailBelongToSameUser.bind(this);
+        this.validatePatchEmail = this.validatePatchEmail.bind(this);
+        this.validateUserExists = this.validateUserExists.bind(this);
+        this.extractUserId = this.extractUserId.bind(this);
+    }
+
     async validateRequiredUserBodyFields(
         req: express.Request,
         res: express.Response,
@@ -23,7 +36,7 @@ class UsersMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        const user = await userService.getUserByEmail(req.body.email);
+        const user = await this.domainLayer.usersService.getUserByEmail(req.body.email);
         if (user) {
             res.status(400).send({ error: `User email already exists` });
         } else {
@@ -36,7 +49,7 @@ class UsersMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        const user = await userService.getUserByEmail(req.body.email);
+        const user = await this.domainLayer.usersService.getUserByEmail(req.body.email);
         if (user && user.id === req.params.userId) {
             next();
         } else {
@@ -45,14 +58,12 @@ class UsersMiddleware {
     }
     
     // Here we need to use an arrow function to bind `this` correctly
-    validatePatchEmail = async (
+    validatePatchEmail(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
-    ) => {
-        if (req.body.email) {
-            log('Validating email', req.body.email);
-    
+    ) {
+        if (req.body.email) {    
             this.validateSameEmailBelongToSameUser(req, res, next);
         } else {
             next();
@@ -64,7 +75,7 @@ class UsersMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        const user = await userService.readById(req.params.userId);
+        const user = await this.domainLayer.usersService.readById(req.params.userId);
         if (user) {
             next();
         } else {
@@ -84,4 +95,4 @@ class UsersMiddleware {
     }
 }
 
-export default new UsersMiddleware();
+export { UsersMiddleware };
