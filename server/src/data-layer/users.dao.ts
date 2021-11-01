@@ -3,16 +3,11 @@ import { PatchUserDto } from '../domain-layer/users/models/patch.user.dto';
 import { PutUserDto } from '../domain-layer/users/models/put.user.dto';
 
 import { nanoid as nanoId } from "nanoid"
-import debug from "debug";
-
-const log: debug.IDebugger = debug('app:in-memory-dao');
 
 class UsersDao {
     users: Array<CreateUserDto> = [];
 
-    constructor() {
-        log("Creating new instance of UsersDao");
-    }
+    constructor() {}
 
     async addUser(user: CreateUserDto): Promise<string> {
         user.id = nanoId();
