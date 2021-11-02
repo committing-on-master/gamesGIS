@@ -1,15 +1,19 @@
 import express from "express";
+import winston from "winston";
 
 export abstract class CommonRoutesConfig {
-    app: express.Application;
     name: string;
+    readonly logger: winston.Logger;
 
-    constructor(app: express.Application, name: string) {
-        this.app = app;
+    constructor(logger: winston.Logger, name: string) {
+        this.logger = logger;
+        this.logger.info(`Creating route config for: ${name}`);
+
         this.name = name;
     }
     getName() {
         return this.name;
     }
-    abstract configureRoutes(): express.Application;
+
+    public abstract configureRoutes(app: express.Application): express.Application;
 }

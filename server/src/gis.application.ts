@@ -10,6 +10,7 @@ import winston from "winston";
 
 import { CommonRoutesConfig } from "./controllers/common.routes.config";
 import { UsersRoutes } from "./controllers/users/users.routes.config";
+import { TokenInjection } from "./infrastructure/token.injection";
 
 class GisApplication {
     // TODO: strictPropertyInitialization как разберешься с текущим косяком, подумай о включении
@@ -65,17 +66,19 @@ class GisApplication {
             return;
         }
         this.app.use(express.json());
-        // вот это вот не точно, но скорее всего придется для SPA и прочей статики отдельный express.js поднимать, поэтому оставим пока так
+        // TODO: вот это вот не точно, но скорее всего придется для SPA и прочей статики отдельный express.js поднимать, поэтому оставим пока так
         // import cors from "cors";
         // app.use(cors());
 
-        // TODO: роуты экспрессу назначаются непрозрачно, шляпа повышающая порог вхождения
-        // отдели создание роутов, от их присвоения
-        container.register<express.Application>("ExpressJsApp", { useValue: this.app });
+        container.register<winston.Logger>(TokenInjection.LOGGER, { useValue: this.logger });
 
         this.routes.push(
             container.resolve(UsersRoutes)
         );
+
+        this.routes.forEach(route => {
+            route.configureRoutes(this.app);
+        });
     }
 
     public start() {
