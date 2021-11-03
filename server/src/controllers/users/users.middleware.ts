@@ -1,6 +1,6 @@
 import express from 'express';
 import { DomainLayer } from '../../domain-layer/domain.layer';
-import { injectable, singleton } from 'tsyringe';
+import { injectable } from 'tsyringe';
 
 @injectable()
 class UsersMiddleware {
@@ -50,7 +50,7 @@ class UsersMiddleware {
         next: express.NextFunction
     ) {
         const user = await this.domainLayer.usersService.getUserByEmail(req.body.email);
-        if (user && user.id === req.params.userId) {
+        if (user && user.id?.toString() === req.params.userId) {
             next();
         } else {
             res.status(400).send({ error: `Invalid email` });
@@ -75,7 +75,12 @@ class UsersMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        const user = await this.domainLayer.usersService.readById(req.params.userId);
+        if (Number.isNaN(req.params?.userId)) {
+            res.status(404).send({
+                error: `User ${req.params.userId} not a number`,
+            });
+        }
+        const user = await this.domainLayer.usersService.readById(parseInt(req.params.userId));
         if (user) {
             next();
         } else {

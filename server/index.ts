@@ -1,8 +1,7 @@
 import dotenv from "dotenv";
 import winston from "winston";
-import * as expressWinston from "express-winston";
 
-import { GisApplication } from "./gis.application";
+import { GisApplication } from "./src/gis.application";
 
 const loggerOptions: winston.LoggerOptions = {
     level: 'info',
@@ -27,8 +26,11 @@ dotenv.config( {path: "./config/.env"} );
 const port = Number.parseInt(process.env.PORT ?? "3000");
 
 const gisApp = new GisApplication(logger, port);
-
-gisApp.start();
+gisApp
+    .setUp("in-memory")
+    .then(() => {
+        gisApp.start();
+    })
 
 process.on("SIGINT", () => {
     gisApp.stop();

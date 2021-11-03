@@ -7,20 +7,20 @@ content-type: application/json
 
 {
     "email": "marcos.henrique@toptal.com",
-    "password": "sup3rS3cr3tPassw0rd!23"
+    "password": "sup3rS3cr3tPassw0rd!23",
+    "name": "Marcoss"
 }
 ###
-GET http://localhost:3000/users/WK1_ue7gNXBKxl1TTWYWD
+GET http://localhost:3000/users/1
 ###
-DELETE http://localhost:3000/users/WK1_ue7gNXBKxl1TTWYWD HTTP/1.1
+DELETE http://localhost:3000/users/1 HTTP/1.1
 ###
-PUT http://localhost:3000/users/WtLNikIKdzXNijmqrW8ka
+PUT http://localhost:3000/users/1
 Content-Type: application/json
 
 {
     "email": "marcos.henrique@toptal.com",
     "password": "sup3rS3cr3tPassw0rd!23",
-    "firstName": "Marcoss",
-    "lastName": "Silva",
+    "name": "Marcoss Frontier",
     "permissionLevel": 8
 }

@@ -1,37 +1,75 @@
-import UsersDao from '../../data-layer/users.dao';
 import { CreateUserDto } from './models/create.user.dto';
 import { PutUserDto } from './models/put.user.dto';
 import { PatchUserDto } from './models/patch.user.dto';
+import { inject, injectable } from 'tsyringe';
+import { DataLayer } from "../../data-layer/data.layer";
+import { UsersDB } from "../../data-layer/models/users.db";
+import winston from 'winston';
+import { TokenInjection } from '../../infrastructure/token.injection';
 
+@injectable()
 class UsersService {
-    constructor() {
+    readonly dataLayer: DataLayer;
+    readonly logger: winston.Logger;
+
+    constructor(@inject(TokenInjection.LOGGER) logger: winston.Logger, dataLayer: DataLayer) {
+        this.logger = logger;
+        this.logger.info("UsersService creation");
+        
+        this.dataLayer = dataLayer;
     }
     async create(resource: CreateUserDto) {
-        return UsersDao.addUser(resource);
+
+        let userDb = new UsersDB();
+        userDb.email = resource.email;
+        userDb.name = resource.name;
+        userDb.password = resource.password;
+        userDb.permissionLevel = resource.permissionLevel;
+
+
+        await this.dataLayer.usersRepository.addUser(userDb);
     }
 
-    async deleteById(id: string) {
-        return UsersDao.removeUserById(id);
+    async deleteById(userId: number) {
+        return this.dataLayer.usersRepository.removeUserById(userId);
     }
 
     async list(limit: number, page: number) {
-        return UsersDao.getUsers();
+        return await this.dataLayer.usersRepository.getUsers();
     }
 
-    async patchById(id: string, resource: PatchUserDto) {
-        return UsersDao.patchUserById(id, resource);
+    async patchById(userId: number, resource: PatchUserDto) {
+        let entry = await this.dataLayer.usersRepository.findUserById(userId);
+        if (!entry) {
+            return;
+        }
+        entry.email = resource.email ?? entry.email;
+        entry.name = resource.name ?? entry.name;
+        entry.password = resource.password ?? entry.password;
+        entry.permissionLevel = resource.permissionLevel ?? entry.permissionLevel;
+        
+        return this.dataLayer.usersRepository.updateUser(entry);
     }
 
-    async readById(id: string) {
-        return UsersDao.getUserById(id);
+    async readById(userId: number) {
+        return await this.dataLayer.usersRepository.findUserById(userId);
     }
 
-    async putById(id: string, resource: PutUserDto) {
-        return UsersDao.putUserById(id, resource);
+    async putById(userId: number, resource: PutUserDto) {
+        let entry = await this.dataLayer.usersRepository.findUserById(userId);
+        if (!entry) {
+            return;
+        }
+        entry.email = resource.email ?? entry.email;
+        entry.name = resource.name ?? entry.name;
+        entry.password = resource.password ?? entry.password;
+        entry.permissionLevel = resource.permissionLevel ?? entry.permissionLevel;
+        
+        return this.dataLayer.usersRepository.updateUser(entry);
     }
 
     async getUserByEmail(email: string) {
-        return UsersDao.getUserByEmail(email);
+        return await this.dataLayer.usersRepository.getUserByEmail(email);
     }
 }
 

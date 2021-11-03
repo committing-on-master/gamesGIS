@@ -7,77 +7,97 @@ import * as http from "http";
 import express from "express"
 import * as expressWinston from "express-winston";
 import winston from "winston";
+import { WinstonAdaptor } from 'typeorm-logger-adaptor/logger/winston';
+
 
 import { CommonRoutesConfig } from "./controllers/common.routes.config";
 import { UsersRoutes } from "./controllers/users/users.routes.config";
 import { TokenInjection } from "./infrastructure/token.injection";
+import { Connection, createConnection, getConnectionOptions } from "typeorm";
 
 class GisApplication {
-    // TODO: strictPropertyInitialization как разберешься с текущим косяком, подумай о включении
-    readonly app: express.Application;
     readonly port: number;
-    readonly server: http.Server;
-    readonly host: string;
-
+    readonly host: string;    
     readonly logger: winston.Logger;
     readonly routes: Array<CommonRoutesConfig>;
-
+    
+    private app?: express.Application;
+    server?: http.Server;
     private startingDate?: Date;
+    private dbConnection?: Connection;
 
     constructor(logger: winston.Logger, port: number, host?: string) {
         this.logger = logger;
         logger.info("Starting GameGis application");
-
+        
         this.port = port;
         this.host = host ?? "localhost";
         this.routes = [];
-
+    }
+    
+    public async setUp(connectionName: string) {
+        container.register<winston.Logger>(TokenInjection.LOGGER, { useValue: this.logger });
         this.app = express();
+        
+        await this.dbInitialization(connectionName);
 
-        this.addExpressLoggingMiddleware(logger);
-        this.serveStaticFiles();
-        this.createRoutes();
+        this.addExpressLoggingMiddleware(this.logger);
+        this.serveExpressStaticFiles();
+        this.createExpressRoutes();
 
         this.server = http.createServer(this.app);
+        return this;
+    }
+
+    private async dbInitialization(connectionName: string) {
+        const winstonOrm = new WinstonAdaptor(this.logger, 'all');
+        // Берет конфигу из ormconfig файла, и подменяем логгер на уже созданный единый логгер приложения
+        this.dbConnection = await getConnectionOptions(connectionName)
+            .then(connectionOpt => {
+                return createConnection(Object.assign(connectionOpt, { logger: winstonOrm }))
+            })
+        container.register<Connection>(Connection, {useValue: this.dbConnection});
     }
 
     private addExpressLoggingMiddleware(logger: winston.Logger) {
+        if (!this.app) {
+            throw new Error("Express is not created.");
+        }
         const expressLoggerOpt: expressWinston.LoggerOptions = {
             winstonInstance: logger,
-            meta: false
+            meta: true
         }
         
         this.app.use(expressWinston.logger(expressLoggerOpt));
     }
 
-    private serveStaticFiles() {
+    private serveExpressStaticFiles() {
         if (!this.app) {
             return;
         }
 
-        this.app.use(express.static(__dirname + "/spa"));
+        // TODO: разобраться с путями, слишком много относительных путей
+        this.app.use(express.static(__dirname + "./../spa"));
         this.app.get("/", (request: express.Request, response: express.Response) => {
-            response.sendFile(path.resolve(__dirname, "spa/index.html"));
+            response.sendFile(path.resolve(__dirname, "./../spa/index.html"));
         });
     }
 
-    private createRoutes() {
+    private createExpressRoutes() {
         if (!this.app) {
-            return;
+            throw new Error("Express is not created.");
         }
         this.app.use(express.json());
         // TODO: вот это вот не точно, но скорее всего придется для SPA и прочей статики отдельный express.js поднимать, поэтому оставим пока так
         // import cors from "cors";
         // app.use(cors());
 
-        container.register<winston.Logger>(TokenInjection.LOGGER, { useValue: this.logger });
-
         this.routes.push(
             container.resolve(UsersRoutes)
         );
-
+        
         this.routes.forEach(route => {
-            route.configureRoutes(this.app);
+            route.configureRoutes(this.app as express.Application);
         });
     }
 
@@ -87,11 +107,12 @@ class GisApplication {
         this.server?.listen(this.port, () => {
             this.logger.info(`Server started at: http://${this.host}:${this.port}/`);
         });
+        return this;
     }
 
     public stop() {
         if (!this.server) {
-            this.logger.info("Server is not running, could not stop.");
+            this.logger.info("Server is not running, so it is Unstoppable.");
             return;
         }
 
