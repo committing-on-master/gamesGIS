@@ -24,8 +24,6 @@ class UsersService {
         userDb.email = resource.email;
         userDb.name = resource.name;
         userDb.password = resource.password;
-        userDb.permissionLevel = resource.permissionLevel;
-
 
         await this.dataLayer.usersRepository.addUser(userDb);
     }
@@ -46,7 +44,7 @@ class UsersService {
         entry.email = resource.email ?? entry.email;
         entry.name = resource.name ?? entry.name;
         entry.password = resource.password ?? entry.password;
-        entry.permissionLevel = resource.permissionLevel ?? entry.permissionLevel;
+        entry.permissionLevel = resource.permissionFlags ?? entry.permissionLevel;
         
         return this.dataLayer.usersRepository.updateUser(entry);
     }
@@ -63,7 +61,7 @@ class UsersService {
         entry.email = resource.email ?? entry.email;
         entry.name = resource.name ?? entry.name;
         entry.password = resource.password ?? entry.password;
-        entry.permissionLevel = resource.permissionLevel ?? entry.permissionLevel;
+        entry.permissionLevel = resource.permissionFlags ?? entry.permissionLevel;
         
         return this.dataLayer.usersRepository.updateUser(entry);
     }

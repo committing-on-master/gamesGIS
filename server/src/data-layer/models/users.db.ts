@@ -5,6 +5,10 @@ import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeor
  */
 @Entity()
 class UsersDB {
+    constructor() {
+        this.permissionLevel = 1;
+    }
+    
     @PrimaryGeneratedColumn()
     id?: number;
 
@@ -17,8 +21,8 @@ class UsersDB {
     @Column({length: 30})
     name!: string;
 
-    @Column({nullable: true})
-    permissionLevel?: number;
+    @Column()
+    permissionLevel: number;
 
     @CreateDateColumn()
     registrationDate!: Date;

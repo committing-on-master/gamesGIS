@@ -24,8 +24,10 @@ export class UsersRoutes extends CommonRoutesConfig {
             .route(`/users`)
             .get(this.usersController.listUsers)
             .post(
-                this.usersMiddleware.validateRequiredUserBodyFields,
-                this.usersMiddleware.validateSameEmailDoesntExist,
+                //this.usersMiddleware.validateRequiredUserBodyFields,
+                //this.usersMiddleware.validateSameEmailDoesntExist,
+                this.usersMiddleware.validateCreateUserSchema(),
+                this.usersMiddleware.validationResult,
                 this.usersController.createUser
             );
 
