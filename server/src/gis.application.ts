@@ -63,9 +63,12 @@ class GisApplication {
         if (!this.app) {
             throw new Error("Express is not created.");
         }
+        //expressWinston.requestWhitelist.push('body');
         const expressLoggerOpt: expressWinston.LoggerOptions = {
             winstonInstance: logger,
-            meta: true
+            meta: true,
+            // TODO: удалить обязательно, логировать бодики POST реквестов на продах крайне не желательно
+            requestWhitelist: ["body"] 
         }
         
         this.app.use(expressWinston.logger(expressLoggerOpt));

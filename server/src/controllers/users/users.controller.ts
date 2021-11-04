@@ -5,15 +5,15 @@ import express from "express";
 import argon2 from 'argon2';
 
 // we use debug with a custom context as described in Part 1
-import { DomainLayer } from "../../domain-layer/domain.layer";
+import { ServicesLayer } from "../../services-layer/services.layer";
 import { injectable } from "tsyringe";
 
 @injectable()
 class UsersController {
-    readonly domainLayer: DomainLayer;
+    readonly services: ServicesLayer;
 
-    constructor(domainLayer: DomainLayer) {
-        this.domainLayer = domainLayer;
+    constructor(services: ServicesLayer) {
+        this.services = services;
 
         // методы уходят в endpoint-ы экспресса, биндим this
         this.listUsers = this.listUsers.bind(this);
@@ -25,18 +25,18 @@ class UsersController {
     }
     
     async listUsers(req: express.Request, res: express.Response) {
-        const users = await this.domainLayer.usersService.list(100, 0);
+        const users = await this.services.usersService.list(100, 0);
         res.status(200).send(users);
     }
 
     async getUserById(req: express.Request, res: express.Response) {
-        const user = await this.domainLayer.usersService.readById(req.body.id);
+        const user = await this.services.usersService.readById(req.body.id);
         res.status(200).send(user);
     }
 
     async createUser(req: express.Request, res: express.Response) {
         req.body.password = await argon2.hash(req.body.password);
-        const userId = await this.domainLayer.usersService.create(req.body);
+        const userId = await this.services.usersService.create(req.body);
         res.status(201).send({ id: userId });
     }
 
@@ -44,18 +44,18 @@ class UsersController {
         if (req.body.password) {
             req.body.password = await argon2.hash(req.body.password);
         }
-        await this.domainLayer.usersService.patchById(req.body.id, req.body);
+        await this.services.usersService.patchById(req.body.id, req.body);
         res.status(204).send();
     }
 
     async put(req: express.Request, res: express.Response) {
         req.body.password = await argon2.hash(req.body.password);
-        await this.domainLayer.usersService.putById(req.body.id, req.body);
+        await this.services.usersService.putById(req.body.id, req.body);
         res.status(204).send();
     }
 
     async removeUser(req: express.Request, res: express.Response) {
-        await this.domainLayer.usersService.deleteById(req.body.id);
+        await this.services.usersService.deleteById(req.body.id);
         res.status(204).send();
     }
 }

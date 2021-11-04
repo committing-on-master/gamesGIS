@@ -2,7 +2,7 @@ import { singleton } from "tsyringe";
 import { UsersService } from "./users/users.service"
 
 @singleton()
-class DomainLayer {
+class ServicesLayer {
     usersService: UsersService;
 
     constructor(userService: UsersService) {
@@ -10,4 +10,4 @@ class DomainLayer {
     }
 }
 
-export { DomainLayer };
+export { ServicesLayer };
