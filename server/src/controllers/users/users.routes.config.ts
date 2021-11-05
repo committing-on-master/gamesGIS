@@ -18,8 +18,7 @@ export class UsersRoutes extends CommonRoutesConfig {
         this.usersMiddleware = usersMiddleware;
     }
 
-    configureRoutes(app: express.Application): express.Application {
-        this.logger.info(`Express route registration: "${this.getName()}"`);
+    protected configureRoute(app: express.Application): express.Application {
         app
             .route(`/users`)
             .get(this.usersController.listUsers)
@@ -27,7 +26,7 @@ export class UsersRoutes extends CommonRoutesConfig {
                 //this.usersMiddleware.validateRequiredUserBodyFields,
                 //this.usersMiddleware.validateSameEmailDoesntExist,
                 this.usersMiddleware.validateCreateUserSchema(),
-                this.usersMiddleware.validationResult,
+                this.usersMiddleware.schemaValidationResult,
                 this.usersController.createUser
             );
 

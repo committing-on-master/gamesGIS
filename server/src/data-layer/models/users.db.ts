@@ -10,7 +10,7 @@ class UsersDB {
     }
     
     @PrimaryGeneratedColumn()
-    id?: number;
+    id!: number;
 
     @Column()
     email!: string;

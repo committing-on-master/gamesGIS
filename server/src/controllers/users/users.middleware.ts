@@ -1,14 +1,19 @@
 import express from 'express';
-import { injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import { validationResult, body, checkSchema } from "express-validator";
 import { ServicesLayer } from '../../services-layer/services.layer';
 import { createUserDtoSchema } from './models.schema/create.user.dto.schema';
+import { CommonMiddleware } from '../common.middleware';
+import { TokenInjection } from '../../infrastructure/token.injection';
+import winston from 'winston';
 
 @injectable()
-class UsersMiddleware {
+class UsersMiddleware extends CommonMiddleware {
     readonly services: ServicesLayer;
 
-    constructor(services: ServicesLayer) {
+    constructor(@inject(TokenInjection.LOGGER) logger: winston.Logger, services: ServicesLayer) {
+        super(logger, "UsersMiddleware");
+
         this.services = services;
 
         // методы уходят в мидлварю экспресса, биндим this
@@ -18,19 +23,6 @@ class UsersMiddleware {
         this.validateUserExists = this.validateUserExists.bind(this);
         this.extractUserId = this.extractUserId.bind(this);
         this.validateCreateUserSchema = this.validateCreateUserSchema.bind(this);
-    }
-
-    validationResult(
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-    ) {
-
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-        next();
     }
 
     validateCreateUserSchema() {

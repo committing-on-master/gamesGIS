@@ -6,13 +6,17 @@ import argon2 from 'argon2';
 
 // we use debug with a custom context as described in Part 1
 import { ServicesLayer } from "../../services-layer/services.layer";
-import { injectable } from "tsyringe";
+import { inject, injectable } from "tsyringe";
+import { CommonController } from "../common.controller";
+import { TokenInjection } from "../../infrastructure/token.injection";
+import winston from "winston";
 
 @injectable()
-class UsersController {
+class UsersController extends CommonController {
     readonly services: ServicesLayer;
 
-    constructor(services: ServicesLayer) {
+    constructor(@inject(TokenInjection.LOGGER) logger: winston.Logger, services: ServicesLayer) {
+        super(logger, "UsersController");
         this.services = services;
 
         // методы уходят в endpoint-ы экспресса, биндим this

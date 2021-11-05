@@ -18,6 +18,7 @@ class UsersService {
         
         this.dataLayer = dataLayer;
     }
+
     async create(resource: CreateUserDto) {
 
         let userDb = new UsersDB();
@@ -67,6 +68,9 @@ class UsersService {
     }
 
     async getUserByEmail(email: string) {
+        if (!email) {
+            return undefined;
+        }
         return await this.dataLayer.usersRepository.getUserByEmail(email);
     }
 }
