@@ -21,13 +21,18 @@ const loggerOptions: winston.LoggerOptions = {
 const logger: winston.Logger = winston.createLogger(loggerOptions);
 
 // Загрузили конфигу в глобальную переменную process
-dotenv.config( {path: "./config/.env"} );
+const dotenvResult = dotenv.config( {path: "./config/.env"} );
+if (dotenvResult.error) {
+    throw dotenvResult.error;
+}
 
 const port = Number.parseInt(process.env.PORT ?? "3000");
+const jwtSecret = process.env.JWT_SECRET || "My!@!Se3cr8tH4sh3";
+const jwtExpiration = (process.env.JWT_EXPIRATION && parseInt(process.env.JWT_EXPIRATION)) || 300;
 
 const gisApp = new GisApplication(logger, port);
 gisApp
-    .setUp("in-memory")
+    .setUp("in-memory", jwtSecret, jwtExpiration)
     .then(() => {
         gisApp.start();
     })

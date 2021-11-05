@@ -14,6 +14,7 @@ import { CommonRoutesConfig } from "./controllers/common.routes.config";
 import { UsersRoutes } from "./controllers/users/users.routes.config";
 import { TokenInjection } from "./infrastructure/token.injection";
 import { Connection, createConnection, getConnectionOptions } from "typeorm";
+import { AuthRoutes } from "./controllers/auth/auth.routes.config";
 
 class GisApplication {
     readonly port: number;
@@ -35,8 +36,11 @@ class GisApplication {
         this.routes = [];
     }
     
-    public async setUp(connectionName: string) {
+    public async setUp(connectionName: string, jwtSecret: string, jwtExpiration:number) {
         container.register<winston.Logger>(TokenInjection.LOGGER, { useValue: this.logger });
+        container.register(TokenInjection.JWT_SECRET, { useValue: jwtSecret });
+        container.register(TokenInjection.JWT_EXPIRATION, { useValue: jwtExpiration });
+        
         this.app = express();
         
         await this.dbInitialization(connectionName);
@@ -96,11 +100,12 @@ class GisApplication {
         // app.use(cors());
 
         this.routes.push(
-            container.resolve(UsersRoutes)
+            container.resolve(UsersRoutes),
+            container.resolve(AuthRoutes)
         );
         
         this.routes.forEach(route => {
-            route.configureRoutes(this.app as express.Application);
+            route.registerRoutes(this.app as express.Application);
         });
     }
 

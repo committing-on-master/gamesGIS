@@ -1,5 +1,5 @@
-import { SchemaValidationProps } from "src/controllers/schema.validation.type";
-import { CreateUserDto } from "src/services-layer/users/models/create.user.dto";
+import { SchemaValidationProps } from "../../common-types/schema.validation.type";
+import { CreateUserDto } from "../../../services-layer/users/models/create.user.dto";
 
 const createUserDtoSchema: SchemaValidationProps<CreateUserDto> = {
     email: {
