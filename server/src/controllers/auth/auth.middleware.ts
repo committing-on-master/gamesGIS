@@ -34,7 +34,7 @@ class AuthMiddleware extends CommonMiddleware {
         this.validJWTNeeded = this.validJWTNeeded.bind(this);
     }
 
-    authSchemaValidation() {
+    public authSchemaValidation() {
         return [
             body('email')
                 .notEmpty()
@@ -45,7 +45,7 @@ class AuthMiddleware extends CommonMiddleware {
         ]
     }
 
-    async verifyUserPassword(
+    public async verifyUserPassword(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
@@ -67,7 +67,7 @@ class AuthMiddleware extends CommonMiddleware {
         res.status(400).send({ errors: ['Invalid email and/or password'] });
     }
 
-    verifyRefreshBodyField(
+    public verifyRefreshBodyField(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
@@ -109,7 +109,7 @@ class AuthMiddleware extends CommonMiddleware {
         }
     }
 
-    validJWTNeeded(
+    public validJWTNeeded(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
