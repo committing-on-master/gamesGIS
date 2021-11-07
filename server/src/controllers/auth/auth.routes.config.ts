@@ -18,13 +18,13 @@ class AuthRoutes extends CommonRoutesConfig {
     }
 
     protected configureRoute(app: Application): Application {
-        app.post("/auth", 
+        app.post("/auth", // authentication request - "Это я, дай токен для проведения операции."
             this.middleware.authSchemaValidation(),
             this.middleware.schemaValidationResult,
             this.middleware.verifyUserPassword,
             this.controller.createJWT
         );
-        app.post("/auth/refresh-token",
+        app.post("/auth/refresh-token", // authentication request - "Это я, токен протух, дай новый"
             this.middleware.validJWTNeeded,
             this.middleware.verifyRefreshBodyField,
             this.middleware.validRefreshNeeded,

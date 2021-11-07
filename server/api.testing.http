@@ -22,7 +22,7 @@ Content-Type: application/json
 
 {
     "email": "marcos.henrique@toptal.com",
-    "password": "sup3rS3cr3tPassw0rd!23"
+    "password": "sup3rPassw0rd!23"
 }
 
 ### get запрос на информацию о пользователе
