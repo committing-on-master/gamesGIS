@@ -37,11 +37,18 @@ class AuthMiddleware extends CommonMiddleware {
     public authSchemaValidation() {
         return [
             body('email')
-                .notEmpty()
-                .isEmail(),
+                .exists({checkNull: true}).withMessage("email body field is missing").bail()
+                .isEmail().withMessage("email body field has wrong Email format").bail(),
             body('password')
-                .notEmpty()
-                .isString()
+                .exists({checkNull: true}).withMessage("password body field is missing").bail()
+                // .isStrongPassword({
+                //     minLength: 6,
+                //     minLowercase: 0,
+                //     minUppercase: 0,
+                //     minNumbers: 0,
+                //     minSymbols: 3
+                // })
+                .isLength({min: 6, max: 16}).withMessage("password field must contain more then 6 symbols and less then 16 symbols").bail()
         ]
     }
 
