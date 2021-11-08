@@ -2,10 +2,10 @@ import { ParamSchema } from 'express-validator';
 
 /**
  * Создаем тип для валидации полей request-а переданной DTO-шки
- * Выведенный тип будет требовать схему валидации для каждого not nullable свойства DTO объекта
+ * Выведенный тип будет требовать схему валидации для каждого свойства DTO объекта
  */
 type SchemaValidationProps<DTO> = {
-    [Property in keyof NonNullable<DTO>]: ParamSchema;
+    [Property in keyof Required<DTO>]: ParamSchema;
 };
 
 export { SchemaValidationProps };

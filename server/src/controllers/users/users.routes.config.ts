@@ -38,16 +38,12 @@ export class UsersRoutes extends CommonRoutesConfig {
             .get(this.usersController.getUserById)
             .delete(this.usersController.removeUser);
 
-        app.put(`/users/:userId`, [
-            this.usersMiddleware.validateRequiredUserBodyFields,
-            this.usersMiddleware.validateSameEmailBelongToSameUser,
-            this.usersController.put,
-        ]);
-
-        app.patch(`/users/:userId`, [
-            this.usersMiddleware.validatePatchEmail,
-            this.usersController.patch,
-        ]);
+        app.patch(`/users/:userId`,
+            this.usersMiddleware.earlyReturnPatchUser,
+            this.usersMiddleware.validatePatchUserSchema(),
+            this.usersMiddleware.schemaValidationResult,
+            this.usersController.patchUser,
+        );
 
         return app;
     }

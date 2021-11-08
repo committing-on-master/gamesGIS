@@ -1,11 +1,12 @@
 import { CreateUserDto } from './models/create.user.dto';
-import { PutUserDto } from './models/put.user.dto';
 import { PatchUserDto } from './models/patch.user.dto';
 import { inject, injectable } from 'tsyringe';
 import { DataLayer } from "../../data-layer/data.layer";
 import { UsersDB } from "../../data-layer/models/users.db";
 import winston from 'winston';
 import { TokenInjection } from '../../infrastructure/token.injection';
+import argon2 from 'argon2';
+import { nameofPropChecker } from '../../infrastructure/name.of.prop.checker';
 
 @injectable()
 class UsersService {
@@ -19,14 +20,60 @@ class UsersService {
         this.dataLayer = dataLayer;
     }
 
-    async create(resource: CreateUserDto) {
-
+    /**
+     * Создаем пользователя в системе
+     * @param resource поля для создания пользователя в базе
+     * @returns идентификатор созданного пользователя
+     */
+    public async createUser(resource: CreateUserDto): Promise<number> {
         let userDb = new UsersDB();
         userDb.email = resource.email;
         userDb.name = resource.name;
-        userDb.password = resource.password;
+        userDb.passwordHash = await argon2.hash(resource.password);
 
-        await this.dataLayer.usersRepository.addUser(userDb);
+        let result = await this.dataLayer.usersRepository.addUser(userDb);
+        return result.id;
+    }
+
+    /**
+     * Проверка данных пользователя на совпадение с ранее зарегистрированными пользователями
+     * @param resource поля нового пользователя
+     * @returns массив, содержащий сообщения об неверных полях (В случае успешной проверки, возвращает пустой массив)
+     */
+    public async checkUserDataAvailability(resource: CreateUserDto): Promise<{prop: string, msg:string}[]> {
+        let result: {prop: string, msg: string}[] = [];
+        if (await this.dataLayer.usersRepository.isNameAlreadyExist(resource.name)) {
+            result.push({
+                prop: nameofPropChecker<CreateUserDto>("name"),
+                msg: `"${resource.name}" is already in use`
+            });
+        }
+        if (await this.dataLayer.usersRepository.isEmailAlreadyExist(resource.email)) {
+            result.push({
+                prop: nameofPropChecker<CreateUserDto>("email"),
+                msg: `"${resource.email}" is already in use`
+            });
+        }
+        return result;
+    }
+
+    /**
+     * Обновляем данные пользователя в системе
+     * @param userId идентификатор пользователя
+     * @param resource обновляемые поля
+     */
+    public async updateUserById(userId: number, resource: PatchUserDto): Promise<void> {
+        let updatingUser = await this.dataLayer.usersRepository.findUserById(userId);
+        if (!updatingUser) {
+            return;
+        }
+        
+        updatingUser.email = resource.email ?? updatingUser.email;
+        updatingUser.name = resource.name ?? updatingUser.name;
+        if (resource.password) {
+            updatingUser.passwordHash = await argon2.hash(resource.password);
+        }
+        this.dataLayer.usersRepository.updateUser(userId, updatingUser);
     }
 
     async deleteById(userId: number) {
@@ -37,34 +84,8 @@ class UsersService {
         return await this.dataLayer.usersRepository.getUsers();
     }
 
-    async patchById(userId: number, resource: PatchUserDto) {
-        let entry = await this.dataLayer.usersRepository.findUserById(userId);
-        if (!entry) {
-            return;
-        }
-        entry.email = resource.email ?? entry.email;
-        entry.name = resource.name ?? entry.name;
-        entry.password = resource.password ?? entry.password;
-        entry.permissionLevel = resource.permissionFlags ?? entry.permissionLevel;
-        
-        return this.dataLayer.usersRepository.updateUser(entry);
-    }
-
     async readById(userId: number) {
         return await this.dataLayer.usersRepository.findUserById(userId);
-    }
-
-    async putById(userId: number, resource: PutUserDto) {
-        let entry = await this.dataLayer.usersRepository.findUserById(userId);
-        if (!entry) {
-            return;
-        }
-        entry.email = resource.email ?? entry.email;
-        entry.name = resource.name ?? entry.name;
-        entry.password = resource.password ?? entry.password;
-        entry.permissionLevel = resource.permissionFlags ?? entry.permissionLevel;
-        
-        return this.dataLayer.usersRepository.updateUser(entry);
     }
 
     async getUserByEmail(email: string) {

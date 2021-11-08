@@ -12,7 +12,7 @@ content-type: application/json
 
 {
     "email": "marcos.henrique@toptal.com",
-    "password": "sup3rS3cr3tPassw0rd!23",
+    "password": "Passw0rd!23",
     "name": "Marcoss"
 }
 
@@ -33,7 +33,7 @@ GET http://localhost:3000/users/1
 DELETE http://localhost:3000/users/2 HTTP/1.1
 
 ### put запрос на изменение данных
-PUT http://localhost:3000/users/1
+PATCH http://localhost:3000/users/1
 Content-Type: application/json
 
 {

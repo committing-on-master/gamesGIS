@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { request } from 'express';
 import { inject, injectable } from 'tsyringe';
 import { validationResult, body, checkSchema } from "express-validator";
 import { ServicesLayer } from '../../services-layer/services.layer';
@@ -6,6 +6,7 @@ import { createUserDtoSchema } from './models.schema/create.user.dto.schema';
 import { CommonMiddleware } from '../common.middleware';
 import { TokenInjection } from '../../infrastructure/token.injection';
 import winston from 'winston';
+import { patchUserDtoSchema } from './models.schema/update.user.dto.schema';
 
 @injectable()
 class UsersMiddleware extends CommonMiddleware {
@@ -25,22 +26,37 @@ class UsersMiddleware extends CommonMiddleware {
         this.validateCreateUserSchema = this.validateCreateUserSchema.bind(this);
     }
 
-    validateCreateUserSchema() {
-        return checkSchema(createUserDtoSchema)
+    /**
+     * Генерируем по схеме модели DTOшки создания пользователя проверочную цепочку
+     * @returns ValidationChain для модели
+     */
+    public validateCreateUserSchema() {
+        return checkSchema(createUserDtoSchema);
     }
 
-    async validateRequiredUserBodyFields(
+    /**
+     * Генерируем по схеме модели DTOшки создания пользователя проверочную цепочку
+     * @returns ValidationChain для модели
+     */
+    public validatePatchUserSchema() {
+        return checkSchema(patchUserDtoSchema);
+    }
+
+    /**
+     * Ранний возврат для Patch endpoint-а. Так как все поля модели могут быть пустыми
+     */
+    public earlyReturnPatchUser(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
     ) {
-        body()
-        if (req.body && req.body.email && req.body.password) {
-            next();
+        if (req.body?.email 
+            || req.body?.password 
+            || req.body?.name
+            ) {
+                next();
         } else {
-            res.status(400).send({
-                error: `Missing required fields email and password`,
-            });
+            res.status(200).send({msg: "All update field are empty"});
         }
     }
 

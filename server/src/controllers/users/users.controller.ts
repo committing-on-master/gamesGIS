@@ -1,10 +1,4 @@
-// we import express to add types to the request/response objects from our controller functions
 import express from "express";
-
-// we import the argon2 library for password hashing
-import argon2 from 'argon2';
-
-// we use debug with a custom context as described in Part 1
 import { ServicesLayer } from "../../services-layer/services.layer";
 import { inject, injectable } from "tsyringe";
 import { CommonController } from "../common.controller";
@@ -23,11 +17,52 @@ class UsersController extends CommonController {
         this.listUsers = this.listUsers.bind(this);
         this.getUserById = this.getUserById.bind(this);
         this.createUser = this.createUser.bind(this);
-        this.patch = this.patch.bind(this);
-        this.put = this.put.bind(this);
+        this.patchUser = this.patchUser.bind(this);
         this.removeUser = this.removeUser.bind(this);
     }
-    
+
+    public async createUser(req: express.Request, res: express.Response) {
+        try {
+            let errorMsgs = await this.services.usersService.checkUserDataAvailability(req.body);
+            if (errorMsgs.length !== 0) {
+                let formatErrors = (errors: {prop: string, msg:string}[]) => {
+                    let result: {value: string, msg: string, param: string, location:string}[] = [];
+                    errors.forEach(error => {
+                        result.push({
+                            location: "body",
+                            msg: error.msg,
+                            param: error.prop,
+                            value: req.body[error.prop]                            
+                        });
+                    });
+                    return result;
+                }
+
+                let someRes = formatErrors(errorMsgs);
+                return res.status(409).json({ errors: someRes });
+            }
+
+            let userId = await this.services.usersService.createUser(req.body);
+            res.status(201).send({ msg: "user registered" });
+        } catch (error) {
+            this.logger.error('UsersController.createUser error', error);
+            return res.status(500).send();
+        }
+    }
+
+    /**
+     * endpoint по обновлению данных пользователя
+     */
+    async patchUser(req: express.Request, res: express.Response) {
+        try {
+            await this.services.usersService.updateUserById(req.body.id, req.body);
+            res.status(200).send({ msg: "user data updates successfully" });
+        } catch (error) {
+            this.logger.error('UsersController.patchUser error', error);
+            return res.status(500).send();
+        }
+    }
+
     async listUsers(req: express.Request, res: express.Response) {
         const users = await this.services.usersService.list(100, 0);
         res.status(200).send(users);
@@ -36,26 +71,6 @@ class UsersController extends CommonController {
     async getUserById(req: express.Request, res: express.Response) {
         const user = await this.services.usersService.readById(req.body.id);
         res.status(200).send(user);
-    }
-
-    async createUser(req: express.Request, res: express.Response) {
-        req.body.password = await argon2.hash(req.body.password);
-        const userId = await this.services.usersService.create(req.body);
-        res.status(201).send({ id: userId });
-    }
-
-    async patch(req: express.Request, res: express.Response) {
-        if (req.body.password) {
-            req.body.password = await argon2.hash(req.body.password);
-        }
-        await this.services.usersService.patchById(req.body.id, req.body);
-        res.status(204).send();
-    }
-
-    async put(req: express.Request, res: express.Response) {
-        req.body.password = await argon2.hash(req.body.password);
-        await this.services.usersService.putById(req.body.id, req.body);
-        res.status(204).send();
     }
 
     async removeUser(req: express.Request, res: express.Response) {

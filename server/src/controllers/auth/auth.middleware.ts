@@ -13,7 +13,7 @@ import { Jwt } from '../common-types/jwt';
 interface IUser {
     id: number;
     email: string;
-    password: string;
+    passwordHash: string;
     permissionLevel: number;
 }
 
@@ -59,7 +59,7 @@ class AuthMiddleware extends CommonMiddleware {
     ) {
         let user: IUser | undefined = await this.services.usersService.getUserByEmail(req.body.email);
         if (user) {
-            const passwordHash = user.password;
+            const passwordHash = user.passwordHash;
             if (await argon2.verify(passwordHash, req.body.password)) {
                 req.body = {
                     userId: user.id,

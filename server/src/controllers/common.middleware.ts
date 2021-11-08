@@ -13,6 +13,10 @@ abstract class CommonMiddleware {
         this.schemaValidationResult = this.schemaValidationResult.bind(this);
     }
 
+    /**
+     * Проверяет request на предмет результатов работы express validator-a.
+     * При наличие ошибок, возвращает response с кодом ошибки
+     */
     public schemaValidationResult(
         req: express.Request,
         res: express.Response,
