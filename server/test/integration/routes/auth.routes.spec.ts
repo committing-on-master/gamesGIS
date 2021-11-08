@@ -29,7 +29,7 @@ describe("Сценарии создания JWT токена",function(){
     const serviceLayer: ServicesLayer = instance(mockedServiceLayer);
 
     const authMiddleware = new AuthMiddleware(loggerStub, jwtSecret, serviceLayer);
-    const authController = new AuthController(loggerStub, jwtSecret, jwtExpiration);
+    const authController = new AuthController(loggerStub, jwtSecret, jwtExpiration, serviceLayer);
 
     const testInstance: AuthRoutes = new AuthRoutes(loggerStub, authController, authMiddleware);
 
@@ -92,3 +92,14 @@ describe("Сценарии создания JWT токена",function(){
         });
     })
 });
+
+/**
+ * ЖВТ сценарии работы
+ * Что лежит в токене
+ *  - идентификатор
+ *  - пермишшен левел
+ * 1) Создание ЖВТ
+ * Приходит запрос, с паролем и идентификатором, создаем два токена (авторизационный + перевыпуск)
+ * 
+ * 
+ */

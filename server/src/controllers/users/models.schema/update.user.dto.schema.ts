@@ -1,17 +1,17 @@
-import { SchemaValidationProps } from "../../common-types/schema.validation.type";
-import { CreateUserDto } from "../../../services-layer/users/models/create.user.dto";
+import { SchemaValidationProps } from "../../../controllers/common-types/schema.validation.type";
+import { PatchUserDto } from "../../../services-layer/users/models/patch.user.dto";
 
-const createUserDtoSchema: SchemaValidationProps<CreateUserDto> = {
+const patchUserDtoSchema: SchemaValidationProps<PatchUserDto> = {
     email: {
         in: ["body"],
-        exists: { errorMessage: "email body field is missing" },
+        optional: true,
         isEmpty: { negated: true, options:{ ignore_whitespace: true }, errorMessage: "email body field is empty" },
         trim: true,
         isEmail: { errorMessage: "wrong email format" }
     },
     password: {
         in: ["body"],
-        exists: { errorMessage: "password body field is missing" },
+        optional: true,
         isEmpty: { negated:true, options:{ ignore_whitespace: true }, errorMessage: "password body field is empty" },
         isStrongPassword: {
             options: {
@@ -22,7 +22,7 @@ const createUserDtoSchema: SchemaValidationProps<CreateUserDto> = {
     },
     name: {
         in: ["body"],
-        exists: { errorMessage: "name body field is missing" },
+        optional: true,
         isEmpty: { negated: true, options:{ ignore_whitespace: true }, errorMessage: "name body field is empty" },
         trim: true,
         isLength: {
@@ -32,4 +32,4 @@ const createUserDtoSchema: SchemaValidationProps<CreateUserDto> = {
     }
 }
 
-export { createUserDtoSchema }
+export { patchUserDtoSchema }

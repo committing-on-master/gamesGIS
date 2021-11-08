@@ -16,7 +16,7 @@ class UsersDB {
     email!: string;
 
     @Column(/*{length: 128}*/)
-    password!: string;
+    passwordHash!: string;
 
     @Column({length: 30})
     name!: string;

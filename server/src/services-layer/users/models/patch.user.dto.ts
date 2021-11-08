@@ -1,3 +1,6 @@
-import { PutUserDto } from "./put.user.dto";
-
-export interface PatchUserDto extends Partial<PutUserDto> {}
+interface PatchUserDto {
+    email?: string;
+    password?: string;
+    name?: string;
+}
+export { PatchUserDto }
