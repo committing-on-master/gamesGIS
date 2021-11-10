@@ -7,12 +7,14 @@ import { TokenInjection } from '../../infrastructure/token.injection';
 import winston from 'winston';
 import { CommonController } from '../common.controller';
 import { ServicesLayer } from '../../services-layer/services.layer';
+import { JwtPayload } from '../common-types/jwt.payload';
+import { body } from 'express-validator';
 
 interface IUser {
     id: number;
     email: string;
     passwordHash: string;
-    permissionLevel: number;
+    permissionFlag: number;
 }
 
 @singleton()
@@ -34,21 +36,32 @@ class AuthController extends CommonController {
         this.createJWT = this.createJWT.bind(this);
     }
 
+    
+
     public async createJWT(req: express.Request, res: express.Response) {
         try {
-            const refreshId = req.body.userId + this.jwtSecret;
+            const userId = parseInt(req.body?.userId);
+            const user = await this.services.usersService.getUserById(userId);
+            if (!user) {
+                return res.status(404).send({errors: ["user is not exist"]})
+            }
+
+            let jwtPayload: JwtPayload = {
+                userId: user.id,
+                permissionFlag: user.permissionFlag
+            };
+
             const salt = crypto.createSecretKey(crypto.randomBytes(16));
-            const hash = crypto
-                .createHmac('sha512', salt)
-                .update(refreshId)
-                .digest('base64');
-            req.body.refreshKey = salt.export();
-            const token = jwt.sign(req.body, this.jwtSecret, {
-                expiresIn: this.tokenExpirationInSeconds,
-            });
+            const refreshToken = crypto.createHmac('sha512', salt)
+                                       .update(user.email)
+                                       .digest('base64');
+            
+            const token = jwt.sign(jwtPayload, this.jwtSecret, { expiresIn: this.tokenExpirationInSeconds });
+            await this.services.usersService.updateUserRefreshToken(userId, refreshToken);
+
             return res
                 .status(201)
-                .send({ accessToken: token, refreshToken: hash });
+                .send({ accessToken: token, refreshToken: refreshToken });
         } catch (err) {
             this.logger.error('createJWT error', err);
             return res.status(500).send();

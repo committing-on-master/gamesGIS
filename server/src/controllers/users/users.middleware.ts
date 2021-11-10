@@ -78,8 +78,7 @@ class UsersMiddleware extends CommonMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        const user = await this.services.usersService.getUserByEmail(req.body.email);
-        if (user && user.id?.toString() === req.params.userId) {
+        if (res.locals.user.id === req.params.userId) {
             next();
         } else {
             res.status(400).send({ error: `Invalid email` });
@@ -109,8 +108,9 @@ class UsersMiddleware extends CommonMiddleware {
                 error: `User ${req.params.userId} not a number`,
             });
         }
-        const user = await this.services.usersService.readById(parseInt(req.params.userId));
+        const user = await this.services.usersService.getUserById(parseInt(req.params.userId));
         if (user) {
+            res.locals.user = user;
             next();
         } else {
             res.status(404).send({
@@ -126,6 +126,23 @@ class UsersMiddleware extends CommonMiddleware {
     ) {
         req.body.id = req.params.userId;
         next();
+    }
+
+    async userCantChangePermission(
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+    ) {
+        if (
+            'permissionFlags' in req.body &&
+            req.body.permissionFlags !== res.locals.user.permissionFlags
+        ) {
+            res.status(400).send({
+                errors: ['User cannot change permission flags'],
+            });
+        } else {
+            next();
+        }
     }
 }
 

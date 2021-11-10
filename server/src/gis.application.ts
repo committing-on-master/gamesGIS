@@ -36,10 +36,11 @@ class GisApplication {
         this.routes = [];
     }
     
-    public async setUp(connectionName: string, jwtSecret: string, jwtExpiration:number) {
+    public async setUp(connectionName: string, jwtSecret: string, jwtExpiration:number, refreshTokenExpiration: number) {
         container.register<winston.Logger>(TokenInjection.LOGGER, { useValue: this.logger });
         container.register(TokenInjection.JWT_SECRET, { useValue: jwtSecret });
         container.register(TokenInjection.JWT_EXPIRATION, { useValue: jwtExpiration });
+        container.register(TokenInjection.REFRESH_TOKEN_EXPIRATION, { useValue: refreshTokenExpiration});
         
         this.app = express();
         

@@ -7,15 +7,8 @@ import { TokenInjection } from '../../infrastructure/token.injection';
 import winston from 'winston';
 import { body } from 'express-validator';
 import crypto from 'crypto';
-import jwt from 'jsonwebtoken';
-import { Jwt } from '../common-types/jwt';
-
-interface IUser {
-    id: number;
-    email: string;
-    passwordHash: string;
-    permissionLevel: number;
-}
+import jwt, { VerifyOptions } from 'jsonwebtoken';
+import { JwtPayload } from '../common-types/jwt.payload';
 
 @injectable()
 class AuthMiddleware extends CommonMiddleware {
@@ -57,23 +50,24 @@ class AuthMiddleware extends CommonMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        let user: IUser | undefined = await this.services.usersService.getUserByEmail(req.body.email);
-        if (user) {
-            const passwordHash = user.passwordHash;
-            if (await argon2.verify(passwordHash, req.body.password)) {
-                req.body = {
-                    userId: user.id,
-                    email: user.email,
-                    permissionLevel: user.permissionLevel,
-                };
-                return next();
+        try {
+            const user = await this.services.usersService.getUserByEmail(req.body.email);            
+            if (user) {
+                const passwordHash = user.passwordHash;
+                if (await argon2.verify(passwordHash, req.body.password)) {
+                    return next();
+                }
             }
+            res.status(403).send({ errors: ['Invalid email and/or password'] });
+        } catch (error) {
+            this.logger.error(`${this.name}.verifyUserPassword`, error);
+            return res.status(500).send();
         }
-        // Giving the same message in both cases
-        // helps protect against cracking attempts:
-        res.status(400).send({ errors: ['Invalid email and/or password'] });
     }
 
+    /**
+     * Проверка наличия refresh токена
+     */
     public verifyRefreshBodyField(
         req: express.Request,
         res: express.Response,
@@ -88,34 +82,74 @@ class AuthMiddleware extends CommonMiddleware {
         }
     }
 
-    async validRefreshNeeded(
+    /**
+     * Проверяем полученный refresh token с ранее сгенерированным эталоном
+     */
+    public async validRefreshNeeded(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
     ) {
         try {
-            const user:any = await this.services.usersService.getUserByEmail(res.locals.jwt.email);
-            const salt = crypto.createSecretKey(Buffer.from(res.locals.jwt.refreshKey.data));
-            const hash = crypto
-                .createHmac('sha512', salt)
-                .update(res.locals.jwt.userId + this.jwtSecret)
-                .digest('base64');
-            if (hash === req.body.refreshToken) {
-                req.body = {
-                    userId: user._id,
-                    email: user.email,
-                    permissionFlags: user.permissionFlags,
-                };
-                return next();
+            const jwtPayload = res.locals.jwt as JwtPayload;            
+            const savedRefreshToken = await this.services.usersService.getRefreshTokenByUserId(jwtPayload.userId);
+            if (!savedRefreshToken) {
+                this.logger.error(`${this.name}.validRefreshNeeded refresh token not found, but access token exist`);
+                return res.status(500).send();
+            }
+            if (savedRefreshToken.revoked || ((savedRefreshToken.expiredDate < new Date()))) {
+                return res.status(401).send({ errors: ["refresh token was revoked or expired"] });
+            }
+            if (req.body?.refreshToken === savedRefreshToken.token) {
+                let user = await this.services.usersService.getUserById(jwtPayload.userId);
+                if (!user) {
+                    return res.status(404).send({errors: ["user is not exist"]});
+                }
+                req.body.userId = jwtPayload.userId;
+                req.body.email = user.email;
+
+                next();
             } else {
-                return res.status(400).send({ errors: ['Invalid refresh token'] });
+                return res.status(400).send({ errors: ["Invalid refresh token"] });
             }
         } catch (error) {
-            this.logger.error('AuthMiddleware.validRefreshNeeded', error);
+            this.logger.error(`${this.name}.validRefreshNeeded`, error);
             return res.status(500).send();
         }
     }
 
+    public jwtTokenValidation(options: VerifyOptions = {}){
+        const execParam = {
+            options: options,
+            jwtSecret: this.jwtSecret
+        };
+        return function(req: express.Request,
+                        res: express.Response,
+                        next: express.NextFunction) {
+            if (req.headers['authorization']) {
+                try {
+                    const authorization = req.headers['authorization'].split(' ');
+                    if (authorization[0] !== 'Bearer') {
+                        return res.status(401).send();
+                    } else {
+                        res.locals.jwt = jwt.verify(
+                            authorization[1],
+                            execParam.jwtSecret,
+                            execParam.options
+                        ) as JwtPayload;
+                        next();
+                    }
+                } catch (err) {
+                    return res.status(403).send();
+                }
+            } else {
+                return res.status(401).send();
+            }
+        }   
+    }
+    /**
+     * Получает из заголовка jwt объект, проверяет подлинность его подписи
+     */
     public validJWTNeeded(
         req: express.Request,
         res: express.Response,
@@ -130,7 +164,7 @@ class AuthMiddleware extends CommonMiddleware {
                     res.locals.jwt = jwt.verify(
                         authorization[1],
                         this.jwtSecret
-                    ) as Jwt;
+                    ) as JwtPayload;
                     next();
                 }
             } catch (err) {

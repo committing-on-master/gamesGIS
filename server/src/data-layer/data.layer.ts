@@ -3,6 +3,7 @@ import { inject, singleton } from 'tsyringe';
 import { Connection } from 'typeorm';
 import winston from 'winston';
 import { UsersRepository } from './repositories/users.repository';
+import { RefreshTokensRepository } from './repositories/refresh.tokens.repository';
 
 @singleton()
 class DataLayer {
@@ -18,6 +19,11 @@ class DataLayer {
     public get usersRepository(): UsersRepository {
         return this.dbContext.getCustomRepository(UsersRepository);
     }
+
+    public get refreshTokensRepository() : RefreshTokensRepository {
+        return this.dbContext.getCustomRepository(RefreshTokensRepository);
+    }
+    
 }
 
 export { DataLayer }
