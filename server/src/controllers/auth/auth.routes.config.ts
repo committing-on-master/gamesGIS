@@ -25,7 +25,7 @@ class AuthRoutes extends CommonRoutesConfig {
             this.controller.createJWT
         );
         app.post("/auth/refresh-token", // authentication request - "Это я, токен протух, дай новый"
-            this.middleware.validJWTNeeded,
+            this.middleware.jwtTokenValidation({ignoreExpiration: true}),
             this.middleware.verifyRefreshBodyField,
             this.middleware.validRefreshNeeded,
             this.controller.createJWT

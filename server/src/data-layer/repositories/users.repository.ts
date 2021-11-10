@@ -1,15 +1,15 @@
 import { EntityRepository, AbstractRepository } from "typeorm";
-import { UsersDB } from "../models/users.db";
+import { UsersDAO } from "../models/users.dao";
 
-@EntityRepository(UsersDB)
-class UsersRepository extends AbstractRepository<UsersDB> {
+@EntityRepository(UsersDAO)
+class UsersRepository extends AbstractRepository<UsersDAO> {
 
     /**
      * Сохраняет пользователя вв базе данных
      * @param user объект содержащий поля для сохранения
      * @returns сохраненная сущность, с присвоенным идентификатором
      */
-    public async addUser(user: UsersDB) {
+    public async addUser(user: UsersDAO): Promise<UsersDAO> {
         return await this.repository.save(user);
     }
 
@@ -25,18 +25,16 @@ class UsersRepository extends AbstractRepository<UsersDB> {
         return await this.repository.findOne(userId) ? true : false;
     }
 
-    public async findUserByEmail(usersEmail: string): Promise<UsersDB | undefined> {
+    public async findUserByEmail(usersEmail: string): Promise<UsersDAO | undefined> {
         return await this.repository.findOne({where: {email: usersEmail}})
     }
 
-    public async updateUser(userId: number, user: Partial<UsersDB>): Promise<void> {
+    public async updateUser(userId: number, user: Partial<UsersDAO>): Promise<void> {
         await this.repository.update(userId, user);
     }
     
-
     public async findUserById(userId: number) {
-        let result = await this.repository.findOne(userId);
-        return result;
+        return await this.repository.findOne(userId);
     }
 
     public async removeUserById(userId: number) {

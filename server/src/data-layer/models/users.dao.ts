@@ -1,12 +1,13 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { RefreshTokensDao } from "./refresh.tokens.dao";
 
 /**
  * Табличка пользователей в базе данных
  */
 @Entity()
-class UsersDB {
+class UsersDAO {
     constructor() {
-        this.permissionLevel = 1;
+        this.permissionFlag = 1;
     }
     
     @PrimaryGeneratedColumn()
@@ -22,10 +23,13 @@ class UsersDB {
     name!: string;
 
     @Column()
-    permissionLevel: number;
+    permissionFlag: number;
 
     @CreateDateColumn()
     registrationDate!: Date;
+
+    @OneToOne(() => RefreshTokensDao)
+    refreshToken?: RefreshTokensDao;
 }
 
-export { UsersDB }
+export { UsersDAO }

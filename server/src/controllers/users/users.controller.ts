@@ -45,7 +45,7 @@ class UsersController extends CommonController {
             let userId = await this.services.usersService.createUser(req.body);
             res.status(201).send({ msg: "user registered" });
         } catch (error) {
-            this.logger.error('UsersController.createUser error', error);
+            this.logger.error(`${this.name}.createUser error`, error);
             return res.status(500).send();
         }
     }
@@ -64,12 +64,13 @@ class UsersController extends CommonController {
     }
 
     async listUsers(req: express.Request, res: express.Response) {
+        // res.locals = { name: "SomeName", sometext: "sometextinresponse" };
         const users = await this.services.usersService.list(100, 0);
         res.status(200).send(users);
     }
 
     async getUserById(req: express.Request, res: express.Response) {
-        const user = await this.services.usersService.readById(req.body.id);
+        const user = await this.services.usersService.getUserById(req.body.id);
         res.status(200).send(user);
     }
 

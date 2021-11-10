@@ -4,7 +4,7 @@ module.exports = [
         type: "sqlite",
         database: ":memory:",
         synchronize: true,
-        entities: [__dirname + "\\dist\\src\\data-layer\\models\\*.db.js"],
+        entities: [__dirname + "\\dist\\src\\data-layer\\models\\*.dao.js"],
         logging: ["query", "error", "info", "log"]
     },
     {
@@ -12,7 +12,7 @@ module.exports = [
         type: "sqlite",
         database: "test.db",
         // dropSchema: true,
-        entities: [__dirname + "\\dist\\src\\data-layer\\models\\*db.js"],
+        entities: [__dirname + "\\dist\\src\\data-layer\\models\\*.dao.js"],
         logging: ["query", "error", "info", "log"]
     }
 ]

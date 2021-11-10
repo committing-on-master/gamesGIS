@@ -2,21 +2,29 @@ import { CreateUserDto } from './models/create.user.dto';
 import { PatchUserDto } from './models/patch.user.dto';
 import { inject, injectable } from 'tsyringe';
 import { DataLayer } from "../../data-layer/data.layer";
-import { UsersDB } from "../../data-layer/models/users.db";
+import { UsersDAO } from "../../data-layer/models/users.dao";
 import winston from 'winston';
 import { TokenInjection } from '../../infrastructure/token.injection';
 import argon2 from 'argon2';
 import { nameofPropChecker } from '../../infrastructure/name.of.prop.checker';
+import { RefreshTokensDao } from '../../data-layer/models/refresh.tokens.dao';
 
 @injectable()
 class UsersService {
-    readonly dataLayer: DataLayer;
-    readonly logger: winston.Logger;
+    private readonly dataLayer: DataLayer;
+    private readonly logger: winston.Logger;
+    /**
+     * Срок жизни refresh token-а в днях
+     */
+    private readonly refreshTokenExpiration: number;
 
-    constructor(@inject(TokenInjection.LOGGER) logger: winston.Logger, dataLayer: DataLayer) {
+    constructor(@inject(TokenInjection.LOGGER) logger: winston.Logger,
+                @inject(TokenInjection.REFRESH_TOKEN_EXPIRATION) expirationTime: number,
+                dataLayer: DataLayer) {
         this.logger = logger;
         this.logger.info("UsersService creation");
         
+        this.refreshTokenExpiration = expirationTime;
         this.dataLayer = dataLayer;
     }
 
@@ -26,7 +34,7 @@ class UsersService {
      * @returns идентификатор созданного пользователя
      */
     public async createUser(resource: CreateUserDto): Promise<number> {
-        let userDb = new UsersDB();
+        let userDb = new UsersDAO();
         userDb.email = resource.email;
         userDb.name = resource.name;
         userDb.passwordHash = await argon2.hash(resource.password);
@@ -76,23 +84,50 @@ class UsersService {
         this.dataLayer.usersRepository.updateUser(userId, updatingUser);
     }
 
+    public async updateUserRefreshToken(userId: number, token: string): Promise<void> {
+        let user = await this.dataLayer.usersRepository.findUserById(userId);
+        if (user) {
+            let existedToken = await this.dataLayer.refreshTokensRepository.findTokenByUserId(userId);
+            if (existedToken) {
+                existedToken.expiredDate = this.getRefreshTokenExpirationDate();
+                this.dataLayer.refreshTokensRepository.updateToken(existedToken);
+            } else {
+                let newToken = new RefreshTokensDao();
+                newToken.revoked = false;
+                newToken.user = user;
+                newToken.expiredDate = this.getRefreshTokenExpirationDate();
+                
+                this.dataLayer.refreshTokensRepository.addToken(newToken);
+            }
+        }
+    }
+
+    public async getRefreshTokenByUserId(userId: number): Promise<RefreshTokensDao | undefined> {
+        return await this.dataLayer.refreshTokensRepository.findTokenByUserId(userId);
+    }
+    
+    public async getUserByEmail(email: string) {
+        if (!email) {
+            return undefined;
+        }
+        return await this.dataLayer.usersRepository.getUserByEmail(email);
+    }
+
+    public async getUserById(userId: number) {
+        return await this.dataLayer.usersRepository.findUserById(userId);
+    }
+
+    private getRefreshTokenExpirationDate(): Date {
+        let currentDate = new Date();
+        return new Date(currentDate.getDate() + this.refreshTokenExpiration);
+    }
+
     async deleteById(userId: number) {
         return this.dataLayer.usersRepository.removeUserById(userId);
     }
 
     async list(limit: number, page: number) {
         return await this.dataLayer.usersRepository.getUsers();
-    }
-
-    async readById(userId: number) {
-        return await this.dataLayer.usersRepository.findUserById(userId);
-    }
-
-    async getUserByEmail(email: string) {
-        if (!email) {
-            return undefined;
-        }
-        return await this.dataLayer.usersRepository.getUserByEmail(email);
     }
 }
 

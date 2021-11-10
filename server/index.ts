@@ -29,10 +29,11 @@ if (dotenvResult.error) {
 const port = Number.parseInt(process.env.PORT ?? "3000");
 const jwtSecret = process.env.JWT_SECRET || "My!@!Se3cr8tH4sh3";
 const jwtExpiration = (process.env.JWT_EXPIRATION && parseInt(process.env.JWT_EXPIRATION)) || 300;
+const refreshTokenExpiration = (process.env.REFRESH_TOKEN_EXPIRATION && parseInt(process.env.REFRESH_TOKEN_EXPIRATION)) || 10;
 
 const gisApp = new GisApplication(logger, port);
 gisApp
-    .setUp("in-memory", jwtSecret, jwtExpiration)
+    .setUp("in-memory", jwtSecret, jwtExpiration, refreshTokenExpiration)
     .then(() => {
         gisApp.start();
     })
