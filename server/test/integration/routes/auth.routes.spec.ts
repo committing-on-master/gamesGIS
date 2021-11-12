@@ -1,12 +1,12 @@
 import "reflect-metadata";
 import argon2 from "argon2";
-import chai, { expect } from "chai";
+import { expect } from "chai";
 import express from "express";
 import supertestServ from "supertest";
 import crypto from 'crypto';
 import jwt from "jsonwebtoken";
 import winston from "winston";
-import { anyString, instance, mock, reset, resetCalls, verify, when } from "ts-mockito";
+import { anyString, mock, verify, when } from "ts-mockito";
 
 import { AuthController } from "../../../src/controllers/auth/auth.controller";
 import { AuthMiddleware } from "../../../src/controllers/auth/auth.middleware";
@@ -16,64 +16,8 @@ import { UsersService } from "../../../src/services-layer/users/users.service";
 import { JwtPayload } from "../../../src/controllers/common-types/jwt.payload";
 import { UsersDAO } from "../../../src/data-layer/models/users.dao";
 import { RefreshTokensDao } from "../../../src/data-layer/models/refresh.tokens.dao";
-import { addAbortSignal } from "stream";
-
-/**
- * Хелпер помогающий работать с ts-mockito
- * Необходимый из-за его странной механики:
- * - вначале сделать прокси объект
- * - потом наворотить на него функциональность
- * - и лишь в конце получить готовую сущность для теста, запретив при этом регистрировать на нее доп функциональность
- */
-class Brick<T> {
-    readonly proxy: T;
-    private mock?: T;
-
-    /**
-     * Создает обертку вокруг proxy: T сущности
-     * @param proxy Созданный ранее прокси объект, для случаев каких-то нестандартных регистраций
-     * @description Если при тестах улетаешь в таймаут, возможно прокси создан не верно и getter Instance залипает на создании финальной сущности.
-     * Проверь доку ts-mockito, возможность мокаешь не верно.
-     */
-    constructor(proxy: T) {
-        this.proxy = proxy;
-    }
-
-    /**
-     * Предоставляет коллбэк, прокидывая внутрь прокси-мок объект, позволяя повешать на него требуемую функциональность
-     * @param callBack колллбэк для определения функциональности
-     * @returns Текущий объект, позволяя собирать цепочку расширяющих колбэков.
-     */
-    public addMock(callBack: (proxy: T) => any ): Brick<T> {
-        if (!mock) {
-            throw new Error("Proxy object locked because instance already created.");
-        }
-        callBack(this.proxy);
-        return this;
-    }
-    /**
-     * Сбрасывает счетчик вызовов методов/полей на mock объекте
-     */
-    public resetCalls() { resetCalls(this.proxy); }
-    /**
-     * Сбрасывает всю зарегистрированную функциональность на mock объекте
-     */
-    public reset() {
-        reset(this.proxy);
-        this.mock = undefined; 
-    }
-    
-    /**
-     * Заворачивает прокси-мок в результирующий объект
-     * Кэширует результат
-     */
-    public get Instance() : T {
-        if (!this.mock) {
-            this.mock = instance(this.proxy);
-        }
-        return this.mock;
-    }
-}
+import { Brick } from "../../helpers/brick";
+import { TestDataBuilder } from "./../../helpers/test.data.builder";
 
 class TestData {
     logger = new Brick(mock<winston.Logger>());
@@ -86,30 +30,18 @@ class TestData {
     jwtExpiration: number = 60;
 }
 
-class TestDataBuilder {
-    data: TestData;
-    
+class AuthTestDataBuilder extends TestDataBuilder<TestData, AuthRoutes> {    
     authMiddleware?: AuthMiddleware;
     authController?: AuthController;
-    testRoutes?: AuthRoutes;    
 
     constructor(){
-        this.data = new TestData();
+        super(new TestData());
         this.defaultPremitiveValues();
     }
 
     private defaultPremitiveValues(){
         this.data.jwtSecret = "S#cReT$tr1ng";
         this.data.jwtExpiration = 60;
-    }
-
-    public addStep(callback: (d: TestData) => void): TestDataBuilder {
-        callback(this.data);
-        return this;
-    }
-
-    public get Data(): TestData {
-        return this.data;
     }
 
     public reset() {
@@ -122,7 +54,7 @@ class TestDataBuilder {
         this.defaultPremitiveValues();        
     }
 
-    public getTestedInstance(): AuthRoutes {
+    public get TestedInstance(): AuthRoutes {
         this.data.serviceLayer.addMock(layer => when(layer.usersService).thenReturn(this.data.userService.Instance));
 
         this.authController = this.authController ?? new AuthController(this.data.logger.Instance, 
@@ -134,15 +66,15 @@ class TestDataBuilder {
                                                                         this.data.jwtSecret,
                                                                         this.data.serviceLayer.Instance);
 
-        this.testRoutes = this.testRoutes ?? new AuthRoutes(this.data.logger.Instance,
+        this.testedInstance = this.testedInstance ?? new AuthRoutes(this.data.logger.Instance,
                                                             this.authController,
                                                             this.authMiddleware);
-        return this.testRoutes;
+        return this.testedInstance;
     }
 }
 
 describe("Сценарии создания JWT токена", function(){
-    let builder = new TestDataBuilder();
+    let builder = new AuthTestDataBuilder();
     let expressApp: express.Application;
 
     /**
@@ -157,7 +89,7 @@ describe("Сценарии создания JWT токена", function(){
     context("Группа тестов на валидацию схемы полей генерации нового токена", function() {
         before(function() {
             manualResetTestInstances();
-            builder.getTestedInstance().registerRoutes(expressApp);
+            builder.TestedInstance.registerRoutes(expressApp);
         })
         const requestsBody: {msg: string, body: string, expected: {code: number, problemField: string }}[] = [
             {
@@ -230,9 +162,10 @@ describe("Сценарии создания JWT токена", function(){
                                         .addMock(user => when(user.id).thenReturn(userId))
                                         .addMock(user => when(user.email).thenReturn(email)) })
             // мок сервиса возвращает модельку userdb
-            .addStep(d=> d.userService.addMock(uService => when(uService.getUserByEmail(email)).thenResolve(d.usersStub.Instance) ))
+            .addStep(d=> d.userService.addMock(uService => when(uService.getUserByEmail(email)).thenResolve(d.usersStub.Instance))
+                                      .addMock(uService => when(uService.getUserById(userId)).thenResolve(d.usersStub.Instance)))
             // регаем роуты на тестовый экспресс
-            .getTestedInstance().registerRoutes(expressApp);
+            .TestedInstance.registerRoutes(expressApp);
         });
 
         it("Удачный сценарий", async function() {
@@ -249,7 +182,7 @@ describe("Сценарии создания JWT токена", function(){
             expect(response.body.refreshToken, "Отсутствует refresh token в ответе").to.not.null;
             expect(response.body.refreshToken, "Ожидали получить refresh token в виде строки").to.be.string;
 
-            let mockedServiсe = builder.data.userService.proxy;
+            let mockedServiсe = builder.Data.userService.proxy;
             verify(mockedServiсe.updateUserRefreshToken(userId, anyString())).once();
         })
     })
@@ -281,7 +214,7 @@ describe("Сценарии создания JWT токена", function(){
             // мок сервиса возвращает модельку userdb
             .addStep(d=> d.userService.addMock(s => when(s.getUserByEmail(email)).thenResolve(d.usersStub.Instance) ) )
             // регаем роуты на тестовый экспресс
-            .getTestedInstance().registerRoutes(expressApp);
+            .TestedInstance.registerRoutes(expressApp);
         });
 
         testCase.forEach(function(testCase) {
@@ -300,12 +233,12 @@ describe("Сценарии создания JWT токена", function(){
         let userId = 562;
         let permissionFlag = 1;
         let email = "name@domain.com";
-        builder.data.jwtExpiration = 0;
+        builder.Data.jwtExpiration = 0;
 
         let { accessToken, refreshToken } = getTokens({userId: userId, permissionFlag: permissionFlag}, 
                                                        email,
-                                                       builder.data.jwtSecret,
-                                                       builder.data.jwtExpiration);
+                                                       builder.Data.jwtSecret,
+                                                       builder.Data.jwtExpiration);
         
         before(async function() {
             manualResetTestInstances();
@@ -318,7 +251,7 @@ describe("Сценарии создания JWT токена", function(){
             .addStep(data => data.userService.addMock(service => when(service.getRefreshTokenByUserId(userId)).thenResolve(data.refreshTokenStub.Instance))
                                              .addMock(service => when(service.getUserById(userId)).thenResolve(data.usersStub.Instance)))
             
-            .getTestedInstance().registerRoutes(expressApp);
+            .TestedInstance.registerRoutes(expressApp);
         });
 
         it("Просроченный access token, валидный refresh, удачный сценарий перевыпуска", async function() {
@@ -337,16 +270,16 @@ describe("Сценарии создания JWT токена", function(){
             expect(response.body.refreshToken, "Ожидали refresh token в виде строки").to.be.string;
             expect(response.body.refreshToken, "Новый refresh токен не отличается от старого").to.not.equal(refreshToken);
             
-            let mockedServiсe = builder.data.userService.proxy;
+            let mockedServiсe = builder.Data.userService.proxy;
             verify(mockedServiсe.updateUserRefreshToken(userId, anyString())).once();
         })
     });
 
-    context.only("Logout", function (){
+    context("Logout", function (){
         let userId = 562;
         let { accessToken } = getTokens({userId: userId, permissionFlag: 1}, 
                                                        "name@email.domain",
-                                                       builder.data.jwtSecret,
+                                                       builder.Data.jwtSecret,
                                                        600);
 
         before(async function(){
@@ -355,7 +288,7 @@ describe("Сценарии создания JWT токена", function(){
                 //.addStep(data => data.usersStub.addMock(user => when))
                 .addStep(data => data.userService.addMock(service => when(service.getUserById(userId)).thenResolve(data.usersStub.Instance))
                                                  .addMock(service => when(service.getRefreshTokenByUserId(userId)).thenResolve(data.refreshTokenStub.Instance)))
-                .getTestedInstance().registerRoutes(expressApp);
+                .TestedInstance.registerRoutes(expressApp);
         });
 
         it("Удачный сценарий", async function() {
@@ -366,7 +299,7 @@ describe("Сценарии создания JWT токена", function(){
                 .send()
                 .expect(200);
 
-            let mockedServiсe = builder.data.userService.proxy;
+            let mockedServiсe = builder.Data.userService.proxy;
             verify(mockedServiсe.revokeUserRefreshToken(userId)).once();
         });
     });
