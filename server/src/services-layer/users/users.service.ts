@@ -85,9 +85,9 @@ class UsersService {
     }
 
     public async updateUserRefreshToken(userId: number, token: string): Promise<void> {
-        let user = await this.dataLayer.usersRepository.findUserById(userId);
+        const user = await this.dataLayer.usersRepository.findUserById(userId);
         if (user) {
-            let existedToken = await this.dataLayer.refreshTokensRepository.findTokenByUserId(userId);
+            const existedToken = await this.dataLayer.refreshTokensRepository.findTokenByUserId(userId);
             if (existedToken) {
                 existedToken.expiredDate = this.getRefreshTokenExpirationDate();
                 this.dataLayer.refreshTokensRepository.updateToken(existedToken);
@@ -99,6 +99,14 @@ class UsersService {
                 
                 this.dataLayer.refreshTokensRepository.addToken(newToken);
             }
+        }
+    }
+
+    public async revokeUserRefreshToken(userId: number) {
+        const existedToken = await this.dataLayer.refreshTokensRepository.findTokenByUserId(userId);
+        if (existedToken) {
+            existedToken.revoked = true;
+            this.dataLayer.refreshTokensRepository.updateToken(existedToken);
         }
     }
 

@@ -34,10 +34,12 @@ class AuthController extends CommonController {
         this.services = services;
 
         this.createJWT = this.createJWT.bind(this);
-    }
+        this.revokeRefreshToken = this.revokeRefreshToken.bind(this);
+    }    
 
-    
-
+    /**
+     * Создание access и refresh token-ов
+     */
     public async createJWT(req: express.Request, res: express.Response) {
         try {
             const userId = parseInt(req.body?.userId);
@@ -64,6 +66,28 @@ class AuthController extends CommonController {
                 .send({ accessToken: token, refreshToken: refreshToken });
         } catch (err) {
             this.logger.error('createJWT error', err);
+            return res.status(500).send();
+        }
+    }
+
+    /**
+     * Отзыв refresh token-а пользователя
+     */
+    public async revokeRefreshToken(req: express.Request, res: express.Response) {
+        try {
+            const jwtPayload = res.locals.jwt as JwtPayload;
+            const user = await this.services.usersService.getUserById(jwtPayload.userId);
+            if (!user) {
+                return res.status(404).send({errors: ["user is not exist"]})
+            }
+            const refreshToken = await this.services.usersService.getRefreshTokenByUserId(jwtPayload.userId);
+            if (!refreshToken) {
+                return res.status(410).send();
+            }
+            await this.services.usersService.revokeUserRefreshToken(jwtPayload.userId);
+            return res.status(200).send();
+        } catch (error) {
+            this.logger.error(`${this.name}.revokeRefreshToken`, error);
             return res.status(500).send();
         }
     }

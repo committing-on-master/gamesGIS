@@ -29,7 +29,12 @@ class AuthRoutes extends CommonRoutesConfig {
             this.middleware.verifyRefreshBodyField,
             this.middleware.validRefreshNeeded,
             this.controller.createJWT
-        )
+        );
+
+        app.post("/auth/logout",
+            this.middleware.jwtTokenValidation(),
+            this.controller.revokeRefreshToken
+        );
         return app;
     }
 }
