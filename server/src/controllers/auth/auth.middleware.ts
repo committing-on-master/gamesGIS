@@ -91,7 +91,7 @@ class AuthMiddleware extends CommonMiddleware {
         next: express.NextFunction
     ) {
         try {
-            const jwtPayload = res.locals.jwt as JwtPayload;            
+            const jwtPayload = res.locals.jwt as JwtPayload;
             const savedRefreshToken = await this.services.usersService.getRefreshTokenByUserId(jwtPayload.userId);
             if (!savedRefreshToken) {
                 this.logger.error(`${this.name}.validRefreshNeeded refresh token not found, but access token exist`);

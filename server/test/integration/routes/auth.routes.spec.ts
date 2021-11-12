@@ -16,6 +16,7 @@ import { UsersService } from "../../../src/services-layer/users/users.service";
 import { JwtPayload } from "../../../src/controllers/common-types/jwt.payload";
 import { UsersDAO } from "../../../src/data-layer/models/users.dao";
 import { RefreshTokensDao } from "../../../src/data-layer/models/refresh.tokens.dao";
+import { addAbortSignal } from "stream";
 
 /**
  * Хелпер помогающий работать с ts-mockito
@@ -144,6 +145,9 @@ describe("Сценарии создания JWT токена", function(){
     let builder = new TestDataBuilder();
     let expressApp: express.Application;
 
+    /**
+     * Игрался с beforeEach, проиграл. За сим, дергаем руками в каждом тесте
+     */
     function manualResetTestInstances() {
         builder.reset();
         expressApp = express();
@@ -153,9 +157,7 @@ describe("Сценарии создания JWT токена", function(){
     context("Группа тестов на валидацию схемы полей генерации нового токена", function() {
         before(function() {
             manualResetTestInstances();
-            builder
-                // вешаем роуты на тестовый експресс
-                .getTestedInstance().registerRoutes(expressApp);
+            builder.getTestedInstance().registerRoutes(expressApp);
         })
         const requestsBody: {msg: string, body: string, expected: {code: number, problemField: string }}[] = [
             {
@@ -197,9 +199,9 @@ describe("Сценарии создания JWT токена", function(){
                     .set("Content-Type", "application/json")
                     .send(testCase.body);
                     
-                chai.expect(response.statusCode).equal(testCase.expected.code);
-                chai.expect(response.body, "Свойство errors отсутствует в ответе").have.property("errors");                
-                chai.expect(
+                expect(response.statusCode).equal(testCase.expected.code);
+                expect(response.body, "Свойство errors отсутствует в ответе").have.property("errors");                
+                expect(
                     (response.body.errors as Array<{param: string}>).some((item) => item.param === testCase.expected.problemField),
                     `ожидали получить ошибочный ответ с полем: ${testCase.expected.problemField}`
                     ).to.be.true;
@@ -239,13 +241,13 @@ describe("Сценарии создания JWT токена", function(){
                 .set("Content-Type", "application/json")
                 .send(testBody);
             
-            chai.expect(response.statusCode).to.be.equal(201);
+            expect(response.statusCode).to.be.equal(201);
 
-            chai.expect(response.body.accessToken, "Отсутствует access токен в ответе").to.not.null;
-            chai.expect(response.body.accessToken, "Ожидали получить access токен в виде строки").to.be.string;
+            expect(response.body.accessToken, "Отсутствует access токен в ответе").to.not.null;
+            expect(response.body.accessToken, "Ожидали получить access токен в виде строки").to.be.string;
 
-            chai.expect(response.body.refreshToken, "Отсутствует refresh token в ответе").to.not.null;
-            chai.expect(response.body.refreshToken, "Ожидали получить refresh token в виде строки").to.be.string;
+            expect(response.body.refreshToken, "Отсутствует refresh token в ответе").to.not.null;
+            expect(response.body.refreshToken, "Ожидали получить refresh token в виде строки").to.be.string;
 
             let mockedServiсe = builder.data.userService.proxy;
             verify(mockedServiсe.updateUserRefreshToken(userId, anyString())).once();
@@ -338,6 +340,35 @@ describe("Сценарии создания JWT токена", function(){
             let mockedServiсe = builder.data.userService.proxy;
             verify(mockedServiсe.updateUserRefreshToken(userId, anyString())).once();
         })
+    });
+
+    context.only("Logout", function (){
+        let userId = 562;
+        let { accessToken } = getTokens({userId: userId, permissionFlag: 1}, 
+                                                       "name@email.domain",
+                                                       builder.data.jwtSecret,
+                                                       600);
+
+        before(async function(){
+            manualResetTestInstances();
+            builder
+                //.addStep(data => data.usersStub.addMock(user => when))
+                .addStep(data => data.userService.addMock(service => when(service.getUserById(userId)).thenResolve(data.usersStub.Instance))
+                                                 .addMock(service => when(service.getRefreshTokenByUserId(userId)).thenResolve(data.refreshTokenStub.Instance)))
+                .getTestedInstance().registerRoutes(expressApp);
+        });
+
+        it("Удачный сценарий", async function() {
+            await supertestServ(expressApp)
+                .post("/auth/logout")
+                .set("Content-Type", "application/json")
+                .set({ Authorization: `Bearer ${accessToken}` })
+                .send()
+                .expect(200);
+
+            let mockedServiсe = builder.data.userService.proxy;
+            verify(mockedServiсe.revokeUserRefreshToken(userId)).once();
+        });
     });
 });
 
