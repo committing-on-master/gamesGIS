@@ -5,17 +5,23 @@ import express from 'express';
 import { inject, injectable } from 'tsyringe';
 import winston from 'winston';
 import { TokenInjection } from "../../infrastructure/token.injection";
+import { PermissionMiddleware } from '../permission.middleware';
 
 @injectable()
 export class UsersRoutes extends CommonRoutesConfig {
     readonly usersMiddleware: UsersMiddleware;
     readonly usersController: UsersController;
+    readonly permissionMiddleware: PermissionMiddleware;
 
-    constructor(@inject(TokenInjection.LOGGER) logger: winston.Logger, usersMiddleware: UsersMiddleware, usersController: UsersController) {
+    constructor(@inject(TokenInjection.LOGGER) logger: winston.Logger,
+                usersMiddleware: UsersMiddleware,
+                permissionMiddleware: PermissionMiddleware,
+                usersController: UsersController) {
         super(logger, "UsersRoutes");
 
         this.usersController = usersController;
         this.usersMiddleware = usersMiddleware;
+        this.permissionMiddleware = permissionMiddleware;
     }
 
     protected configureRoute(app: express.Application): express.Application {
@@ -23,8 +29,6 @@ export class UsersRoutes extends CommonRoutesConfig {
             .route(`/users`)
             .get(this.usersController.listUsers)
             .post(
-                //this.usersMiddleware.validateRequiredUserBodyFields,
-                //this.usersMiddleware.validateSameEmailDoesntExist,
                 this.usersMiddleware.validateCreateUserSchema(),
                 this.usersMiddleware.schemaValidationResult,
                 this.usersController.createUser
@@ -36,8 +40,7 @@ export class UsersRoutes extends CommonRoutesConfig {
             .route(`/users/:userId`)
             .all(
                 this.usersMiddleware.validateUserExists,
-                // jwtMiddleware.validJWTNeeded,
-                this.usersMiddleware.onlySameUserOrAdminCanDoThisAction
+                this.permissionMiddleware.onlySameUserOrAdminCanDoThisAction
             )
             .get(this.usersController.getUserById)
             .delete(this.usersController.removeUser);

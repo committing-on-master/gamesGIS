@@ -90,14 +90,16 @@ class UsersService {
             const existedToken = await this.dataLayer.refreshTokensRepository.findTokenByUserId(userId);
             if (existedToken) {
                 existedToken.expiredDate = this.getRefreshTokenExpirationDate();
+                existedToken.token = token;
                 this.dataLayer.refreshTokensRepository.updateToken(existedToken);
             } else {
                 let newToken = new RefreshTokensDao();
                 newToken.revoked = false;
                 newToken.user = user;
                 newToken.expiredDate = this.getRefreshTokenExpirationDate();
+                newToken.token = token;
                 
-                this.dataLayer.refreshTokensRepository.addToken(newToken);
+                await this.dataLayer.refreshTokensRepository.addToken(newToken);
             }
         }
     }

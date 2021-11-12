@@ -6,7 +6,6 @@ import { CommonMiddleware } from '../common.middleware';
 import { TokenInjection } from '../../infrastructure/token.injection';
 import winston from 'winston';
 import { body } from 'express-validator';
-import crypto from 'crypto';
 import jwt, { VerifyOptions } from 'jsonwebtoken';
 import { JwtPayload } from '../common-types/jwt.payload';
 
@@ -55,6 +54,7 @@ class AuthMiddleware extends CommonMiddleware {
             if (user) {
                 const passwordHash = user.passwordHash;
                 if (await argon2.verify(passwordHash, req.body.password)) {
+                    req.body.userId = user.id;
                     return next();
                 }
             }
@@ -147,6 +147,7 @@ class AuthMiddleware extends CommonMiddleware {
             }
         }   
     }
+
     /**
      * Получает из заголовка jwt объект, проверяет подлинность его подписи
      */
