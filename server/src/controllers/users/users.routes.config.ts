@@ -1,27 +1,41 @@
-import { CommonRoutesConfig } from '../common.routes.config';
-import { UsersController } from './users.controller';
-import { UsersMiddleware } from './users.middleware';
 import express from 'express';
 import { inject, injectable } from 'tsyringe';
 import winston from 'winston';
+import { checkSchema } from 'express-validator';
+
+import { CommonRoutesConfig } from '../common.routes.config';
+import { UsersController } from './users.controller';
+import { UsersMiddleware } from './users.middleware';
 import { TokenInjection } from "../../infrastructure/token.injection";
 import { PermissionMiddleware } from '../permission.middleware';
+import { createUserDtoSchema } from './models.schema/create.user.dto.schema';
+import { patchUserDtoSchema } from './models.schema/update.user.dto.schema';
+import { AsyncEmailValidation } from './models.schema/async.email.validation';
+import { UsersService } from './../../services-layer/users/users.service';
+import { AsyncNameValidation } from './models.schema/async.name.validation';
+import { AuthMiddleware } from '../auth/auth.middleware';
 
 @injectable()
 export class UsersRoutes extends CommonRoutesConfig {
-    readonly usersMiddleware: UsersMiddleware;
-    readonly usersController: UsersController;
-    readonly permissionMiddleware: PermissionMiddleware;
+    private readonly usersMiddleware: UsersMiddleware;
+    private readonly usersController: UsersController;
+    private readonly permissionMiddleware: PermissionMiddleware;
+    private readonly authMiddleware: AuthMiddleware;
+    private readonly usersService: UsersService;
 
     constructor(@inject(TokenInjection.LOGGER) logger: winston.Logger,
                 usersMiddleware: UsersMiddleware,
                 permissionMiddleware: PermissionMiddleware,
-                usersController: UsersController) {
+                authMiddleware: AuthMiddleware,
+                usersController: UsersController,
+                usersService: UsersService) {
         super(logger, "UsersRoutes");
 
         this.usersController = usersController;
         this.usersMiddleware = usersMiddleware;
         this.permissionMiddleware = permissionMiddleware;
+        this.authMiddleware = authMiddleware;
+        this.usersService = usersService;
     }
 
     protected configureRoute(app: express.Application): express.Application {
@@ -29,8 +43,9 @@ export class UsersRoutes extends CommonRoutesConfig {
             .route(`/users`)
             .get(this.usersController.listUsers)
             .post(
-                this.usersMiddleware.validateCreateUserSchema(),
-                this.usersMiddleware.schemaValidationResult,
+                this.usersMiddleware.validateRequestSchema(checkSchema(createUserDtoSchema)),
+                this.usersMiddleware.validateRequestSchema(AsyncEmailValidation(this.usersService)),
+                this.usersMiddleware.validateRequestSchema(AsyncNameValidation(this.usersService)),
                 this.usersController.createUser
             );
 
@@ -39,16 +54,18 @@ export class UsersRoutes extends CommonRoutesConfig {
         app
             .route(`/users/:userId`)
             .all(
+                this.authMiddleware.jwtTokenValidation(),
                 this.usersMiddleware.validateUserExists,
                 this.permissionMiddleware.onlySameUserOrAdminCanDoThisAction
             )
             .get(this.usersController.getUserById)
-            .delete(this.usersController.removeUser);
+            // .delete(this.usersController.removeUser);
 
         app.patch(`/users/:userId`,
             this.usersMiddleware.earlyReturnPatchUser,
-            this.usersMiddleware.validatePatchUserSchema(),
-            this.usersMiddleware.schemaValidationResult,
+            this.usersMiddleware.validateRequestSchema(checkSchema(patchUserDtoSchema)),
+            // this.usersMiddleware.validatePatchUserSchema(),
+            // this.usersMiddleware.schemaValidationResult,
             this.usersController.patchUser,
         );
 

@@ -1,9 +1,12 @@
 import express from "express";
-import { ServicesLayer } from "../../services-layer/services.layer";
 import { inject, injectable } from "tsyringe";
-import { CommonController } from "../common.controller";
-import { TokenInjection } from "../../infrastructure/token.injection";
 import winston from "winston";
+
+import { ServicesLayer } from "./../../services-layer/services.layer";
+import { CommonController } from "./../common.controller";
+import { TokenInjection } from "./../../infrastructure/token.injection";
+import { UsersDAO } from "./../../data-layer/models/users.dao";
+import { GetUserDto } from "./../../services-layer/users/models/get.user.dto";
 
 @injectable()
 class UsersController extends CommonController {
@@ -21,31 +24,42 @@ class UsersController extends CommonController {
         this.removeUser = this.removeUser.bind(this);
     }
 
+    private formatErrors(req: express.Request, errors: {prop: string, msg:string}[]) {
+        let result: {value: string, msg: string, param: string, location:string}[] = [];
+        errors.forEach(error => {
+            result.push({
+                location: "body",
+                msg: error.msg,
+                param: error.prop,
+                value: req.body[error.prop]                            
+            });
+        });
+        
+        return result;
+    }
+
     public async createUser(req: express.Request, res: express.Response) {
         try {
-            let errorMsgs = await this.services.usersService.checkUserDataAvailability(req.body);
-            if (errorMsgs.length !== 0) {
-                let formatErrors = (errors: {prop: string, msg:string}[]) => {
-                    let result: {value: string, msg: string, param: string, location:string}[] = [];
-                    errors.forEach(error => {
-                        result.push({
-                            location: "body",
-                            msg: error.msg,
-                            param: error.prop,
-                            value: req.body[error.prop]                            
-                        });
-                    });
-                    return result;
-                }
-
-                let someRes = formatErrors(errorMsgs);
-                return res.status(409).json({ errors: someRes });
-            }
-
-            let userId = await this.services.usersService.createUser(req.body);
+            await this.services.usersService.createUser(req.body);
             res.status(201).send({ msg: "user registered" });
         } catch (error) {
             this.logger.error(`${this.name}.createUser error`, error);
+            return res.status(500).send();
+        }
+    }
+
+    public async getUserById(req: express.Request, res: express.Response) {
+        try {
+            let user: UsersDAO = res.locals.user;
+            let responseData: GetUserDto = {
+                email: user.email,
+                name: user.name,
+                permissionFlag: user.permissionFlag,
+                registrationDate: user.registrationDate
+            }
+            res.status(200).send({user: responseData});
+        } catch (error) {
+            this.logger.error(`${this.name}.getUserById`, error);
             return res.status(500).send();
         }
     }
@@ -55,6 +69,12 @@ class UsersController extends CommonController {
      */
     async patchUser(req: express.Request, res: express.Response) {
         try {
+            let errorMsgs = await this.services.usersService.checkUserDataAvailability(req.body);
+            if (errorMsgs.length !== 0) {
+                let formatted = this.formatErrors(req, errorMsgs);
+                return res.status(409).json({ errors: formatted });
+            }
+            
             await this.services.usersService.updateUserById(req.body.id, req.body);
             res.status(200).send({ msg: "user data updates successfully" });
         } catch (error) {
@@ -63,16 +83,13 @@ class UsersController extends CommonController {
         }
     }
 
+    // TODO: удолить после тестов
     async listUsers(req: express.Request, res: express.Response) {
-        // res.locals = { name: "SomeName", sometext: "sometextinresponse" };
         const users = await this.services.usersService.list(100, 0);
         res.status(200).send(users);
     }
 
-    async getUserById(req: express.Request, res: express.Response) {
-        const user = await this.services.usersService.getUserById(req.body.id);
-        res.status(200).send(user);
-    }
+
 
     async removeUser(req: express.Request, res: express.Response) {
         await this.services.usersService.deleteById(req.body.id);

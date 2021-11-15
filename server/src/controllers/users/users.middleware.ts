@@ -18,28 +18,11 @@ class UsersMiddleware extends CommonMiddleware {
         this.services = services;
 
         // методы уходят в мидлварю экспресса, биндим this
-        this.validateSameEmailDoesntExist = this.validateSameEmailDoesntExist.bind(this);
+        this.validateEmailAvailability = this.validateEmailAvailability.bind(this);
         this.validateSameEmailBelongToSameUser = this.validateSameEmailBelongToSameUser.bind(this);
         this.validatePatchEmail = this.validatePatchEmail.bind(this);
         this.validateUserExists = this.validateUserExists.bind(this);
         this.extractUserId = this.extractUserId.bind(this);
-        this.validateCreateUserSchema = this.validateCreateUserSchema.bind(this);
-    }
-
-    /**
-     * Генерируем по схеме модели DTOшки создания пользователя проверочную цепочку
-     * @returns ValidationChain для модели
-     */
-    public validateCreateUserSchema() {
-        return checkSchema(createUserDtoSchema);
-    }
-
-    /**
-     * Генерируем по схеме модели DTOшки создания пользователя проверочную цепочку
-     * @returns ValidationChain для модели
-     */
-    public validatePatchUserSchema() {
-        return checkSchema(patchUserDtoSchema);
     }
 
     /**
@@ -60,11 +43,16 @@ class UsersMiddleware extends CommonMiddleware {
         }
     }
 
-    async validateSameEmailDoesntExist(
+    public async validateEmailAvailability(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
     ) {
+        body("email", "This email already in use")
+            .custom(async (value, {req, location, path }) => 
+                this.services.usersService.isEmailAvailable(value)
+                    .then(available => (available)? Promise.resolve() : Promise.reject())
+            )
         const user = await this.services.usersService.getUserByEmail(req.body.email);
         if (user) {
             res.status(400).send({ error: `User email already exists` });
@@ -111,7 +99,7 @@ class UsersMiddleware extends CommonMiddleware {
         const user = await this.services.usersService.getUserById(parseInt(req.params.userId));
         if (user) {
             res.locals.user = user;
-            next();
+            return next();
         } else {
             res.status(404).send({
                 error: `User ${req.params.userId} not found`,

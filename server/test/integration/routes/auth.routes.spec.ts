@@ -1,24 +1,23 @@
 import "reflect-metadata";
-import argon2 from "argon2";
 import { expect } from "chai";
 import express from "express";
 import supertestServ from "supertest";
-import crypto from 'crypto';
-import jwt from "jsonwebtoken";
 import winston from "winston";
 import { anyString, mock, verify, when } from "ts-mockito";
+
+import { CryptoHelper } from "./../../helpers/crypto.helper"
+import { TestDataBuilder } from "./../../helpers/test.data.builder";
+import { Brick } from "../../helpers/brick";
 
 import { AuthController } from "../../../src/controllers/auth/auth.controller";
 import { AuthMiddleware } from "../../../src/controllers/auth/auth.middleware";
 import { AuthRoutes } from "../../../src/controllers/auth/auth.routes.config";
 import { ServicesLayer } from "../../../src/services-layer/services.layer";
 import { UsersService } from "../../../src/services-layer/users/users.service";
-import { JwtPayload } from "../../../src/controllers/common-types/jwt.payload";
 import { UsersDAO } from "../../../src/data-layer/models/users.dao";
 import { RefreshTokensDao } from "../../../src/data-layer/models/refresh.tokens.dao";
-import { Brick } from "../../helpers/brick";
-import { TestDataBuilder } from "./../../helpers/test.data.builder";
 
+/**Данные используемые в тестах */
 class TestData {
     logger = new Brick(mock<winston.Logger>());
     userService = new Brick(mock(UsersService));
@@ -46,7 +45,7 @@ class AuthTestDataBuilder extends TestDataBuilder<TestData, AuthRoutes> {
 
     public reset() {
         this.data.logger.reset();
-        // this.data.logger.addMock(logger => when(logger.info(anyString())).thenCall((str) => console.log(str)));        
+        // this.data.logger.addMock(logger => when(logger.info(anyString())).thenCall((str) => console.log(str)));
         this.data.serviceLayer.reset();
         this.data.userService.reset();
         this.data.usersStub.reset();
@@ -57,18 +56,18 @@ class AuthTestDataBuilder extends TestDataBuilder<TestData, AuthRoutes> {
     public get TestedInstance(): AuthRoutes {
         this.data.serviceLayer.addMock(layer => when(layer.usersService).thenReturn(this.data.userService.Instance));
 
-        this.authController = this.authController ?? new AuthController(this.data.logger.Instance, 
-                                                                        this.data.jwtSecret,
-                                                                        this.data.jwtExpiration,
-                                                                        this.data.serviceLayer.Instance);
+        this.authController = new AuthController(this.data.logger.Instance, 
+                                                 this.data.jwtSecret,
+                                                 this.data.jwtExpiration,
+                                                 this.data.serviceLayer.Instance);
 
-        this.authMiddleware = this.authMiddleware ?? new AuthMiddleware(this.data.logger.Instance,
-                                                                        this.data.jwtSecret,
-                                                                        this.data.serviceLayer.Instance);
+        this.authMiddleware = new AuthMiddleware(this.data.logger.Instance,
+                                                 this.data.jwtSecret,
+                                                 this.data.serviceLayer.Instance);
 
-        this.testedInstance = this.testedInstance ?? new AuthRoutes(this.data.logger.Instance,
-                                                            this.authController,
-                                                            this.authMiddleware);
+        this.testedInstance = new AuthRoutes(this.data.logger.Instance,
+                                             this.authController,
+                                             this.authMiddleware);
         return this.testedInstance;
     }
 }
@@ -99,27 +98,27 @@ describe("Сценарии создания JWT токена", function(){
             },
             {
                 msg: "email задан в неверном формате - без собаки",
-                body: JSON.stringify({ email: "marcos.henriquetoptal.com"}),
+                body: JSON.stringify({ email: "marcos.henriquetoptal.com", password: "TheLongestLeg"}),
                 expected: {code: 400, problemField: "email" } 
             },
             {
                 msg: "email задан в неверном формате - без домена верхнего уровня",
-                body: JSON.stringify({ email: "marcos.henriquetop@talcom"}),
+                body: JSON.stringify({ email: "marcos.henriquetop@talcom", password: "TheLongestLeg"}),
                 expected: {code: 400, problemField: "email" } 
             },
             {
                 msg: "email задан в неверном формате - без ящика",
-                body: JSON.stringify({ email: "@toptal.com"}),
+                body: JSON.stringify({ email: "@toptal.com", password: "TheLongestLeg" }),
                 expected: {code: 400, problemField: "email" } 
             },
             {
-                msg: "Пароль слишком короткий",
-                body: JSON.stringify({ password: "Some"}),
+                msg: "Пароль слишком короткий < 5",
+                body: JSON.stringify({ password: "Five5", email: "gachi@tarkov.com"}),
                 expected: {code: 400, problemField: "password" } 
             },
             {
-                msg: "Пароль слишком длинный",
-                body: JSON.stringify({ password: "I'm_the_hero_of_the_story.Don't_need_to_be_saved"}),
+                msg: "Пароль слишком длинный > 16",
+                body: JSON.stringify({ password: "12345678901234567", email: "gachi@tarkov.com"}),
                 expected: {code: 400, problemField: "password" } 
             }
         ];
@@ -154,7 +153,7 @@ describe("Сценарии создания JWT токена", function(){
 
         before(async function() {
             manualResetTestInstances();
-            let passwordHash = await getHash(password)
+            let passwordHash = await CryptoHelper.getHash(password)
 
             builder
             // говорим чтоб userdb по запросу пароля через почту, возвращал ранее посчитанный хэш и имел id-шник
@@ -206,7 +205,7 @@ describe("Сценарии создания JWT токена", function(){
 
         before(async function() {            
             manualResetTestInstances();
-            let passwordHash = await getHash(password);
+            let passwordHash = await CryptoHelper.getHash(password);
 
             builder
             // говорим чтоб userdb по запросу пароля через почту, возвращал ранее посчитанный хэш
@@ -235,10 +234,10 @@ describe("Сценарии создания JWT токена", function(){
         let email = "name@domain.com";
         builder.Data.jwtExpiration = 0;
 
-        let { accessToken, refreshToken } = getTokens({userId: userId, permissionFlag: permissionFlag}, 
-                                                       email,
-                                                       builder.Data.jwtSecret,
-                                                       builder.Data.jwtExpiration);
+        let { accessToken, refreshToken } = CryptoHelper.getTokens({userId: userId, permissionFlag: permissionFlag}, 
+                                                                    email,
+                                                                    builder.Data.jwtSecret,
+                                                                    builder.Data.jwtExpiration);
         
         before(async function() {
             manualResetTestInstances();
@@ -259,7 +258,7 @@ describe("Сценарии создания JWT токена", function(){
                 .post("/auth/refresh-token")
                 .set("Content-Type", "application/json")
                 .set({ Authorization: `Bearer ${accessToken}` })
-                .send({ refreshToken });
+                .send({ refreshToken: refreshToken })
 
             expect(response.statusCode).to.be.equal(201);
 
@@ -277,10 +276,10 @@ describe("Сценарии создания JWT токена", function(){
 
     context("Logout", function (){
         let userId = 562;
-        let { accessToken } = getTokens({userId: userId, permissionFlag: 1}, 
-                                                       "name@email.domain",
-                                                       builder.Data.jwtSecret,
-                                                       600);
+        let { accessToken } = CryptoHelper.getTokens({userId: userId, permissionFlag: 1}, 
+                                                      "name@email.domain",
+                                                      builder.Data.jwtSecret,
+                                                      600);
 
         before(async function(){
             manualResetTestInstances();
@@ -304,19 +303,3 @@ describe("Сценарии создания JWT токена", function(){
         });
     });
 });
-
-async function getHash(str:string) {
-    return await argon2.hash(str)
-}
-
-function getTokens(jwtPayload: JwtPayload,
-                   email: string,
-                   jwtSecret: string,
-                   tokenExpirationInSeconds: number): {accessToken: string, refreshToken: string} {
-    const salt = crypto.createSecretKey(crypto.randomBytes(16));
-    const refreshToken = crypto.createHmac('sha512', salt)
-                                .update(email)
-                                .digest('base64');    
-    const token = jwt.sign(jwtPayload, jwtSecret, { expiresIn: tokenExpirationInSeconds });
-    return {accessToken: token, refreshToken: refreshToken}
-}

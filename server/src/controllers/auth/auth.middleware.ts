@@ -22,26 +22,8 @@ class AuthMiddleware extends CommonMiddleware {
         this.services = services;
 
         this.verifyUserPassword = this.verifyUserPassword.bind(this);
-        this.validRefreshNeeded = this.validRefreshNeeded.bind(this);
-        this.validJWTNeeded = this.validJWTNeeded.bind(this);
-    }
-
-    public authSchemaValidation() {
-        return [
-            body('email')
-                .exists({checkNull: true}).withMessage("email body field is missing").bail()
-                .isEmail().withMessage("email body field has wrong Email format").bail(),
-            body('password')
-                .exists({checkNull: true}).withMessage("password body field is missing").bail()
-                // .isStrongPassword({
-                //     minLength: 6,
-                //     minLowercase: 0,
-                //     minUppercase: 0,
-                //     minNumbers: 0,
-                //     minSymbols: 3
-                // })
-                .isLength({min: 6, max: 16}).withMessage("password field must contain more then 6 symbols and less then 16 symbols").bail()
-        ]
+        this.verifyRefreshToken = this.verifyRefreshToken.bind(this);
+        // this.validJWTNeeded = this.validJWTNeeded.bind(this);
     }
 
     public async verifyUserPassword(
@@ -50,25 +32,25 @@ class AuthMiddleware extends CommonMiddleware {
         next: express.NextFunction
     ) {
         try {
-            const user = await this.services.usersService.getUserByEmail(req.body.email);            
+            const user = await this.services.usersService.getUserByEmail(req.body.email);
             if (user) {
                 const passwordHash = user.passwordHash;
                 if (await argon2.verify(passwordHash, req.body.password)) {
-                    req.body.userId = user.id;
+                    res.locals.user = user;
                     return next();
                 }
             }
             res.status(403).send({ errors: ['Invalid email and/or password'] });
         } catch (error) {
             this.logger.error(`${this.name}.verifyUserPassword`, error);
-            return res.status(500).send();
+            next(error);
         }
     }
 
     /**
      * Проверка наличия refresh токена
      */
-    public verifyRefreshBodyField(
+    public verifyRefreshTokenBodyField(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
@@ -85,7 +67,7 @@ class AuthMiddleware extends CommonMiddleware {
     /**
      * Проверяем полученный refresh token с ранее сгенерированным эталоном
      */
-    public async validRefreshNeeded(
+    public async verifyRefreshToken(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
@@ -94,27 +76,28 @@ class AuthMiddleware extends CommonMiddleware {
             const jwtPayload = res.locals.jwt as JwtPayload;
             const savedRefreshToken = await this.services.usersService.getRefreshTokenByUserId(jwtPayload.userId);
             if (!savedRefreshToken) {
-                this.logger.error(`${this.name}.validRefreshNeeded refresh token not found, but access token exist`);
-                return res.status(500).send();
+                let message = `[${this.name}.validRefreshNeeded] refresh token not found, but access token exist`;
+                this.logger.error(message);
+                return next({ errors: [message] });
             }
+            if (req.body?.refreshToken !== savedRefreshToken.token) {
+                return res.status(400).send({ errors: ["Invalid refresh token"] });
+            }
+            // проверка на отзыва refresh токена
             if (savedRefreshToken.revoked || ((savedRefreshToken.expiredDate < new Date()))) {
                 return res.status(401).send({ errors: ["refresh token was revoked or expired"] });
             }
-            if (req.body?.refreshToken === savedRefreshToken.token) {
-                let user = await this.services.usersService.getUserById(jwtPayload.userId);
-                if (!user) {
-                    return res.status(404).send({errors: ["user is not exist"]});
-                }
-                req.body.userId = jwtPayload.userId;
-                req.body.email = user.email;
-
-                next();
-            } else {
-                return res.status(400).send({ errors: ["Invalid refresh token"] });
+            let user = await this.services.usersService.getUserById(jwtPayload.userId);
+            if (!user) {
+                let message = `[${this.name}.validRefreshNeeded] refresh token exist, but user don't`;
+                this.logger.error(message);
+                return next({ errors: [message] });
             }
+            res.locals.user = user;
+            return next();
         } catch (error) {
-            this.logger.error(`${this.name}.validRefreshNeeded`, error);
-            return res.status(500).send();
+            this.logger.error(`[${this.name}.validRefreshNeeded]`, error);
+            return next(error);
         }
     }
 
@@ -137,13 +120,13 @@ class AuthMiddleware extends CommonMiddleware {
                             execParam.jwtSecret,
                             execParam.options
                         ) as JwtPayload;
-                        next();
+                        return next();
                     }
                 } catch (err) {
-                    return res.status(403).send();
+                    return next(err);
                 }
             } else {
-                return res.status(401).send();
+                return res.status(401).send({});
             }
         }   
     }
@@ -151,30 +134,30 @@ class AuthMiddleware extends CommonMiddleware {
     /**
      * Получает из заголовка jwt объект, проверяет подлинность его подписи
      */
-    public validJWTNeeded(
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-    ) {
-        if (req.headers['authorization']) {
-            try {
-                const authorization = req.headers['authorization'].split(' ');
-                if (authorization[0] !== 'Bearer') {
-                    return res.status(401).send();
-                } else {
-                    res.locals.jwt = jwt.verify(
-                        authorization[1],
-                        this.jwtSecret
-                    ) as JwtPayload;
-                    next();
-                }
-            } catch (err) {
-                return res.status(403).send();
-            }
-        } else {
-            return res.status(401).send();
-        }
-    }
+    // public validJWTNeeded(
+    //     req: express.Request,
+    //     res: express.Response,
+    //     next: express.NextFunction
+    // ) {
+    //     if (req.headers['authorization']) {
+    //         try {
+    //             const authorization = req.headers['authorization'].split(' ');
+    //             if (authorization[0] !== 'Bearer') {
+    //                 return res.status(401).send();
+    //             } else {
+    //                 res.locals.jwt = jwt.verify(
+    //                     authorization[1],
+    //                     this.jwtSecret
+    //                 ) as JwtPayload;
+    //                 next();
+    //             }
+    //         } catch (err) {
+    //             return res.status(403).send();
+    //         }
+    //     } else {
+    //         return res.status(401).send();
+    //     }
+    // }
 }
 
 export { AuthMiddleware }
