@@ -43,6 +43,15 @@ class UsersService {
         return result.id;
     }
 
+
+    public async isEmailAvailable(email: string): Promise<boolean> {
+        return await !this.dataLayer.usersRepository.isEmailAlreadyExist(email);
+    }
+
+    public async isNameAvailable(name: string): Promise<boolean> {
+        return await !this.dataLayer.usersRepository.isNameAlreadyExist(name);
+    }
+
     /**
      * Проверка данных пользователя на совпадение с ранее зарегистрированными пользователями
      * @param resource поля нового пользователя

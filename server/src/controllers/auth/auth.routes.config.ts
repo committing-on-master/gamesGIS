@@ -5,6 +5,8 @@ import winston from "winston";
 import { CommonRoutesConfig } from "../common.routes.config";
 import { AuthController } from "./auth.controller";
 import { AuthMiddleware } from "./auth.middleware";
+import { checkSchema } from "express-validator";
+import { LoginAuthSchema } from "./models.schema/login.auth.schema";
 
 @injectable()
 class AuthRoutes extends CommonRoutesConfig {
@@ -18,20 +20,19 @@ class AuthRoutes extends CommonRoutesConfig {
     }
 
     protected configureRoute(app: Application): Application {
-        app.post("/auth", // authentication request - "Это я, дай токен для проведения операции."
-            this.middleware.authSchemaValidation(),
-            this.middleware.schemaValidationResult,
+        app.post("/auth", // authentication request - "мой логин-пароль, дай мне пару токенов access-refresh"
+            this.middleware.validateRequestSchema(checkSchema(LoginAuthSchema)),
             this.middleware.verifyUserPassword,
             this.controller.createJWT
         );
-        app.post("/auth/refresh-token", // authentication request - "Это я, токен протух, дай новый"
-            this.middleware.jwtTokenValidation({ignoreExpiration: true}),
-            this.middleware.verifyRefreshBodyField,
-            this.middleware.validRefreshNeeded,
+        app.post("/auth/refresh-token", // authentication request - "мой access-refresh, дай новую пару access-refresh
+            this.middleware.jwtTokenValidation({ignoreExpiration: true}), // вот это вот дебатабельно, но пускай будет пока так
+            this.middleware.verifyRefreshTokenBodyField,
+            this.middleware.verifyRefreshToken,
             this.controller.createJWT
         );
 
-        app.post("/auth/logout",
+        app.post("/auth/logout", // отозвать refresh token
             this.middleware.jwtTokenValidation(),
             this.controller.revokeRefreshToken
         );

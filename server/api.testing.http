@@ -39,6 +39,6 @@ Content-Type: application/json
 {
     "email": "marcos.henrique@toptal.com",
     "password": "sup3rS3cr3tPassw0rd!23",
-    "name": "Marcoss Frontier",
+    "name": "Marcoss1",
     "permissionLevel": 8
 }

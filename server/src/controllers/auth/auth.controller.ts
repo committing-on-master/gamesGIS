@@ -8,7 +8,7 @@ import winston from 'winston';
 import { CommonController } from '../common.controller';
 import { ServicesLayer } from '../../services-layer/services.layer';
 import { JwtPayload } from '../common-types/jwt.payload';
-import { body } from 'express-validator';
+import { UsersDAO } from 'src/data-layer/models/users.dao';
 
 interface IUser {
     id: number;
@@ -35,19 +35,14 @@ class AuthController extends CommonController {
 
         this.createJWT = this.createJWT.bind(this);
         this.revokeRefreshToken = this.revokeRefreshToken.bind(this);
-    }    
-
+    }
+    
     /**
      * Создание access и refresh token-ов
      */
     public async createJWT(req: express.Request, res: express.Response) {
         try {
-            const userId = parseInt(req.body?.userId);
-            const user = await this.services.usersService.getUserById(userId);
-            if (!user) {
-                return res.status(404).send({errors: ["user is not exist"]})
-            }
-
+            const user:UsersDAO = res.locals.user;
             let jwtPayload: JwtPayload = {
                 userId: user.id,
                 permissionFlag: user.permissionFlag
@@ -59,7 +54,7 @@ class AuthController extends CommonController {
                                        .digest('base64');
             
             const token = jwt.sign(jwtPayload, this.jwtSecret, { expiresIn: this.tokenExpirationInSeconds });
-            await this.services.usersService.updateUserRefreshToken(userId, refreshToken);
+            await this.services.usersService.updateUserRefreshToken(user.id, refreshToken);
 
             return res
                 .status(201)
@@ -87,20 +82,9 @@ class AuthController extends CommonController {
             await this.services.usersService.revokeUserRefreshToken(jwtPayload.userId);
             return res.status(200).send();
         } catch (error) {
-            this.logger.error(`${this.name}.revokeRefreshToken`, error);
+            this.logger.error(`[${this.name}.revokeRefreshToken]`, error);
             return res.status(500).send();
         }
-    }
-
-    private async verifyUserPassword(email: string, password: string): Promise<boolean> {
-        let user: IUser | undefined = await this.services.usersService.getUserByEmail(email);
-        if (user) {
-            const passwordHash = user.passwordHash;
-            if (await argon2.verify(passwordHash, password)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
 
