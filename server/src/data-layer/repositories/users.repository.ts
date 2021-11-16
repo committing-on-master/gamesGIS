@@ -14,14 +14,17 @@ class UsersRepository extends AbstractRepository<UsersDAO> {
     }
 
     public async isEmailAlreadyExist(checkingEmail: string): Promise<boolean> {
+        // TODO: переделать на SELECT 1, экранировав строку в параметре
         return await this.repository.findOne({where: {email: checkingEmail}}) ? true : false;
     }
 
     public async isNameAlreadyExist(checkingName: string): Promise<boolean> {
+        // TODO: переделать на SELECT 1, экранировав строку в параметре
         return await this.repository.findOne({where: {name: checkingName}}) ? true : false;
     }
 
     public async isUserExist(userId: number): Promise<boolean> {
+        // TODO: переделать на SELECT 1, экранировав строку в параметре
         return await this.repository.findOne(userId) ? true : false;
     }
 
