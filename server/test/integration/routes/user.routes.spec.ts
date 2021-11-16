@@ -1,4 +1,5 @@
-import { anyString, anything, mock, when, verify, capture } from "ts-mockito";
+import "reflect-metadata";
+import { anything, mock, when, verify, capture } from "ts-mockito";
 import winston from "winston";
 import express from "express";
 import supertestServ from "supertest";
@@ -66,7 +67,7 @@ class UserTestDataBuilder extends TestDataBuilder<TestData, UsersRoutes> {
     }
 }
 
-describe("Проверка работы допусков при работе UserController-а", function(){
+describe("User Routes", function(){
     const builder = new UserTestDataBuilder();
     let expressApp: express.Application;
 
@@ -192,42 +193,75 @@ describe("Проверка работы допусков при работе Use
             builder
             .addStep(data => data.usersStub.addMock(user => when(user.id).thenReturn(userId))
                                            .addMock(user => when(user.email).thenReturn(userEmail)))
-            .addStep(data => data.userService.addMock(service => when(service.getUserById(userId)).thenResolve(data.usersStub.Instance)))
+            .addStep(data => data.userService.addMock(service => when(service.getUserById(userId)).thenResolve(data.usersStub.Instance))
+                                             .addMock(service => when(service.isUserExist(userId)).thenResolve(true)))
             .TestedInstance.registerRoutes(expressApp);
         })
         it("Удачный сценарий получения данных", async function() {
             let response = await supertestServ(expressApp)
                 .get(`/users/${userId}`)
-                .set("Content-Type", "application/json")
                 .set({ Authorization: `Bearer ${accessToken}` })
-                .expect(200);
+                .set("Accept", "application/json");
 
+            expect(response.statusCode).to.be.equal(200);
             expect(response.body.user).is.not.null;
             expect(response.body.user.email).is.equal(userEmail);
         })
     })
 
-    context.skip("Сценарий редактирования пользовательских данных", function() {
+    context("Сценарии редактирования пользовательских данных", function() {
         const userId = 134;
         const userEmail = "gachi@tarkov.gay";
         const jwtSecret = builder.Data.jwtSecret;
-        const { accessToken } = CryptoHelper.getTokens({userId: userId, permissionFlag: 1},
+        const newUserName = "Herrington";
+        const newUserEmail = "stamina@crossfit.com";
+        const { accessToken } = CryptoHelper.getTokens({userId: userId, permissionFlag: 2},
                                                         userEmail,
                                                         jwtSecret,
                                                         60)
-        before(function() {
+        beforeEach(function() {
             manualResetTestInstances();
             builder
-            // .addStep(data => data.userService.addMock(service => when(service.checkUserDataAvailability(anything())).thenResolve([])))
+            .addStep(data => data.usersStub.addMock(user => when(user.id).thenReturn(userId)))
+            .addStep(data => data.userService.addMock(service => when(service.isUserExist(userId)).thenResolve(true))
+                                             .addMock(service => when(service.getUserById(userId)).thenResolve(data.usersStub.Instance))
+                                             .addMock(service => when(service.isNameAvailable(newUserName)).thenResolve(true))
+                                             .addMock(service => when(service.isEmailAvailable(newUserEmail)).thenResolve(true)))
             .TestedInstance.registerRoutes(expressApp);
         })
 
         it("Смена имени", async function() {
             let response = await supertestServ(expressApp)
-                .post("/users/234")
+                .patch(`/users/${userId}`)
                 .set("Content-Type", "application/json")
-                .send({name: "newName"})
-                .expect(201);
+                .set({ Authorization: `Bearer ${accessToken}` })
+                .send({name: newUserName});
+                
+            expect(response.statusCode).to.be.equal(200);
+            
+            let mockedService = builder.Data.userService.proxy;
+            verify(mockedService.updateUserById(userId, anything())).once();
+            
+            let updateDto = capture(mockedService.updateUserById).first()[1];
+            expect(updateDto.name).is.equal(newUserName);
+
+        })
+
+        it("Смена почты", async function() {
+            let response = await supertestServ(expressApp)
+                .patch(`/users/${userId}`)
+                .set("Content-Type", "application/json")
+                .set({ Authorization: `Bearer ${accessToken}` })
+                .send({email: newUserEmail});
+                
+            expect(response.statusCode).to.be.equal(200);
+            
+            let mockedService = builder.Data.userService.proxy;
+            verify(mockedService.updateUserById(userId, anything())).once();
+            
+            let updateDto = capture(mockedService.updateUserById).first()[1];
+            expect(updateDto.email).is.equal(newUserEmail);
+
         })
     }) 
     

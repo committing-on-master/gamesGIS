@@ -1,8 +1,9 @@
-import { TokenInjection } from '../infrastructure/token.injection';
 import { inject, singleton } from 'tsyringe';
 import { Connection } from 'typeorm';
 import winston from 'winston';
+
 import { UsersRepository } from './repositories/users.repository';
+import { TokenInjection } from '../infrastructure/token.injection';
 import { RefreshTokensRepository } from './repositories/refresh.tokens.repository';
 
 @singleton()

@@ -1,7 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import * as argon2 from 'argon2';
 import { inject, singleton } from 'tsyringe';
 import { TokenInjection } from '../../infrastructure/token.injection';
 import winston from 'winston';

@@ -40,7 +40,7 @@ export class UsersRoutes extends CommonRoutesConfig {
 
     protected configureRoute(app: express.Application): express.Application {
         app
-            .route(`/users`)
+            .route("/users")
             .get(this.usersController.listUsers)
             .post(
                 this.usersMiddleware.validateRequestSchema(checkSchema(createUserDtoSchema)),
@@ -50,24 +50,22 @@ export class UsersRoutes extends CommonRoutesConfig {
             );
 
         app
-            .param(`userId`, this.usersMiddleware.extractUserId);
+            .param("userId", this.usersMiddleware.extractUserId);
         app
-            .route(`/users/:userId`)
+            .route("/users/:userId")
             .all(
                 this.authMiddleware.jwtTokenValidation(),
                 this.usersMiddleware.validateUserExists,
                 this.permissionMiddleware.onlySameUserOrAdminCanDoThisAction
             )
-            .get(this.usersController.getUserById)
-            // .delete(this.usersController.removeUser);
-
-        app.patch(`/users/:userId`,
-            this.usersMiddleware.earlyReturnPatchUser,
-            this.usersMiddleware.validateRequestSchema(checkSchema(patchUserDtoSchema)),
-            // this.usersMiddleware.validatePatchUserSchema(),
-            // this.usersMiddleware.schemaValidationResult,
-            this.usersController.patchUser,
-        );
+            .get(this.usersController.getUser)
+            .patch(
+                this.usersMiddleware.earlyReturnPatchUser,
+                this.usersMiddleware.validateRequestSchema(checkSchema(patchUserDtoSchema)),
+                this.usersMiddleware.validateRequestSchema(AsyncEmailValidation(this.usersService, true)),
+                this.usersMiddleware.validateRequestSchema(AsyncNameValidation(this.usersService, true)),
+                this.usersController.patchUser // обычный апдейт, без верификаций паролем и прочих критически важных штук
+            );        
 
         return app;
     }

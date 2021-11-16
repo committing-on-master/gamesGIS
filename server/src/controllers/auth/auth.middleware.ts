@@ -5,7 +5,6 @@ import { inject, injectable } from 'tsyringe';
 import { CommonMiddleware } from '../common.middleware';
 import { TokenInjection } from '../../infrastructure/token.injection';
 import winston from 'winston';
-import { body } from 'express-validator';
 import jwt, { VerifyOptions } from 'jsonwebtoken';
 import { JwtPayload } from '../common-types/jwt.payload';
 

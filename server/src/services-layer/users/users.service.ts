@@ -1,11 +1,12 @@
+import { inject, injectable } from 'tsyringe';
+import winston from 'winston';
+import argon2 from 'argon2';
+
 import { CreateUserDto } from './models/create.user.dto';
 import { PatchUserDto } from './models/patch.user.dto';
-import { inject, injectable } from 'tsyringe';
 import { DataLayer } from "../../data-layer/data.layer";
 import { UsersDAO } from "../../data-layer/models/users.dao";
-import winston from 'winston';
 import { TokenInjection } from '../../infrastructure/token.injection';
-import argon2 from 'argon2';
 import { nameofPropChecker } from '../../infrastructure/name.of.prop.checker';
 import { RefreshTokensDao } from '../../data-layer/models/refresh.tokens.dao';
 
@@ -45,11 +46,15 @@ class UsersService {
 
 
     public async isEmailAvailable(email: string): Promise<boolean> {
-        return await !this.dataLayer.usersRepository.isEmailAlreadyExist(email);
+        return !await this.dataLayer.usersRepository.isEmailAlreadyExist(email);
     }
 
     public async isNameAvailable(name: string): Promise<boolean> {
-        return await !this.dataLayer.usersRepository.isNameAlreadyExist(name);
+        return !await this.dataLayer.usersRepository.isNameAlreadyExist(name);
+    }
+
+    public async isUserExist(userId: number): Promise<boolean> {
+        return await this.dataLayer.usersRepository.isUserExist(userId);
     }
 
     /**
@@ -126,9 +131,6 @@ class UsersService {
     }
     
     public async getUserByEmail(email: string) {
-        if (!email) {
-            return undefined;
-        }
         return await this.dataLayer.usersRepository.getUserByEmail(email);
     }
 

@@ -1,50 +1,46 @@
 import express from "express";
-import { TokenInjection } from "./../infrastructure/token.injection";
-import { PermissionFlag } from "./../services-layer/users/models/permission.flag";
 import { inject, singleton } from "tsyringe";
 import winston from "winston";
+
+import { TokenInjection } from "./../infrastructure/token.injection";
+import { PermissionFlag } from "./../services-layer/users/models/permission.flag";
 import { CommonMiddleware } from "./common.middleware";
 
 @singleton()
 class PermissionMiddleware extends CommonMiddleware {
-    
+
     constructor(@inject(TokenInjection.LOGGER) logger: winston.Logger) {
-        super(logger, "PermissionMiddleware");        
+        super(logger, "PermissionMiddleware");
     }
 
     /**
      * Проверка прав доступа пользователя
      * @param requiredPermissionFlag требуемый уровень прав, для дальнейшего прохождения запроса
      */
-     public permissionFlagRequired(requiredPermissionFlag: PermissionFlag) {
-        return (
+    public permissionFlagRequired(requiredPermissionFlag: PermissionFlag) {
+        const requiredFlag = requiredPermissionFlag;
+        return function (
             req: express.Request,
             res: express.Response,
             next: express.NextFunction
-        ) => {
-            try {
-                const userPermissionFlags = parseInt(
-                    res.locals.jwt.permissionFlags
-                );
-                if (userPermissionFlags & requiredPermissionFlag) {
-                    next();
-                } else {
-                    res.status(403).send();
-                }
-            } catch (error) {
-                this.logger.error(`${this.name}.permissionFlagRequired`, error);
+        ) {
+            const userPermissionFlags = res.locals.jwt.permissionFlags;
+            if (userPermissionFlags & requiredFlag) {
+                next();
+            } else {
+                res.status(403).send();
             }
         };
     }
 
-    
+
     public async onlySameUserOrAdminCanDoThisAction(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
     ) {
-        const userPermissionFlag = parseInt(res.locals.jwt.permissionFlag);
-        if (parseInt(req.params.userId) === res.locals.jwt.userId) {
+        const userPermissionFlag = res.locals.jwt.permissionFlag;
+        if (res.locals.userId === res.locals.jwt.userId) {
             return next();
         } else {
             if (userPermissionFlag & PermissionFlag.ADMIN_PERMISSION) {
