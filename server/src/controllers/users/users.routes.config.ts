@@ -14,6 +14,7 @@ import { AsyncEmailValidation } from './models.schema/async.email.validation';
 import { UsersService } from './../../services-layer/users/users.service';
 import { AsyncNameValidation } from './models.schema/async.name.validation';
 import { AuthMiddleware } from '../auth/auth.middleware';
+import { PermissionFlag } from './../../services-layer/users/models/permission.flag';
 
 @injectable()
 export class UsersRoutes extends CommonRoutesConfig {
@@ -65,7 +66,15 @@ export class UsersRoutes extends CommonRoutesConfig {
                 this.usersMiddleware.validateRequestSchema(AsyncEmailValidation(this.usersService, true)),
                 this.usersMiddleware.validateRequestSchema(AsyncNameValidation(this.usersService, true)),
                 this.usersController.patchUser // обычный апдейт, без верификаций паролем и прочих критически важных штук
-            );        
+            );
+
+        app.patch("/users/:userId/permission",
+                this.authMiddleware.jwtTokenValidation(),
+                this.usersMiddleware.validateUserExists,
+                this.permissionMiddleware.extractPermissionFlag,
+                this.permissionMiddleware.permissionFlagRequired(PermissionFlag.ADMIN_PERMISSION),
+                this.usersController.changeUserPermission
+            );
 
         return app;
     }

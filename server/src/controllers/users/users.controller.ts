@@ -20,16 +20,17 @@ class UsersController extends CommonController {
         this.createUser = this.createUser.bind(this);
         this.patchUser = this.patchUser.bind(this);
         this.getUser = this.getUser.bind(this);
+        this.changeUserPermission = this.changeUserPermission.bind(this);
     }
 
     /**endpoint по созданию пользователя*/
     public async createUser(req: express.Request, res: express.Response) {
         try {
             await this.services.usersService.createUser(req.body);
-            res.status(201).send({ msg: "user registered" });
+            return res.status(201).send({ msg: "user registered" });
         } catch (error) {
             this.logger.error(`${this.name}.createUser error`, error);
-            return res.status(500).send();
+            return res.status(500).send({});
         }
     }
 
@@ -49,20 +50,31 @@ class UsersController extends CommonController {
             res.status(200).send({user: responseData});
         } catch (error) {
             this.logger.error(`${this.name}.getUserById`, error);
-            return res.status(500).send();
+            return res.status(500).send({});
         }
     }
 
     /**
      * endpoint по обновлению данных пользователя
      */
-    async patchUser(req: express.Request, res: express.Response) {
+    public async patchUser(req: express.Request, res: express.Response) {
         try {
             await this.services.usersService.updateUserById(res.locals.userId, req.body);
-            res.status(200).send({ msg: "user data updates successfully" });
+            return res.status(200).send({ msg: "user data updates successfully" });
         } catch (error) {
-            this.logger.error('UsersController.patchUser error', error);
-            return res.status(500).send();
+            this.logger.error(`${this.name}.patchUser`, error);
+            return res.status(500).send({});
+        }
+    }
+    public async changeUserPermission(req: express.Request, res: express.Response) {
+        try {
+            const targetUser: number = res.locals.userId;
+            const newPermission: number = res.locals.permissionFlag;
+            await this.services.usersService.updateUserPermission(targetUser, newPermission);
+            return res.status(200).send({ msg: "user permission successfully changed" });
+        } catch (error) {
+            this.logger.error(`${this.name}.changeUserPermission`, error);
+            return res.status(500).send({});
         }
     }
 

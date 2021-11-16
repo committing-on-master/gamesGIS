@@ -100,6 +100,10 @@ class AuthMiddleware extends CommonMiddleware {
         }
     }
 
+    /**
+     * Валидация JWT токена при запросе
+     * @param options опции валидации, которые можно задать для данного конкретного route-а
+     */
     public jwtTokenValidation(options: VerifyOptions = {}){
         const execParam = {
             options: options,

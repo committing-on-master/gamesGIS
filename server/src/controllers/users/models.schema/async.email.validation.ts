@@ -2,7 +2,7 @@ import { body, ValidationChain } from "express-validator";
 import { UsersService } from "../../../services-layer/users/users.service";
 
 /**
- * Проверка почты на предмет доступности
+ * Проверка почты на предмет доступности (не занятости)
  * @param userService сервис по работе с пользователями
  * @param {boolean} [optional = false] опциональность поля, true для случаев когда наличие поля пустым допускается
  */

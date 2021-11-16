@@ -38,6 +38,7 @@ class UsersMiddleware extends CommonMiddleware {
         }
     }
 
+    /**Проверка, что в route указан существующий пользователь */
     public async validateUserExists(
         req: express.Request,
         res: express.Response,

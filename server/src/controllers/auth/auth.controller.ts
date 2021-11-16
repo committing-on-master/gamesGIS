@@ -7,7 +7,7 @@ import winston from 'winston';
 import { CommonController } from '../common.controller';
 import { ServicesLayer } from '../../services-layer/services.layer';
 import { JwtPayload } from '../common-types/jwt.payload';
-import { UsersDAO } from 'src/data-layer/models/users.dao';
+import { UsersDAO } from './../../data-layer/models/users.dao';
 
 interface IUser {
     id: number;

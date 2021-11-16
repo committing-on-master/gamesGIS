@@ -8,7 +8,6 @@ import { CommonMiddleware } from "./common.middleware";
 
 @singleton()
 class PermissionMiddleware extends CommonMiddleware {
-
     constructor(@inject(TokenInjection.LOGGER) logger: winston.Logger) {
         super(logger, "PermissionMiddleware");
     }
@@ -24,15 +23,14 @@ class PermissionMiddleware extends CommonMiddleware {
             res: express.Response,
             next: express.NextFunction
         ) {
-            const userPermissionFlags = res.locals.jwt.permissionFlags;
-            if (userPermissionFlags & requiredFlag) {
-                next();
+            const userPermissionFlag = res.locals.jwt.permissionFlag;
+            if (userPermissionFlag & requiredFlag) {
+                return next();
             } else {
                 res.status(403).send();
             }
         };
     }
-
 
     public async onlySameUserOrAdminCanDoThisAction(
         req: express.Request,
@@ -51,21 +49,26 @@ class PermissionMiddleware extends CommonMiddleware {
         }
     }
 
-    public async userCantChangePermission(
+    /**Достает PermissionFlag из запроса, проверяет его корректность*/
+    extractPermissionFlag(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction
     ) {
-        if (
-            'permissionFlags' in req.body &&
-            req.body.permissionFlags !== res.locals.user.permissionFlags
-        ) {
-            res.status(400).send({
-                errors: ['User cannot change permission flags'],
+        if (Number.isNaN(req.body?.permissionFlag)) {
+            return res.status(400).send({
+                error: "Permission null or have incorrect format"
             });
-        } else {
-            next();
         }
+        let permission = parseInt(req.body.permissionFlag, 10);
+        if ( !(permission in PermissionFlag) ) {
+            return res.status(400).send({
+                error: "Incorrect value for permission level"
+            });
+        }
+
+        res.locals.permissionFlag = permission;
+        next();
     }
 }
 
