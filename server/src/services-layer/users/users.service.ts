@@ -9,6 +9,7 @@ import { UsersDAO } from "../../data-layer/models/users.dao";
 import { TokenInjection } from '../../infrastructure/token.injection';
 import { nameofPropChecker } from '../../infrastructure/name.of.prop.checker';
 import { RefreshTokensDao } from '../../data-layer/models/refresh.tokens.dao';
+import { PermissionFlag } from './models/permission.flag';
 
 @injectable()
 class UsersService {
@@ -58,28 +59,6 @@ class UsersService {
     }
 
     /**
-     * Проверка данных пользователя на совпадение с ранее зарегистрированными пользователями
-     * @param resource поля нового пользователя
-     * @returns массив, содержащий сообщения об неверных полях (В случае успешной проверки, возвращает пустой массив)
-     */
-    public async checkUserDataAvailability(resource: CreateUserDto): Promise<{prop: string, msg:string}[]> {
-        let result: {prop: string, msg: string}[] = [];
-        if (await this.dataLayer.usersRepository.isNameAlreadyExist(resource.name)) {
-            result.push({
-                prop: nameofPropChecker<CreateUserDto>("name"),
-                msg: `"${resource.name}" is already in use`
-            });
-        }
-        if (await this.dataLayer.usersRepository.isEmailAlreadyExist(resource.email)) {
-            result.push({
-                prop: nameofPropChecker<CreateUserDto>("email"),
-                msg: `"${resource.email}" is already in use`
-            });
-        }
-        return result;
-    }
-
-    /**
      * Обновляем данные пользователя в системе
      * @param userId идентификатор пользователя
      * @param resource обновляемые поля
@@ -95,6 +74,15 @@ class UsersService {
         if (resource.password) {
             updatingUser.passwordHash = await argon2.hash(resource.password);
         }
+        this.dataLayer.usersRepository.updateUser(userId, updatingUser);
+    }
+
+    public async updateUserPermission(userId: number, permission: PermissionFlag) {
+        let updatingUser = await this.dataLayer.usersRepository.findUserById(userId);
+        if (!updatingUser) {
+            return;
+        }
+        updatingUser.permissionFlag = permission;
         this.dataLayer.usersRepository.updateUser(userId, updatingUser);
     }
 

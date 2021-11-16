@@ -17,6 +17,7 @@ import { UsersService } from "./../../../src/services-layer/users/users.service"
 import { CryptoHelper } from "./../../helpers/crypto.helper";
 import { UsersDAO } from "./../../../src/data-layer/models/users.dao";
 import { AuthMiddleware } from "./../../../src/controllers/auth/auth.middleware";
+import { PermissionFlag } from "./../../../src/services-layer/users/models/permission.flag";
 
 class TestData {
     logger = new Brick(mock<winston.Logger>());
@@ -263,7 +264,76 @@ describe("User Routes", function(){
             expect(updateDto.email).is.equal(newUserEmail);
 
         })
-    }) 
+    })
+
+    context("Меняем пользовательскую роль", function(){
+        const userId = 101;
+        const userEmail = "some@mail.ru";
+        let accessToken: string = ""
+
+        beforeEach(function() {
+            manualResetTestInstances();
+            builder
+            // .addStep(data => data.usersStub.addMock(user => when(user.id).thenReturn(userId)))
+            .addStep(data => data.userService.addMock(service => when(service.isUserExist(userId)).thenResolve(true)))
+            //                                  .addMock(service => when(service.getUserById(userId)).thenResolve(data.usersStub.Instance))
+            //                                  .addMock(service => when(service.isNameAvailable(newUserName)).thenResolve(true))
+            //                                  .addMock(service => when(service.isEmailAvailable(newUserEmail)).thenResolve(true)))
+            .TestedInstance.registerRoutes(expressApp);
+        });
+
+        it("Обычный пользователь - отказано", function(done) {
+            accessToken = CryptoHelper.getTokens({userId: userId, permissionFlag: PermissionFlag.APPROVED_USER},
+                                                 userEmail,
+                                                 builder.Data.jwtSecret,
+                                                 60).accessToken;
+
+            supertestServ(expressApp)
+                .patch(`/users/${userId}/permission`)
+                .set("Content-Type", "application/json")
+                .set({ Authorization: `Bearer ${accessToken}` })
+                .send({permissionFlag: PermissionFlag.REGISTERED_USER})
+                .expect(403)
+                .end(done);
+        });
+
+        it("Администратор - у целевого пользователя изменили уровень допуска", async function() {
+            let adminId = 42;
+            let adminEmail = "Billy@Herrington.boss";
+            accessToken = CryptoHelper.getTokens({userId: adminId, permissionFlag: PermissionFlag.ADMIN_PERMISSION},
+                                                 adminEmail,
+                                                 builder.Data.jwtSecret,
+                                                 60).accessToken;
+
+            let response = await supertestServ(expressApp)
+                .patch(`/users/${userId}/permission`)
+                .set("Content-Type", "application/json")
+                .set({ Authorization: `Bearer ${accessToken}` })
+                .send({permissionFlag: PermissionFlag.APPROVED_USER});
+            
+            expect(response.statusCode).to.be.equal(200);
+
+            let mockedService = builder.Data.userService.proxy;
+            verify(mockedService.updateUserPermission(userId, PermissionFlag.APPROVED_USER)).once();
+        })
+
+        it("Переданный уровень допуска отсутствует в списке допусков - отказано", function(done) {
+            let adminId = 42;
+            let adminEmail = "Billy@Herrington.boss";
+            accessToken = CryptoHelper.getTokens({userId: adminId, permissionFlag: PermissionFlag.ADMIN_PERMISSION},
+                                                 adminEmail,
+                                                 builder.Data.jwtSecret,
+                                                 60).accessToken;
+
+            supertestServ(expressApp)
+                .patch(`/users/${userId}/permission`)
+                .set("Content-Type", "application/json")
+                .set({ Authorization: `Bearer ${accessToken}` })
+                .send({permissionFlag: 3})
+                .expect(400)
+                .end(done);
+        })
+    });
     
     // context.only("custom", function(){
     //     it("", function(done){
