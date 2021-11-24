@@ -31,7 +31,7 @@ class AuthMiddleware extends CommonMiddleware {
         next: express.NextFunction
     ) {
         try {
-            const user = await this.services.usersService.getUserByEmail(req.body.email);
+            const user = await this.services.Users.getUserByEmail(req.body.email);
             if (user) {
                 const passwordHash = user.passwordHash;
                 if (await argon2.verify(passwordHash, req.body.password)) {
@@ -73,7 +73,7 @@ class AuthMiddleware extends CommonMiddleware {
     ) {
         try {
             const jwtPayload = res.locals.jwt as JwtPayload;
-            const savedRefreshToken = await this.services.usersService.getRefreshTokenByUserId(jwtPayload.userId);
+            const savedRefreshToken = await this.services.Users.getRefreshTokenByUserId(jwtPayload.userId);
             if (!savedRefreshToken) {
                 let message = `[${this.name}.validRefreshNeeded] refresh token not found, but access token exist`;
                 this.logger.error(message);
@@ -86,7 +86,7 @@ class AuthMiddleware extends CommonMiddleware {
             if (savedRefreshToken.revoked || ((savedRefreshToken.expiredDate < new Date()))) {
                 return res.status(401).send({ errors: ["refresh token was revoked or expired"] });
             }
-            let user = await this.services.usersService.getUserById(jwtPayload.userId);
+            let user = await this.services.Users.getUserById(jwtPayload.userId);
             if (!user) {
                 let message = `[${this.name}.validRefreshNeeded] refresh token exist, but user don't`;
                 this.logger.error(message);

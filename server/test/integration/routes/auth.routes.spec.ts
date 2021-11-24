@@ -54,7 +54,7 @@ class AuthTestDataBuilder extends TestDataBuilder<TestData, AuthRoutes> {
     }
 
     public get TestedInstance(): AuthRoutes {
-        this.data.serviceLayer.addMock(layer => when(layer.usersService).thenReturn(this.data.userService.Instance));
+        this.data.serviceLayer.addMock(layer => when(layer.Users).thenReturn(this.data.userService.Instance));
 
         this.authController = new AuthController(this.data.logger.Instance, 
                                                  this.data.jwtSecret,

@@ -17,7 +17,7 @@ import { AuthMiddleware } from '../auth/auth.middleware';
 import { PermissionFlag } from './../../services-layer/users/models/permission.flag';
 
 @injectable()
-export class UsersRoutes extends CommonRoutesConfig {
+class UsersRoutes extends CommonRoutesConfig {
     private readonly usersMiddleware: UsersMiddleware;
     private readonly usersController: UsersController;
     private readonly permissionMiddleware: PermissionMiddleware;
@@ -79,3 +79,5 @@ export class UsersRoutes extends CommonRoutesConfig {
         return app;
     }
 }
+
+export { UsersRoutes }

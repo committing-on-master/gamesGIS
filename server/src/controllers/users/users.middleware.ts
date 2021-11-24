@@ -44,7 +44,7 @@ class UsersMiddleware extends CommonMiddleware {
         res: express.Response,
         next: express.NextFunction
     ) {
-        const userExist = await this.services.usersService.isUserExist(res.locals.userId);
+        const userExist = await this.services.Users.isUserExist(res.locals.userId);
         if (userExist) {
             return next();
         } else {

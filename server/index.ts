@@ -33,7 +33,8 @@ const refreshTokenExpiration = (process.env.REFRESH_TOKEN_EXPIRATION && parseInt
 
 const gisApp = new GisApplication(logger, port);
 gisApp
-    .setUp("in-memory", jwtSecret, jwtExpiration, refreshTokenExpiration)
+    // .setUp("in-memory", jwtSecret, jwtExpiration, refreshTokenExpiration)
+    .setUp("production", jwtSecret, jwtExpiration, refreshTokenExpiration)
     .then(() => {
         gisApp.start();
     })

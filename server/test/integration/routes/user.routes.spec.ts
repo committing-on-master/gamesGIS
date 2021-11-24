@@ -47,7 +47,7 @@ class UserTestDataBuilder extends TestDataBuilder<TestData, UsersRoutes> {
         this.Data.userService.reset();
     }
     get TestedInstance(): UsersRoutes {
-        this.Data.serviceLayer.addMock(layer => when(layer.usersService).thenReturn(this.Data.userService.Instance));
+        this.Data.serviceLayer.addMock(layer => when(layer.Users).thenReturn(this.Data.userService.Instance));
 
         this.usersMiddleware = new UsersMiddleware(this.Data.logger.Instance,
                                                    this.Data.serviceLayer.Instance);

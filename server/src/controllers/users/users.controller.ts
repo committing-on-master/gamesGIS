@@ -6,6 +6,7 @@ import { ServicesLayer } from "./../../services-layer/services.layer";
 import { CommonController } from "./../common.controller";
 import { TokenInjection } from "./../../infrastructure/token.injection";
 import { GetUserDto } from "./../../services-layer/users/models/get.user.dto";
+import { GetAgreementDto } from "./../../services-layer/agreements/models/get.agreement.dto";
 
 @injectable()
 class UsersController extends CommonController {
@@ -26,7 +27,7 @@ class UsersController extends CommonController {
     /**endpoint по созданию пользователя*/
     public async createUser(req: express.Request, res: express.Response) {
         try {
-            await this.services.usersService.createUser(req.body);
+            await this.services.Users.createUser(req.body);
             return res.status(201).send({ msg: "user registered" });
         } catch (error) {
             this.logger.error(`${this.name}.createUser error`, error);
@@ -37,7 +38,7 @@ class UsersController extends CommonController {
     /**endpoint получения данных пользователя */
     public async getUser(req: express.Request, res: express.Response) {
         try {
-            let user = await this.services.usersService.getUserById(res.locals.userId);
+            let user = await this.services.Users.getUserById(res.locals.userId);
             if (!user) {
                 return res.status(404).send({error: `User ${req.params.userId} not found`});
             }
@@ -59,7 +60,7 @@ class UsersController extends CommonController {
      */
     public async patchUser(req: express.Request, res: express.Response) {
         try {
-            await this.services.usersService.updateUserById(res.locals.userId, req.body);
+            await this.services.Users.updateUserById(res.locals.userId, req.body);
             return res.status(200).send({ msg: "user data updates successfully" });
         } catch (error) {
             this.logger.error(`${this.name}.patchUser`, error);
@@ -70,7 +71,7 @@ class UsersController extends CommonController {
         try {
             const targetUser: number = res.locals.userId;
             const newPermission: number = res.locals.permissionFlag;
-            await this.services.usersService.updateUserPermission(targetUser, newPermission);
+            await this.services.Users.updateUserPermission(targetUser, newPermission);
             return res.status(200).send({ msg: "user permission successfully changed" });
         } catch (error) {
             this.logger.error(`${this.name}.changeUserPermission`, error);
@@ -80,7 +81,7 @@ class UsersController extends CommonController {
 
     // TODO: удолить после тестов
     async listUsers(req: express.Request, res: express.Response) {
-        const users = await this.services.usersService.list(100, 0);
+        const users = await this.services.Users.list(100, 0);
         res.status(200).send(users);
     }
 }

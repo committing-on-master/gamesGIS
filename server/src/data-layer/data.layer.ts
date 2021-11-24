@@ -5,6 +5,7 @@ import winston from 'winston';
 import { UsersRepository } from './repositories/users.repository';
 import { TokenInjection } from '../infrastructure/token.injection';
 import { RefreshTokensRepository } from './repositories/refresh.tokens.repository';
+import { AgreementsRepository } from './repositories/agreements.repository';
 
 @singleton()
 class DataLayer {
@@ -21,8 +22,12 @@ class DataLayer {
         return this.dbContext.getCustomRepository(UsersRepository);
     }
 
-    public get refreshTokensRepository() : RefreshTokensRepository {
+    public get refreshTokensRepository(): RefreshTokensRepository {
         return this.dbContext.getCustomRepository(RefreshTokensRepository);
+    }
+
+    public get agreementsRepository(): AgreementsRepository {
+        return this.dbContext.getCustomRepository(AgreementsRepository);
     }
     
 }
