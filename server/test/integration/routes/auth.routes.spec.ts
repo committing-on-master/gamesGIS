@@ -115,11 +115,6 @@ describe("Сценарии создания JWT токена", function(){
                 msg: "Пароль слишком короткий < 5",
                 body: JSON.stringify({ password: "Five5", email: "gachi@tarkov.com"}),
                 expected: {code: 400, problemField: "password" } 
-            },
-            {
-                msg: "Пароль слишком длинный > 16",
-                body: JSON.stringify({ password: "12345678901234567", email: "gachi@tarkov.com"}),
-                expected: {code: 400, problemField: "password" } 
             }
         ];
 
