@@ -42,3 +42,5 @@ Content-Type: application/json
     "name": "Marcoss1",
     "permissionLevel": 8
 }
+### Получить последнее пользовательское соглашение
+GET http://localhost:3000/agreement HTTP/1.1

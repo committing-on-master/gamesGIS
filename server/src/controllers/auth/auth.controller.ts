@@ -53,7 +53,7 @@ class AuthController extends CommonController {
                                        .digest('base64');
             
             const token = jwt.sign(jwtPayload, this.jwtSecret, { expiresIn: this.tokenExpirationInSeconds });
-            await this.services.usersService.updateUserRefreshToken(user.id, refreshToken);
+            await this.services.Users.updateUserRefreshToken(user.id, refreshToken);
 
             return res
                 .status(201)
@@ -70,15 +70,15 @@ class AuthController extends CommonController {
     public async revokeRefreshToken(req: express.Request, res: express.Response) {
         try {
             const jwtPayload = res.locals.jwt as JwtPayload;
-            const user = await this.services.usersService.getUserById(jwtPayload.userId);
+            const user = await this.services.Users.getUserById(jwtPayload.userId);
             if (!user) {
                 return res.status(404).send({errors: ["user is not exist"]})
             }
-            const refreshToken = await this.services.usersService.getRefreshTokenByUserId(jwtPayload.userId);
+            const refreshToken = await this.services.Users.getRefreshTokenByUserId(jwtPayload.userId);
             if (!refreshToken) {
                 return res.status(410).send();
             }
-            await this.services.usersService.revokeUserRefreshToken(jwtPayload.userId);
+            await this.services.Users.revokeUserRefreshToken(jwtPayload.userId);
             return res.status(200).send();
         } catch (error) {
             this.logger.error(`[${this.name}.revokeRefreshToken]`, error);

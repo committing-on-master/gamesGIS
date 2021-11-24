@@ -15,6 +15,7 @@ import { UsersRoutes } from "./controllers/users/users.routes.config";
 import { TokenInjection } from "./infrastructure/token.injection";
 import { Connection, createConnection, getConnectionOptions } from "typeorm";
 import { AuthRoutes } from "./controllers/auth/auth.routes.config";
+import { AgreementsRoutes } from "./controllers/agreements/agreements.routes.config";
 
 class GisApplication {
     readonly port: number;
@@ -102,7 +103,8 @@ class GisApplication {
 
         this.routes.push(
             container.resolve(UsersRoutes),
-            container.resolve(AuthRoutes)
+            container.resolve(AuthRoutes),
+            container.resolve(AgreementsRoutes)
         );
         
         this.routes.forEach(route => {
