@@ -39,9 +39,9 @@ class StaticSchemaFactory {
             isLength: {
                 options: {
                     min: 6,
-                    max: 16
+                    max: 255
                 },
-                errorMessage: "password should not be greater than 16 symbols, not shorter than 4 symbols"
+                errorMessage: "password should not be greater than 255 symbols or shorter than 6 symbols"
             }
         }
     }

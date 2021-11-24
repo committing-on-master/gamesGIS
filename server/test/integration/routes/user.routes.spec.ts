@@ -113,11 +113,6 @@ describe("User Routes", function(){
                 expected: {code: 400, problemField: "password" } 
             },
             {
-                msg: "Пароль слишком длинный > 16",
-                body: JSON.stringify({ password: "12345678901234567", name: "Leha", email: "gachi@tarkov.com"}),
-                expected: {code: 400, problemField: "password" } 
-            },
-            {
                 msg: "Имя пользователя не задано",
                 body: JSON.stringify({ password: "TheWarrior2008", email: "gachi@tarkov.com"}),
                 expected: {code: 400, problemField: "name" } 
