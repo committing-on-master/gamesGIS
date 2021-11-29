@@ -1,0 +1,1 @@
+export interface IRequestOptions extends Omit<RequestInit, "body" | "method"> {}
