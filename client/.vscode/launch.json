@@ -12,7 +12,12 @@
             "webRoot": "${workspaceFolder}/src",
             "sourceMapPathOverrides": {
                 "webpack:///src/*": "${webRoot}/*"
-            }
+            },
+            "runtimeArgs": [
+                // "--disable-web-security",
+                "--incognito",
+                "--remote-debugging-port=9222"
+            ]
         }
     ]
 }

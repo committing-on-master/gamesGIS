@@ -1,6 +1,4 @@
-import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { useState } from "@storybook/client-api";
 
 import TempForm from "./TempForm";
 import { Provider } from 'react-redux';
