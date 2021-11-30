@@ -7,7 +7,7 @@ import { iSuccessResponse } from "../../api/dto/iSuccessResponse";
 
 interface AgreementTextProps {
     endPoint: string;
-    onLoaded(): void;
+    onTextLoaded(): void;
 }
 
 type LoadingStatus = "loading" | "loaded" | "failed";
@@ -22,7 +22,7 @@ function AgreementText(props: AgreementTextProps) {
                 if (response.ok && response.successBody) {
                     setComponentStatus("loaded");
                     setText(response.successBody.payload.agreementText);
-                    props.onLoaded();
+                    props.onTextLoaded();
                     return Promise.resolve();
                 } else {
                     switch (response.code) {
