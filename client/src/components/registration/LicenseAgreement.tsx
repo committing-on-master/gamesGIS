@@ -26,7 +26,7 @@ function LicenseAgreement(props: LicenseAgreementProps) {
                     <p className="modal-card-title">License agreement</p>
                     <button className="delete" aria-label="close" onClick={props.onCancel}></button>
                 </header>
-                <AgreementText endPoint={props.endPoint} onLoaded={onAgreementTestLoaded}/>
+                <AgreementText endPoint={props.endPoint} onTextLoaded={onAgreementTestLoaded}/>
                 <footer className="modal-card-foot">
                     <button className="button is-success" disabled={agreementTextLoading} onClick={props.onConfirm}>Agree</button>
                     <button className="button" onClick={props.onCancel}>Cancel</button>
