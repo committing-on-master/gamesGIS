@@ -1,3 +1,4 @@
+import express from "express";
 import winston from "winston";
 
 abstract class CommonController {

@@ -5,6 +5,7 @@ import path from "path";
 import * as http from "http";
 
 import express from "express"
+import cors from "cors";
 import * as expressWinston from "express-winston";
 import winston from "winston";
 import { WinstonAdaptor } from 'typeorm-logger-adaptor/logger/winston';
@@ -98,8 +99,8 @@ class GisApplication {
         }
         this.app.use(express.json());
         // TODO: вот это вот не точно, но скорее всего придется для SPA и прочей статики отдельный express.js поднимать, поэтому оставим пока так
-        // import cors from "cors";
-        // app.use(cors());
+        
+        this.app.use(cors());
 
         this.routes.push(
             container.resolve(UsersRoutes),
