@@ -6,6 +6,7 @@ import { ServicesLayer } from "./../../services-layer/services.layer";
 import { TokenInjection } from "./../../infrastructure/token.injection";
 import { CommonController } from "./../common.controller";
 import { GetAgreementDto } from "./../../services-layer/agreements/models/get.agreement.dto";
+import { ResponseBody } from "../response.body";
 
 @injectable()
 class AgreementsController extends CommonController {
@@ -22,16 +23,16 @@ class AgreementsController extends CommonController {
         try {
             const agreement = await this.services.Agreements.getLastAgreement();
             if (!agreement) {
-                return res.status(404).send({});
+                return res.status(404).send(ResponseBody.jsonEmpty());
             }
             const result: GetAgreementDto = {
                 version: agreement.version,
                 agreementText: agreement.agreementBody
             }
-            return res.status(200).send({agreement: result});
+            return res.status(200).send(ResponseBody.jsonOk(`Agreement version: ${result.version}`, result));
         } catch (error) {
             this.logger.error(`${this.name}.getUserAgreement`, error);
-            return res.status(500).send({});
+            return res.status(500).send(ResponseBody.jsonEmpty());
         }
     }    
 }
