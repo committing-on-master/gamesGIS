@@ -1,11 +1,11 @@
-import { inject, singleton } from 'tsyringe';
-import { Connection } from 'typeorm';
-import winston from 'winston';
+import {inject, singleton} from "tsyringe";
+import {Connection} from "typeorm";
+import winston from "winston";
 
-import { UsersRepository } from './repositories/users.repository';
-import { TokenInjection } from '../infrastructure/token.injection';
-import { RefreshTokensRepository } from './repositories/refresh.tokens.repository';
-import { AgreementsRepository } from './repositories/agreements.repository';
+import {UsersRepository} from "./repositories/users.repository";
+import {TokenInjection} from "../infrastructure/token.injection";
+import {RefreshTokensRepository} from "./repositories/refresh.tokens.repository";
+import {AgreementsRepository} from "./repositories/agreements.repository";
 
 @singleton()
 class DataLayer {
@@ -29,7 +29,6 @@ class DataLayer {
     public get agreementsRepository(): AgreementsRepository {
         return this.dbContext.getCustomRepository(AgreementsRepository);
     }
-    
 }
 
-export { DataLayer }
+export {DataLayer};

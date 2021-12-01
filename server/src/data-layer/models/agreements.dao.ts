@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+/* eslint-disable new-cap */
+import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn} from "typeorm";
 
 /**
  * Табличка пользовательских соглашений
@@ -6,16 +7,16 @@ import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeor
 @Entity()
 class AgreementsDAO {
     @PrimaryGeneratedColumn()
-    id!: number;
+        id!: number;
 
     @Column()
-    version!: number;
+        version!: number;
 
     @Column()
-    agreementBody!: string;
+        agreementBody!: string;
 
     @CreateDateColumn()
-    creationDate!: Date;
+        creationDate!: Date;
 }
 
-export { AgreementsDAO }
+export {AgreementsDAO};

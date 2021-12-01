@@ -1,10 +1,10 @@
 import express from "express";
-import { inject, singleton } from "tsyringe";
+import {inject, singleton} from "tsyringe";
 import winston from "winston";
 
-import { TokenInjection } from "./../infrastructure/token.injection";
-import { PermissionFlag } from "./../services-layer/users/models/permission.flag";
-import { CommonMiddleware } from "./common.middleware";
+import {TokenInjection} from "./../infrastructure/token.injection";
+import {PermissionFlag} from "./../services-layer/users/models/permission.flag";
+import {CommonMiddleware} from "./common.middleware";
 
 @singleton()
 class PermissionMiddleware extends CommonMiddleware {
@@ -14,14 +14,15 @@ class PermissionMiddleware extends CommonMiddleware {
 
     /**
      * Проверка прав доступа пользователя
-     * @param requiredPermissionFlag требуемый уровень прав, для дальнейшего прохождения запроса
+     * @param {PermissionFlag} requiredPermissionFlag требуемый уровень прав, для дальнейшего прохождения запроса
+     * @return {Function} middleware функция, проверяющая входящий запрос на наличие соответствующих прав
      */
     public permissionFlagRequired(requiredPermissionFlag: PermissionFlag) {
         const requiredFlag = requiredPermissionFlag;
-        return function (
+        return function(
             req: express.Request,
             res: express.Response,
-            next: express.NextFunction
+            next: express.NextFunction,
         ) {
             const userPermissionFlag = res.locals.jwt.permissionFlag;
             if (userPermissionFlag & requiredFlag) {
@@ -35,7 +36,7 @@ class PermissionMiddleware extends CommonMiddleware {
     public async onlySameUserOrAdminCanDoThisAction(
         req: express.Request,
         res: express.Response,
-        next: express.NextFunction
+        next: express.NextFunction,
     ) {
         const userPermissionFlag = res.locals.jwt.permissionFlag;
         if (res.locals.userId === res.locals.jwt.userId) {
@@ -49,21 +50,27 @@ class PermissionMiddleware extends CommonMiddleware {
         }
     }
 
-    /**Достает PermissionFlag из запроса, проверяет его корректность*/
+    /**
+     * Достает PermissionFlag из запроса, проверяет его корректность
+     * @param {express.Request} req
+     * @param {express.Response} res
+     * @param {express.NextFunction} next
+     * @return {void}
+     * */
     extractPermissionFlag(
         req: express.Request,
         res: express.Response,
-        next: express.NextFunction
+        next: express.NextFunction,
     ) {
         if (Number.isNaN(req.body?.permissionFlag)) {
             return res.status(400).send({
-                error: "Permission null or have incorrect format"
+                error: "Permission null or have incorrect format",
             });
         }
-        let permission = parseInt(req.body.permissionFlag, 10);
+        const permission = parseInt(req.body.permissionFlag, 10);
         if ( !(permission in PermissionFlag) ) {
             return res.status(400).send({
-                error: "Incorrect value for permission level"
+                error: "Incorrect value for permission level",
             });
         }
 
@@ -72,4 +79,4 @@ class PermissionMiddleware extends CommonMiddleware {
     }
 }
 
-export { PermissionMiddleware }
+export {PermissionMiddleware};

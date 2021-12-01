@@ -1,15 +1,14 @@
-import { inject, injectable } from 'tsyringe';
-import winston from 'winston';
-import argon2 from 'argon2';
+import {inject, injectable} from "tsyringe";
+import winston from "winston";
+import argon2 from "argon2";
 
-import { CreateUserDto } from './models/create.user.dto';
-import { PatchUserDto } from './models/patch.user.dto';
-import { DataLayer } from "../../data-layer/data.layer";
-import { UsersDAO } from "../../data-layer/models/users.dao";
-import { TokenInjection } from '../../infrastructure/token.injection';
-import { nameofPropChecker } from '../../infrastructure/name.of.prop.checker';
-import { RefreshTokensDao } from '../../data-layer/models/refresh.tokens.dao';
-import { PermissionFlag } from './models/permission.flag';
+import {CreateUserDto} from "./models/create.user.dto";
+import {PatchUserDto} from "./models/patch.user.dto";
+import {DataLayer} from "../../data-layer/data.layer";
+import {UsersDAO} from "../../data-layer/models/users.dao";
+import {TokenInjection} from "../../infrastructure/token.injection";
+import {RefreshTokensDao} from "../../data-layer/models/refresh.tokens.dao";
+import {PermissionFlag} from "./models/permission.flag";
 
 @injectable()
 class UsersService {
@@ -22,26 +21,26 @@ class UsersService {
 
     constructor(@inject(TokenInjection.LOGGER) logger: winston.Logger,
                 @inject(TokenInjection.REFRESH_TOKEN_EXPIRATION) expirationTime: number,
-                dataLayer: DataLayer) {
+        dataLayer: DataLayer) {
         this.logger = logger;
         this.logger.info("UsersService creation");
-        
+
         this.refreshTokenExpiration = expirationTime;
         this.dataLayer = dataLayer;
     }
 
     /**
      * Создаем пользователя в системе
-     * @param resource поля для создания пользователя в базе
-     * @returns идентификатор созданного пользователя
+     * @param {CreateUserDto} resource поля для создания пользователя в базе
+     * @return {Promise<number>} идентификатор созданного пользователя
      */
     public async createUser(resource: CreateUserDto): Promise<number> {
-        let userDb = new UsersDAO();
+        const userDb = new UsersDAO();
         userDb.email = resource.email;
         userDb.name = resource.name;
         userDb.passwordHash = await argon2.hash(resource.password);
 
-        let result = await this.dataLayer.usersRepository.addUser(userDb);
+        const result = await this.dataLayer.usersRepository.addUser(userDb);
         return result.id;
     }
 
@@ -60,15 +59,15 @@ class UsersService {
 
     /**
      * Обновляем данные пользователя в системе
-     * @param userId идентификатор пользователя
-     * @param resource обновляемые поля
+     * @param {number} userId идентификатор пользователя
+     * @param {PatchUserDto} resource обновляемые поля
      */
     public async updateUserById(userId: number, resource: PatchUserDto): Promise<void> {
-        let updatingUser = await this.dataLayer.usersRepository.findUserById(userId);
+        const updatingUser = await this.dataLayer.usersRepository.findUserById(userId);
         if (!updatingUser) {
             return;
         }
-        
+
         updatingUser.email = resource.email ?? updatingUser.email;
         updatingUser.name = resource.name ?? updatingUser.name;
         if (resource.password) {
@@ -78,7 +77,7 @@ class UsersService {
     }
 
     public async updateUserPermission(userId: number, permission: PermissionFlag) {
-        let updatingUser = await this.dataLayer.usersRepository.findUserById(userId);
+        const updatingUser = await this.dataLayer.usersRepository.findUserById(userId);
         if (!updatingUser) {
             return;
         }
@@ -95,12 +94,12 @@ class UsersService {
                 existedToken.token = token;
                 this.dataLayer.refreshTokensRepository.updateToken(existedToken);
             } else {
-                let newToken = new RefreshTokensDao();
+                const newToken = new RefreshTokensDao();
                 newToken.revoked = false;
                 newToken.user = user;
                 newToken.expiredDate = this.getRefreshTokenExpirationDate();
                 newToken.token = token;
-                
+
                 await this.dataLayer.refreshTokensRepository.addToken(newToken);
             }
         }
@@ -117,7 +116,7 @@ class UsersService {
     public async getRefreshTokenByUserId(userId: number): Promise<RefreshTokensDao | undefined> {
         return await this.dataLayer.refreshTokensRepository.findTokenByUserId(userId);
     }
-    
+
     public async getUserByEmail(email: string) {
         return await this.dataLayer.usersRepository.getUserByEmail(email);
     }
@@ -127,7 +126,7 @@ class UsersService {
     }
 
     private getRefreshTokenExpirationDate(): Date {
-        let currentDate = new Date();
+        const currentDate = new Date();
         return new Date(currentDate.getDate() + this.refreshTokenExpiration);
     }
 
@@ -140,4 +139,4 @@ class UsersService {
     }
 }
 
-export { UsersService };
+export {UsersService};

@@ -6,4 +6,4 @@ abstract class TokenInjection {
     public static REFRESH_TOKEN_EXPIRATION = "REFRESH_TOKEN_EXPIRATION";
 }
 
-export { TokenInjection }
+export {TokenInjection};

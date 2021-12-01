@@ -3,4 +3,4 @@ interface GetAgreementDto {
     agreementText: string;
 }
 
-export { GetAgreementDto }
+export {GetAgreementDto};

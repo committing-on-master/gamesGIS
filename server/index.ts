@@ -1,14 +1,14 @@
 import dotenv from "dotenv";
 import winston from "winston";
 
-import { GisApplication } from "./src/gis.application";
+import {GisApplication} from "./src/gis.application";
 
 const loggerOptions: winston.LoggerOptions = {
-    level: 'info',
+    level: "info",
     format: winston.format.combine(winston.format.colorize({all: true}), winston.format.json()),
     // defaultMeta: { service: 'user-service' },
     transports: [
-        new winston.transports.Console({format: winston.format.simple()})
+        new winston.transports.Console({format: winston.format.simple()}),
 
         // - Write all logs with level `error` and below to `error.log`
         // new winston.transports.File({ filename: 'error.log', level: 'error' }),
@@ -16,7 +16,7 @@ const loggerOptions: winston.LoggerOptions = {
         // - Write all logs with level `info` and below to `combined.log`
         // new winston.transports.File({ filename: 'combined.log' }),
     ],
-}
+};
 
 const logger: winston.Logger = winston.createLogger(loggerOptions);
 
@@ -37,7 +37,7 @@ gisApp
     .setUp("production", jwtSecret, jwtExpiration, refreshTokenExpiration)
     .then(() => {
         gisApp.start();
-    })
+    });
 
 process.on("SIGINT", () => {
     gisApp.stop();

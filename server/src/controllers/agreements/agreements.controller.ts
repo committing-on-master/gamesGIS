@@ -1,12 +1,12 @@
-import { inject, injectable } from "tsyringe";
+import {inject, injectable} from "tsyringe";
 import winston from "winston";
 import express from "express";
 
-import { ServicesLayer } from "./../../services-layer/services.layer";
-import { TokenInjection } from "./../../infrastructure/token.injection";
-import { CommonController } from "./../common.controller";
-import { GetAgreementDto } from "./../../services-layer/agreements/models/get.agreement.dto";
-import { ResponseBody } from "../response.body";
+import {ServicesLayer} from "./../../services-layer/services.layer";
+import {TokenInjection} from "./../../infrastructure/token.injection";
+import {CommonController} from "./../common.controller";
+import {GetAgreementDto} from "./../../services-layer/agreements/models/get.agreement.dto";
+import {ResponseBody} from "../response.body";
 
 @injectable()
 class AgreementsController extends CommonController {
@@ -27,14 +27,14 @@ class AgreementsController extends CommonController {
             }
             const result: GetAgreementDto = {
                 version: agreement.version,
-                agreementText: agreement.agreementBody
-            }
+                agreementText: agreement.agreementBody,
+            };
             return res.status(200).send(ResponseBody.jsonOk(`Agreement version: ${result.version}`, result));
         } catch (error) {
             this.logger.error(`${this.name}.getUserAgreement`, error);
             return res.status(500).send(ResponseBody.jsonEmpty());
         }
-    }    
+    }
 }
 
-export { AgreementsController }
+export {AgreementsController};

@@ -1,10 +1,10 @@
-import express from 'express';
-import { inject, injectable } from 'tsyringe';
-import winston from 'winston';
+import express from "express";
+import {inject, injectable} from "tsyringe";
+import winston from "winston";
 
-import { ServicesLayer } from '../../services-layer/services.layer';
-import { CommonMiddleware } from '../common.middleware';
-import { TokenInjection } from '../../infrastructure/token.injection';
+import {ServicesLayer} from "../../services-layer/services.layer";
+import {CommonMiddleware} from "../common.middleware";
+import {TokenInjection} from "../../infrastructure/token.injection";
 
 @injectable()
 class UsersMiddleware extends CommonMiddleware {
@@ -22,27 +22,37 @@ class UsersMiddleware extends CommonMiddleware {
 
     /**
      * Ранний возврат для Patch endpoint-а. Так как все поля модели могут быть пустыми
+     * @param {express.Request} req
+     * @param {express.Response} res
+     * @param {express.NextFunction} next
+     * @return {void}
      */
     public earlyReturnPatchUser(
         req: express.Request,
         res: express.Response,
-        next: express.NextFunction
-    ) {
-        if (req.body?.email 
-            || req.body?.password 
-            || req.body?.name
-            ) {
-                return next();
+        next: express.NextFunction,
+    ): void {
+        if (req.body?.email ||
+            req.body?.password ||
+            req.body?.name
+        ) {
+            return next();
         } else {
             res.status(200).send({msg: "All update field are empty"});
         }
     }
 
-    /**Проверка, что в route указан существующий пользователь */
+    /**
+     * Проверка, что в route указан существующий пользователь
+     * @param {express.Request} req
+     * @param {express.Response} res
+     * @param {express.NextFunction} next
+     * @return {void}
+     * */
     public async validateUserExists(
         req: express.Request,
         res: express.Response,
-        next: express.NextFunction
+        next: express.NextFunction,
     ) {
         const userExist = await this.services.Users.isUserExist(res.locals.userId);
         if (userExist) {
@@ -57,7 +67,7 @@ class UsersMiddleware extends CommonMiddleware {
     public async extractUserId(
         req: express.Request,
         res: express.Response,
-        next: express.NextFunction
+        next: express.NextFunction,
     ) {
         if (Number.isNaN(req.params.userId)) {
             return res.status(404).send({
@@ -71,14 +81,14 @@ class UsersMiddleware extends CommonMiddleware {
     public async userCantChangePermission(
         req: express.Request,
         res: express.Response,
-        next: express.NextFunction
+        next: express.NextFunction,
     ) {
         if (
-            'permissionFlags' in req.body &&
+            "permissionFlags" in req.body &&
             req.body.permissionFlags !== res.locals.user.permissionFlags
         ) {
             res.status(400).send({
-                errors: ['User cannot change permission flags'],
+                errors: ["User cannot change permission flags"],
             });
         } else {
             next();
@@ -86,4 +96,4 @@ class UsersMiddleware extends CommonMiddleware {
     }
 }
 
-export { UsersMiddleware };
+export {UsersMiddleware};
