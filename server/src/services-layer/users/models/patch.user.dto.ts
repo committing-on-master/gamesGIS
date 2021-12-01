@@ -3,4 +3,4 @@ interface PatchUserDto {
     password?: string;
     name?: string;
 }
-export { PatchUserDto }
+export {PatchUserDto};

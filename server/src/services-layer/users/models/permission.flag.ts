@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * Права доступа
  * шаг ^2 => 1 2 4 8 16 32 ... 2147483647
@@ -9,4 +10,4 @@ enum PermissionFlag {
     ADMIN_PERMISSION = 4
 }
 
-export { PermissionFlag }
+export {PermissionFlag};

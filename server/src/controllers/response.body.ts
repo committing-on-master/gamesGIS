@@ -10,21 +10,23 @@ interface ISuccessBody<T> extends IResponseBody {
     payload?: T;
 }
 
-/**Формат ошибок express-validator */
+/** Формат ошибок express-validator */
 interface IError {
-    /**Сообщение об ошибке */
+    /** Сообщение об ошибке */
     msg: string;
 
-    /**Полученное значение */
+    /** Полученное значение */
     value?: string;
-    /**Параметр запроса, содержащий значение */
+    /** Параметр запроса, содержащий значение */
     param?: string;
-    /**Расположение параметра в запросе body | params | header etc*/
+    /** Расположение параметра в запросе body | params | header etc*/
     location?: string;
 }
 
 abstract class ResponseBody {
-    public static jsonEmpty() { return {} }
+    public static jsonEmpty() {
+        return {};
+    }
 
     public static jsonOk<T = null>(message?: string, dto?: T): ISuccessBody<T> {
         const result: ISuccessBody<T> = {};
@@ -54,4 +56,4 @@ abstract class ResponseBody {
     }
 }
 
-export { ResponseBody };
+export {ResponseBody};

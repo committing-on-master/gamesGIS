@@ -1,8 +1,8 @@
-import { inject, injectable } from "tsyringe";
+import {inject, injectable} from "tsyringe";
 import winston from "winston";
 
-import { TokenInjection } from "./../../infrastructure/token.injection";
-import { DataLayer } from "./../../data-layer/data.layer";
+import {TokenInjection} from "./../../infrastructure/token.injection";
+import {DataLayer} from "./../../data-layer/data.layer";
 
 @injectable()
 class AgreementsService {
@@ -10,7 +10,7 @@ class AgreementsService {
     private readonly dataLayer: DataLayer;
 
     constructor(@inject(TokenInjection.LOGGER) logger: winston.Logger,
-                dataLayer: DataLayer) {
+        dataLayer: DataLayer) {
         this.logger = logger;
         this.logger.info("AgreementService creation");
 
@@ -20,7 +20,6 @@ class AgreementsService {
     public async getLastAgreement() {
         return await this.dataLayer.agreementsRepository.getLastAgreement();
     }
-    
 }
 
-export { AgreementsService }
+export {AgreementsService};

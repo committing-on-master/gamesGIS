@@ -1,12 +1,11 @@
 import express from "express";
-import { inject, injectable } from "tsyringe";
+import {inject, injectable} from "tsyringe";
 import winston from "winston";
 
-import { ServicesLayer } from "./../../services-layer/services.layer";
-import { CommonController } from "./../common.controller";
-import { TokenInjection } from "./../../infrastructure/token.injection";
-import { GetUserDto } from "./../../services-layer/users/models/get.user.dto";
-import { GetAgreementDto } from "./../../services-layer/agreements/models/get.agreement.dto";
+import {ServicesLayer} from "./../../services-layer/services.layer";
+import {CommonController} from "./../common.controller";
+import {TokenInjection} from "./../../infrastructure/token.injection";
+import {GetUserDto} from "./../../services-layer/users/models/get.user.dto";
 
 @injectable()
 class UsersController extends CommonController {
@@ -24,30 +23,40 @@ class UsersController extends CommonController {
         this.changeUserPermission = this.changeUserPermission.bind(this);
     }
 
-    /**endpoint по созданию пользователя*/
+    /**
+     * endpoint по созданию пользователя
+     * @param {express.Request} req
+     * @param {express.Response} res
+     * @return {void}
+     * */
     public async createUser(req: express.Request, res: express.Response) {
         try {
             await this.services.Users.createUser(req.body);
-            return res.status(201).send({ msg: "user registered" });
+            return res.status(201).send({msg: "user registered"});
         } catch (error) {
             this.logger.error(`${this.name}.createUser error`, error);
             return res.status(500).send({});
         }
     }
 
-    /**endpoint получения данных пользователя */
+    /**
+     * endpoint получения данных пользователя
+     * @param {express.Request} req
+     * @param {express.Response} res
+     * @return {void}
+     * */
     public async getUser(req: express.Request, res: express.Response) {
         try {
-            let user = await this.services.Users.getUserById(res.locals.userId);
+            const user = await this.services.Users.getUserById(res.locals.userId);
             if (!user) {
                 return res.status(404).send({error: `User ${req.params.userId} not found`});
             }
-            let responseData: GetUserDto = {
+            const responseData: GetUserDto = {
                 email: user.email,
                 name: user.name,
                 permissionFlag: user.permissionFlag,
-                registrationDate: user.registrationDate
-            }
+                registrationDate: user.registrationDate,
+            };
             res.status(200).send({user: responseData});
         } catch (error) {
             this.logger.error(`${this.name}.getUserById`, error);
@@ -57,11 +66,14 @@ class UsersController extends CommonController {
 
     /**
      * endpoint по обновлению данных пользователя
+     * @param {express.Request} req
+     * @param {express.Response} res
+     * @return {void}
      */
     public async patchUser(req: express.Request, res: express.Response) {
         try {
             await this.services.Users.updateUserById(res.locals.userId, req.body);
-            return res.status(200).send({ msg: "user data updates successfully" });
+            return res.status(200).send({msg: "user data updates successfully"});
         } catch (error) {
             this.logger.error(`${this.name}.patchUser`, error);
             return res.status(500).send({});
@@ -72,7 +84,7 @@ class UsersController extends CommonController {
             const targetUser: number = res.locals.userId;
             const newPermission: number = res.locals.permissionFlag;
             await this.services.Users.updateUserPermission(targetUser, newPermission);
-            return res.status(200).send({ msg: "user permission successfully changed" });
+            return res.status(200).send({msg: "user permission successfully changed"});
         } catch (error) {
             this.logger.error(`${this.name}.changeUserPermission`, error);
             return res.status(500).send({});
@@ -86,4 +98,4 @@ class UsersController extends CommonController {
     }
 }
 
-export { UsersController };
+export {UsersController};

@@ -5,4 +5,4 @@ interface GetUserDto {
     registrationDate: Date
 }
 
-export { GetUserDto }
+export {GetUserDto};

@@ -1,13 +1,13 @@
-import { EntityRepository, AbstractRepository } from "typeorm";
-import { UsersDAO } from "../models/users.dao";
+import {EntityRepository, AbstractRepository} from "typeorm";
+import {UsersDAO} from "../models/users.dao";
 
+// eslint-disable-next-line new-cap
 @EntityRepository(UsersDAO)
 class UsersRepository extends AbstractRepository<UsersDAO> {
-
     /**
      * Сохраняет пользователя вв базе данных
-     * @param user объект содержащий поля для сохранения
-     * @returns сохраненная сущность, с присвоенным идентификатором
+     * @param {UsersDAO} user объект содержащий поля для сохранения
+     * @return {Promise<UsersDAO>} сохраненная сущность, с присвоенным идентификатором
      */
     public async addUser(user: UsersDAO): Promise<UsersDAO> {
         return await this.repository.save(user);
@@ -29,13 +29,13 @@ class UsersRepository extends AbstractRepository<UsersDAO> {
     }
 
     public async findUserByEmail(usersEmail: string): Promise<UsersDAO | undefined> {
-        return await this.repository.findOne({where: {email: usersEmail}})
+        return await this.repository.findOne({where: {email: usersEmail}});
     }
 
     public async updateUser(userId: number, user: Partial<UsersDAO>): Promise<void> {
         await this.repository.update(userId, user);
     }
-    
+
     public async findUserById(userId: number) {
         return await this.repository.findOne(userId);
     }
@@ -51,9 +51,9 @@ class UsersRepository extends AbstractRepository<UsersDAO> {
 
     public async getUsers() {
         // TODO: выпили эту хуйню после теста
-        let result = await this.repository.find();
+        const result = await this.repository.find();
         return result;
     }
 }
 
-export { UsersRepository }
+export {UsersRepository};

@@ -1,4 +1,5 @@
-import { ParamSchema } from 'express-validator';
+/* eslint-disable no-unused-vars */
+import {ParamSchema} from "express-validator";
 
 /**
  * Создаем тип для валидации полей request-а переданной DTO-шки
@@ -8,4 +9,4 @@ type SchemaValidationProps<DTO> = {
     [Property in keyof Required<DTO>]: ParamSchema;
 };
 
-export { SchemaValidationProps };
+export {SchemaValidationProps};

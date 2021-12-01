@@ -4,4 +4,4 @@ interface CreateUserDto {
     name: string
 }
 
-export { CreateUserDto }
+export {CreateUserDto};

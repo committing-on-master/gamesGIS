@@ -1,5 +1,5 @@
-import { SchemaValidationProps } from "./../../common-types/schema.validation.type";
-import { StaticSchemaFactory } from "./../../common-types/schema.factory";
+import {SchemaValidationProps} from "./../../common-types/schema.validation.type";
+import {StaticSchemaFactory} from "./../../common-types/schema.factory";
 
 interface LoginAuthBody {
     email: string,
@@ -8,7 +8,7 @@ interface LoginAuthBody {
 
 const LoginAuthSchema: SchemaValidationProps<LoginAuthBody> = {
     email: StaticSchemaFactory.createEmailSchema(),
-    password: StaticSchemaFactory.createPasswordSchema()
-}
+    password: StaticSchemaFactory.createPasswordSchema(),
+};
 
-export { LoginAuthSchema }
+export {LoginAuthSchema};

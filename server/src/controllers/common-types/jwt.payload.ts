@@ -3,4 +3,4 @@ type JwtPayload = {
     permissionFlag: number;
 };
 
-export { JwtPayload }
+export {JwtPayload};

@@ -1,29 +1,29 @@
 import "reflect-metadata";
-import { container } from "tsyringe";
+import {container} from "tsyringe";
 
 import path from "path";
 import * as http from "http";
 
-import express from "express"
+import express from "express";
 import cors from "cors";
 import * as expressWinston from "express-winston";
 import winston from "winston";
-import { WinstonAdaptor } from 'typeorm-logger-adaptor/logger/winston';
+import {WinstonAdaptor} from "typeorm-logger-adaptor/logger/winston";
 
 
-import { CommonRoutesConfig } from "./controllers/common.routes.config";
-import { UsersRoutes } from "./controllers/users/users.routes.config";
-import { TokenInjection } from "./infrastructure/token.injection";
-import { Connection, createConnection, getConnectionOptions } from "typeorm";
-import { AuthRoutes } from "./controllers/auth/auth.routes.config";
-import { AgreementsRoutes } from "./controllers/agreements/agreements.routes.config";
+import {CommonRoutesConfig} from "./controllers/common.routes.config";
+import {UsersRoutes} from "./controllers/users/users.routes.config";
+import {TokenInjection} from "./infrastructure/token.injection";
+import {Connection, createConnection, getConnectionOptions} from "typeorm";
+import {AuthRoutes} from "./controllers/auth/auth.routes.config";
+import {AgreementsRoutes} from "./controllers/agreements/agreements.routes.config";
 
 class GisApplication {
     readonly port: number;
-    readonly host: string;    
+    readonly host: string;
     readonly logger: winston.Logger;
     readonly routes: Array<CommonRoutesConfig>;
-    
+
     private app?: express.Application;
     server?: http.Server;
     private startingDate?: Date;
@@ -32,20 +32,20 @@ class GisApplication {
     constructor(logger: winston.Logger, port: number, host?: string) {
         this.logger = logger;
         logger.info("Starting GameGis application");
-        
+
         this.port = port;
         this.host = host ?? "localhost";
         this.routes = [];
     }
-    
+
     public async setUp(connectionName: string, jwtSecret: string, jwtExpiration:number, refreshTokenExpiration: number) {
-        container.register<winston.Logger>(TokenInjection.LOGGER, { useValue: this.logger });
-        container.register(TokenInjection.JWT_SECRET, { useValue: jwtSecret });
-        container.register(TokenInjection.JWT_EXPIRATION, { useValue: jwtExpiration });
-        container.register(TokenInjection.REFRESH_TOKEN_EXPIRATION, { useValue: refreshTokenExpiration});
-        
+        container.register<winston.Logger>(TokenInjection.LOGGER, {useValue: this.logger});
+        container.register(TokenInjection.JWT_SECRET, {useValue: jwtSecret});
+        container.register(TokenInjection.JWT_EXPIRATION, {useValue: jwtExpiration});
+        container.register(TokenInjection.REFRESH_TOKEN_EXPIRATION, {useValue: refreshTokenExpiration});
+
         this.app = express();
-        
+
         await this.dbInitialization(connectionName);
 
         this.addExpressLoggingMiddleware(this.logger);
@@ -60,9 +60,9 @@ class GisApplication {
         const winstonOrm = new WinstonAdaptor(this.logger, "all");
         // Берем конфигу из ormconfig файла, и подменяем логгер на уже созданный единый логгер приложения
         this.dbConnection = await getConnectionOptions(connectionName)
-            .then(connectionOpt => {
-                return createConnection(Object.assign(connectionOpt, { logger: winstonOrm }))
-            })
+            .then((connectionOpt) => {
+                return createConnection(Object.assign(connectionOpt, {logger: winstonOrm}));
+            });
         container.register<Connection>(Connection, {useValue: this.dbConnection});
     }
 
@@ -70,14 +70,14 @@ class GisApplication {
         if (!this.app) {
             throw new Error("Express is not created.");
         }
-        //expressWinston.requestWhitelist.push('body');
+        // expressWinston.requestWhitelist.push('body');
         const expressLoggerOpt: expressWinston.LoggerOptions = {
             winstonInstance: logger,
             meta: true,
             // TODO: удалить обязательно, логировать бодики POST реквестов на продах крайне не желательно
-            requestWhitelist: ["body"] 
-        }
-        
+            requestWhitelist: ["body"],
+        };
+
         this.app.use(expressWinston.logger(expressLoggerOpt));
     }
 
@@ -99,16 +99,16 @@ class GisApplication {
         }
         this.app.use(express.json());
         // TODO: вот это вот не точно, но скорее всего придется для SPA и прочей статики отдельный express.js поднимать, поэтому оставим пока так
-        
+
         this.app.use(cors());
 
         this.routes.push(
             container.resolve(UsersRoutes),
             container.resolve(AuthRoutes),
-            container.resolve(AgreementsRoutes)
+            container.resolve(AgreementsRoutes),
         );
-        
-        this.routes.forEach(route => {
+
+        this.routes.forEach((route) => {
             route.registerRoutes(this.app as express.Application);
         });
     }
@@ -139,4 +139,4 @@ class GisApplication {
 }
 
 // export default new GisApplication();
-export { GisApplication };
+export {GisApplication};

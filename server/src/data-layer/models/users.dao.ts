@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { RefreshTokensDao } from "./refresh.tokens.dao";
+/* eslint-disable new-cap */
+import {Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn} from "typeorm";
+import {RefreshTokensDao} from "./refresh.tokens.dao";
 
 /**
  * Табличка пользователей в базе данных
@@ -9,27 +10,27 @@ class UsersDAO {
     constructor() {
         this.permissionFlag = 1;
     }
-    
+
     @PrimaryGeneratedColumn()
-    id!: number;
+        id!: number;
 
     @Column()
-    email!: string;
+        email!: string;
 
-    @Column(/*{length: 128}*/)
-    passwordHash!: string;
+    @Column(/* {length: 128}*/)
+        passwordHash!: string;
 
     @Column({length: 30})
-    name!: string;
+        name!: string;
 
     @Column()
-    permissionFlag: number;
+        permissionFlag: number;
 
     @CreateDateColumn()
-    registrationDate!: Date;
+        registrationDate!: Date;
 
     @OneToOne(() => RefreshTokensDao)
-    refreshToken?: RefreshTokensDao;
+        refreshToken?: RefreshTokensDao;
 }
 
-export { UsersDAO }
+export {UsersDAO};

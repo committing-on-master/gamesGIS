@@ -11,13 +11,13 @@ abstract class CommonRoutesConfig {
 
         this.name = name;
     }
-    
+
     public registerRoutes(app: express.Application): express.Application {
         this.logger.info(`Express route registration: "${this.name}"`);
         return this.configureRoute(app);
     }
-    
+
     protected abstract configureRoute(app: express.Application): express.Application;
 }
 
-export { CommonRoutesConfig }
+export {CommonRoutesConfig};

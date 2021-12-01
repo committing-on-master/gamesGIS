@@ -1,6 +1,6 @@
-import { singleton } from "tsyringe";
-import { AgreementsService } from "./agreements/agreements.service";
-import { UsersService } from "./users/users.service"
+import {singleton} from "tsyringe";
+import {AgreementsService} from "./agreements/agreements.service";
+import {UsersService} from "./users/users.service";
 
 @singleton()
 class ServicesLayer {
@@ -8,7 +8,7 @@ class ServicesLayer {
     private readonly agreementsService: AgreementsService;
 
     constructor(userService: UsersService,
-                agreementService: AgreementsService) {
+        agreementService: AgreementsService) {
         this.usersService = userService;
         this.agreementsService = agreementService;
     }
@@ -20,7 +20,6 @@ class ServicesLayer {
     public get Users(): UsersService {
         return this.usersService;
     }
-    
 }
 
-export { ServicesLayer };
+export {ServicesLayer};
