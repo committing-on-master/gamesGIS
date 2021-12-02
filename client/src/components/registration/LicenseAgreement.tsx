@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AgreementText } from "./AgreementText";
 
 interface LicenseAgreementProps {
@@ -12,14 +12,20 @@ interface LicenseAgreementProps {
 
 function LicenseAgreement(props: LicenseAgreementProps) {
     const [agreementTextLoading, setagreementTextLoading] = useState(true);
+    const [modalVisibility, setModalVisibility] = useState(true);
 
     function onAgreementTestLoaded() {
         setagreementTextLoading(false);
     }
-    const confirmButtonClass = agreementTextLoading ? "button is-success" : "button is-success";
+
+    function handleConfirm() {
+        setModalVisibility(false);
+    }
+    
+    const modalClass = modalVisibility? "modal is-active" : "modal";
 
     return (
-        <div className="modal is-active">
+        <div className={modalClass}>
             <div className="modal-background"></div>
             <div className="modal-card">
                 <header className="modal-card-head">
@@ -28,7 +34,7 @@ function LicenseAgreement(props: LicenseAgreementProps) {
                 </header>
                 <AgreementText endPoint={props.endPoint} onTextLoaded={onAgreementTestLoaded}/>
                 <footer className="modal-card-foot">
-                    <button className="button is-success" disabled={agreementTextLoading} onClick={props.onConfirm}>Agree</button>
+                    <button className="button is-success" disabled={agreementTextLoading} onClick={handleConfirm}>Agree</button>
                     <button className="button" onClick={props.onCancel}>Cancel</button>
                 </footer>
             </div>

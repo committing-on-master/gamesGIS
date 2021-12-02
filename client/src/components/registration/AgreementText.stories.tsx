@@ -97,9 +97,9 @@ Faluire500.play = () => {
         )
 }
 
-export const FaluireNetworkError = Template.bind({});
-FaluireNetworkError.args = { endPoint: "NetworkError" }
-FaluireNetworkError.play = () => {
+export const FailureNetworkError = Template.bind({});
+FailureNetworkError.args = { endPoint: "NetworkError" }
+FailureNetworkError.play = () => {
     fetchMock
         .restore()
         .get(

@@ -15,6 +15,7 @@ class JsonRequestWrapper implements IHttpMethods {
     private get Host(): string { return `http://${JsonRequestWrapper.domain}:${JsonRequestWrapper.port}` }
     private getUrl(endPoint: string) { return `${this.Host}/${endPoint}` }
 
+    
     public get withAuth(): IHttpMethods {
         // проверка токена на протухание, если протух то перевыпускаем
         // если не смогли перевыпустить, то возвращаем заглушку выдающую 403 на любые запросы
@@ -23,7 +24,15 @@ class JsonRequestWrapper implements IHttpMethods {
         // return new JsonRequestWrapper();
     }
 
-
+    /**
+     * Обертка над get запросом. Получаем пакеты только в application/json формате
+     * @template TSuccessBody ожидаемый формат ответа от сервера в случае успеха (коды 200-299)
+     * @template TErrorBody ожидаемый формат ответа от сервера с ошибками
+     * @param endPoint endpoint для запроса
+     * @param opt параметры запроса
+     * @return {Promise< IResult<TSuccessBody, TErrorBody> >} промис с наложенным(mapped) результатом ответа
+     * @throws при проблемах с установлением соединения, или при неверном формате ответа сервера
+     */
     public get<TSuccessBody, TErrorBody>(endPoint: string, opt: IRequestOptions = {}): Promise<IResult<TSuccessBody, TErrorBody>> {
         const requestOpt: RequestInit = {
                                             ...opt,
@@ -34,6 +43,16 @@ class JsonRequestWrapper implements IHttpMethods {
         return this.exec<TSuccessBody, TErrorBody>(endPoint, requestOpt);
     }
 
+    /**
+     * Обертка над post запросом. Отправляем и получаем пакеты только в application/json формате
+     * @template TSuccessBody ожидаемый формат ответа от сервера в случае успеха (коды 200-299)
+     * @template TErrorBody ожидаемый формат ответа от сервера с ошибками
+     * @param endPoint endpoint для запроса
+     * @param body тело запроса
+     * @param opt параметры запроса
+     * @return {Promise< IResult<TSuccessBody, TErrorBody> >} промис с наложенным(mapped) результатом ответа
+     * @throws при проблемах с установлением соединения, или при неверном формате ответа сервера
+     */
     public post<TSuccessBody, TErrorBody>(endPoint: string, body: BodyInit | object , opt: IRequestOptions = {}) {
         if (typeof body === "object") {
             body = JSON.stringify(body);
