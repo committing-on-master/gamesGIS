@@ -11,7 +11,9 @@ type Inputs = {
 
 function LoginForm() {
     const { register, handleSubmit, formState: { errors } } = useForm<Inputs>();
-    const onSubmit: SubmitHandler<Inputs> = data => alert(JSON.stringify(data));
+    const onSubmit: SubmitHandler<Inputs> = (data) => {
+        alert(JSON.stringify(data));
+    }
 
     return (
         <div className="p-3">

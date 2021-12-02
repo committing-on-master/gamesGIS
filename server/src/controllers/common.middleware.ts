@@ -1,6 +1,7 @@
 import express from "express";
 import winston from "winston";
 import {ValidationChain, validationResult} from "express-validator";
+import {ResponseBody} from "./response.body";
 
 abstract class CommonMiddleware {
     protected readonly logger: winston.Logger;
@@ -38,7 +39,7 @@ abstract class CommonMiddleware {
                 if (errors.isEmpty()) {
                     return next();
                 }
-                res.status(400).json({errors: errors.array()});
+                res.status(400).json(ResponseBody.jsonError("async validation error", errors.array()));
             } catch (error) {
                 scopedLogger.error(methodName, error);
                 return next(error);

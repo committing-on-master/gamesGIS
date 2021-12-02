@@ -34,7 +34,7 @@ function AgreementText(props: AgreementTextProps) {
                             console.log(`response code: ${response.code}`)
                             console.log(response.errorBody);
                             setComponentStatus("failed");
-                            setText("Server makes \"Ooops\". Please try again later ¯\\_(ツ)_/¯");
+                            setText("Server makes \"Oops\". Please try again later ¯\\_(ツ)_/¯");
                             break;
                     }
                 }
@@ -46,7 +46,7 @@ function AgreementText(props: AgreementTextProps) {
             })
 
 
-    }, [])
+    }, [props, props.endPoint])
 
     let content: JSX.Element;
 
