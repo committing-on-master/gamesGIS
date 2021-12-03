@@ -5,17 +5,17 @@ interface LicenseAgreementProps {
     /**endpoint с которого будет загружено пользовательское соглашение */
     endPoint: string;
     /**событие подтверждения лицензионного соглашения */
-    onConfirm(): void;
+    onConfirm?(): void;
     /**событие отказа от лицензионного соглашения */
-    onCancel(): void;
+    onCancel?(): void;
 }
 
 function LicenseAgreement(props: LicenseAgreementProps) {
-    const [agreementTextLoading, setagreementTextLoading] = useState(true);
+    const [agreementTextLoading, setAgreementTextLoading] = useState(true);
     const [modalVisibility, setModalVisibility] = useState(true);
 
     function onAgreementTestLoaded() {
-        setagreementTextLoading(false);
+        setAgreementTextLoading(false);
     }
 
     function handleConfirm() {
