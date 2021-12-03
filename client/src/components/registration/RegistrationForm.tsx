@@ -7,15 +7,15 @@ import { RequestWrapper } from "../../api/JsonRequestWrapper";
 import { iCreateUserDto } from "../../api/dto/iCreateUserDto";
 import { iSuccessResponse } from "../../api/dto/iSuccessResponse";
 import { useState } from "react";
-import { IErrorBody } from "../../api/dto/IErrorBody";
 import { nameofPropChecker } from "../../api/nameofPropChecker";
+import { IErrorBody } from "../../api/dto/iErrorBody";
 
 interface RegistrationFormProps {
-    onRegistrationEvent?(): void;
+    onRegistered?(userData: Inputs): void;
     endPoint: string;
 }
 
-type Inputs = {
+export type Inputs = {
     userEmail: string,
     userName: string,
     userPassword: string,
@@ -26,7 +26,9 @@ function RegistrationForm(props: RegistrationFormProps) {
     const { register, handleSubmit, setError, formState: { errors }, watch } = useForm<Inputs>();
     const [unexpectedError, setUnexpectedError] = useState("");
 
-    const onSubmit: SubmitHandler<Inputs> = (data) => {
+    const onSubmit: SubmitHandler<Inputs> = (data, event) => {
+        event?.preventDefault();
+
         const requestBody: iCreateUserDto = {
             email: data.userEmail,
             name: data.userName,
@@ -36,7 +38,9 @@ function RegistrationForm(props: RegistrationFormProps) {
         RequestWrapper.post<iSuccessResponse, IErrorBody>(props.endPoint, requestBody)
             .then(res => {
                 if (res.ok) {
-                    alert("fuck yeah \\m/");
+                    if (props.onRegistered) {
+                        props.onRegistered(data);
+                    }
                     return Promise.resolve();
                 }
                 switch (res.code) {
@@ -58,7 +62,7 @@ function RegistrationForm(props: RegistrationFormProps) {
                                     break;
                             }
                         })
-                        break;
+                        return Promise.resolve();
                     default:
                         console.log(res.errorBody);
                         setUnexpectedError(res.errorBody?.msg || "Unexpected received response error format");

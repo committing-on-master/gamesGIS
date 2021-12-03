@@ -3,6 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelope, faKey } from '@fortawesome/free-solid-svg-icons'
 import { SchemaValidation } from "./../../schemas/schemaValidation";
+import { Link } from "react-router-dom";
 
 type Inputs = {
     userPassword: string,
@@ -47,7 +48,7 @@ function LoginForm() {
                 </div>
 
             </form>
-            <p>Registration form: <a href="#">Link</a></p>
+            <p>Registration form: <Link to="registration">click here</Link></p>
         </div>
     )
 }
