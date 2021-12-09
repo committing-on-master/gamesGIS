@@ -1,7 +1,7 @@
 # gamesGIS
 Service providing aliases with geolocation for game Escape from tarkov
 
-Пэт-проект, на котором мы собираемся обкатать разрозненные знания, собрав их для себя в какое-то единое представление. Проект будет из себя представлять связку в виде Frontend(Typescript, React, SASS) + Backend(Typescript, Node.js, Express.js, Swagger.js, SQLite, Jest)
+Пэт-проект, на котором мы собираемся обкатать разрозненные знания, собрав их для себя в какое-то единое представление. Проект будет из себя представлять связку в виде Frontend(Typescript, React, Redux, Router) + Backend(Typescript, Node.js, Express.js, SQLite)
 Проект постараемся вести итеративно, формируя документацию как на большом проекте, но без крайнего фанатизма в духе Fully Dressed Use Case-ов. С большой долей вероятности, в целях экономии времени use case-ы будут реализовываться в духе *happy path scenario* с незначительным покрытием самых грубых extension-ов.
 
 ## Запуск
