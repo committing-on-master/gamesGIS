@@ -1,5 +1,7 @@
 import 'bulma/css/bulma.css'
 import { BrowserRouter } from "react-router-dom";
+import { store } from "./../src/store/store";
+import { Provider } from "react-redux";
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
@@ -16,5 +18,9 @@ export const decorators = [
     <BrowserRouter>
       <Story />
     </BrowserRouter>
-  )
+  ),
+  (Story) =>
+    <Provider store={store}>
+      <Story />
+    </Provider>
 ];

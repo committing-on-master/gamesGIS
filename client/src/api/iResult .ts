@@ -1,4 +1,4 @@
-export interface IResult<TSuccessBody, TErrorBody> {
+export interface Result<TSuccessBody, TErrorBody> {
     /**
      * true - response codes [200, 300)
      * false - response codes [100, 200) U [300, 526+]
@@ -6,8 +6,8 @@ export interface IResult<TSuccessBody, TErrorBody> {
     ok: boolean;
     /**код ответа */
     code: number;
-    /**распарсеное тело удачного ответа */
-    successBody?: TSuccessBody;
-    /**распарсеное тело ошибки от сервера */
-    errorBody?: TErrorBody;
+    /**тело удачного ответа */
+    success?: TSuccessBody;
+    /**тело с описанием ошибки*/
+    failure?: TErrorBody;
 }

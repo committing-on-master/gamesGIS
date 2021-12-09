@@ -1,24 +1,21 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 
-import accountSlice from "./account/accountSlice";
-import { debugLoggingMiddleware } from "./middleware/debugLoggingMiddleware";
-
-import { combineReducers } from "redux";
-
-let reducers = combineReducers({accountSlice});
+import accountReducer from "./account/slice";
+// let reducers = combineReducers({accountSlice});
 
 export const store = configureStore({
     reducer: {
-        account: accountSlice
+        account: accountReducer
     },
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware()
-            .prepend(
-                debugLoggingMiddleware
+    devTools: process.env.NODE_ENV !== "production",
+    // middleware: (getDefaultMiddleware) =>
+    //     getDefaultMiddleware()y
+    //         .prepend(
+    //             debugLoggingMiddleware
 
-                // you can also type middlewares manually
-                // untypedMiddleware as Middleware<(action: Action<'specialAction'>) => number, RootState >
-            )
+    // //             // you can also type middlewares manually
+    // //             // untypedMiddleware as Middleware<(action: Action<'specialAction'>) => number, RootState >
+    //         )
     // prepend and concat calls can be chained
     // .concat(debugLoggingMiddleware)
 });

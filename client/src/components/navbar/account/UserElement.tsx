@@ -3,7 +3,7 @@ import { LoginForm } from "./LoginForm";
 import { LogoutForm } from "./LogoutForm";
 import { UserName } from "./UserName";
 
-interface IUserProps {
+interface UserProps {
     /**
      * Отображаемое имя пользователя
      * undefined - отображается строкой Login
@@ -17,15 +17,22 @@ interface IUserProps {
     dropdownAlignDirection?: "right" | "left";
 }
 
-function UserElement(props: IUserProps) {
+function UserElement(props: UserProps) {
     const [dropdownVisibility, setDropdownVisibility] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     
     const dropdownAlignClass = (props.dropdownAlignDirection === "right") ? "is-right" : "";
     const dropdownVisibilityClass = dropdownVisibility ? "is-active" : "";
     const dropdownClass = `dropdown ${dropdownVisibilityClass} ${dropdownAlignClass}`;
+
+    const handleDropdownSuccessfullyEvent = () => {
+        setDropdownVisibility(false);
+    }
     
-    const dropDownContent: JSX.Element = (props.userName) ? <LogoutForm /> : <LoginForm />
+    const dropDownContent: JSX.Element = (props.userName) 
+        ? <LogoutForm onSuccessfullyProcess={handleDropdownSuccessfullyEvent}/>
+        : <LoginForm onSuccessfullyLogin={handleDropdownSuccessfullyEvent} />
+        
     function switchDropdownVisivility() {
         setDropdownVisibility(!dropdownVisibility);
     }

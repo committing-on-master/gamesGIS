@@ -8,6 +8,7 @@ import {CommonController} from "../common.controller";
 import {ServicesLayer} from "../../services-layer/services.layer";
 import {JwtPayload} from "../common-types/jwt.payload";
 import {UsersDAO} from "./../../data-layer/models/users.dao";
+import {ResponseBody} from "../response.body";
 
 @singleton()
 class AuthController extends CommonController {
@@ -39,6 +40,7 @@ class AuthController extends CommonController {
             const user:UsersDAO = res.locals.user;
             const jwtPayload: JwtPayload = {
                 userId: user.id,
+                userName: user.name,
                 permissionFlag: user.permissionFlag,
             };
 
@@ -50,12 +52,17 @@ class AuthController extends CommonController {
             const token = jwt.sign(jwtPayload, this.jwtSecret, {expiresIn: this.tokenExpirationInSeconds});
             await this.services.Users.updateUserRefreshToken(user.id, refreshToken);
 
+            const jwtResponseDTO = {
+                accessToken: token,
+                refreshToken: refreshToken,
+            };
+
             return res
                 .status(201)
-                .send({accessToken: token, refreshToken: refreshToken});
+                .send(ResponseBody.jsonOk("jwt created", jwtResponseDTO));
         } catch (err) {
             this.logger.error("createJWT error", err);
-            return res.status(500).send();
+            return res.status(500).send({});
         }
     }
 

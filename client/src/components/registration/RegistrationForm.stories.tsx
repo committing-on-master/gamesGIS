@@ -1,7 +1,7 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import fetchMock from 'fetch-mock';
 import { RegistrationForm } from './RegistrationForm';
-import { IErrorBody } from '../../api/dto/iErrorBody';
+import { ErrorDTO } from '../../api/dto/response/ErrorDTO';
 
 export default {
     title: 'registration/RegistrationForm',
@@ -13,7 +13,7 @@ const Template: ComponentStory<typeof RegistrationForm> = (props) => <Registrati
 export const NameError = Template.bind({});
 NameError.args = { endPoint: "users/nameError" }
 NameError.play = () => {
-    const errorBody: IErrorBody = {
+    const errorBody: ErrorDTO = {
         errors: [{ param: "name", msg: "This name already in use"}]
     }
     fetchMock
@@ -31,7 +31,7 @@ NameError.play = () => {
 export const EmailError = Template.bind({});
 EmailError.args = { endPoint: "users/emailError" }
 EmailError.play = () => {
-    const errorBody: IErrorBody = {
+    const errorBody: ErrorDTO = {
         errors: [{ param: "email", msg: "This email already in use"}]
     }
     fetchMock
@@ -49,8 +49,8 @@ EmailError.play = () => {
 export const PasswordError = Template.bind({});
 PasswordError.args = { endPoint: "users/passwordError" }
 PasswordError.play = () => {
-    const errorBody: IErrorBody = {
-        errors: [{ param: "email", msg: "This password is something-something error"}]
+    const errorBody: ErrorDTO = {
+        errors: [{ param: "password", msg: "This password is something-something error"}]
     }
     fetchMock
         .restore()

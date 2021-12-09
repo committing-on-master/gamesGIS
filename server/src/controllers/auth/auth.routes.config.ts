@@ -7,6 +7,7 @@ import {AuthController} from "./auth.controller";
 import {AuthMiddleware} from "./auth.middleware";
 import {checkSchema} from "express-validator";
 import {LoginAuthSchema} from "./models.schema/login.auth.schema";
+import {RefreshAuthSchema} from "./models.schema/refresh.auth.schema";
 
 @injectable()
 class AuthRoutes extends CommonRoutesConfig {
@@ -25,9 +26,8 @@ class AuthRoutes extends CommonRoutesConfig {
             this.middleware.verifyUserPassword,
             this.controller.createJWT,
         );
-        app.post("/auth/refresh-token", // authentication request - "мой access-refresh, дай новую пару access-refresh
-            this.middleware.jwtTokenValidation({ignoreExpiration: true}), // вот это вот дебатабельно, но пускай будет пока так
-            this.middleware.verifyRefreshTokenBodyField,
+        app.post("/auth/refresh-token", // authentication request - "мой id и refresh, дай новую пару access-refresh
+            this.middleware.validateRequestSchema(checkSchema(RefreshAuthSchema)),
             this.middleware.verifyRefreshToken,
             this.controller.createJWT,
         );

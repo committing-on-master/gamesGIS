@@ -5,14 +5,13 @@ import { loremIpsum } from 'lorem-ipsum';
 import { RegistrationPage } from "./RegistrationPage";
 
 export default {
-    title: 'registration/RegistrationPage',
+    title: 'Pages/Registration',
     component: RegistrationPage,
 } as ComponentMeta<typeof RegistrationPage>;
 
-const Template: ComponentStory<typeof RegistrationPage> = (props) => <RegistrationPage {...props} />;
+const Template: ComponentStory<typeof RegistrationPage> = () => <RegistrationPage />;
 
 export const SuccessLoad = Template.bind({});
-// SuccessLoad.args = { endPoint: "SuccessLoad" }
 SuccessLoad.play = () => {
     fetchMock
         .restore()

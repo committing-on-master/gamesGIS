@@ -1,19 +1,22 @@
 import { useNavigate } from 'react-router';
 import { Inputs, RegistrationForm } from '../components/registration/RegistrationForm';
 import { LicenseAgreement } from './../components/registration/LicenseAgreement';
+import { useAppDispatch } from '../store/hooks';
+import { loginUser } from '../store/account/thunks';
 
-interface RegistrationPageProps {
-
-}
-
-function RegistrationPage(props: RegistrationPageProps) {
+function RegistrationPage() {
+    const dispatch = useAppDispatch();
     const routerNav = useNavigate();
 
     function handleCancel() {
         routerNav("/")
     }
     function handleRegistration(data: Inputs) {
-        
+        dispatch(loginUser({userEmail: data.userEmail, userPassword: data.userPassword}))
+            .unwrap()
+            .then(() => {
+                routerNav("howto");
+            });
     }
 
     return (

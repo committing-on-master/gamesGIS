@@ -1,27 +1,70 @@
+import { JwtDTO } from "./dto/response/JwtDTO";
 import { IHttpMethods } from "./iHttpMethods";
-import { IRequestOptions } from "./iRequestOptions";
-import { IResult } from "./iResult ";
+import { RequestOptions } from "./RequestOptions";
+import { Result } from "./iResult ";
+import { JwtToken } from "./jwtToken";
 
 class JsonRequestWrapper implements IHttpMethods {
+    private static jwtToken = new JwtToken();
     private static domain = "localhost";
     private static port = 3000;
 
+    
+    public get JwtToken() : JwtToken {
+        return JsonRequestWrapper.jwtToken;
+    }
+
+    public static async LoadToken() {
+        const tokens = this.jwtToken;
+        if (tokens.Access) {
+            if (tokens.ExpirationTimeout && tokens.ExpirationTimeout > 5 * 1000) {
+                return; // access токен есть и срок его жизни превышает 5 секунд, то обновлять не надо
+            }
+        }
+
+        if (!tokens.Refresh) {
+            return; // refresh токена нет, отправлять нечего
+        }
+        this.exec<JwtDTO, null>("auth/refresh-token", {body:JSON.stringify({refreshToken: tokens.Refresh}),  method: "POST", headers: {"Content-type": "application/json; charset=UTF-8"}})
+            .then(res => {
+                if (res.ok) {
+                    tokens.Access = res.success?.payload.accessToken;
+                    tokens.Refresh = res.success?.payload.refreshToken;
+                    return Promise.resolve();
+                }
+                return Promise.reject(res.failure);
+            })
+    }
+    
     private predefinedHeaders = new Headers ({
         "Content-type": "application/json; charset=UTF-8"
     })
 
-    // private constructor(endPoint: string, requestOpt: RequestInit) {}
-
-    private get Host(): string { return `http://${JsonRequestWrapper.domain}:${JsonRequestWrapper.port}` }
-    private getUrl(endPoint: string) { return `${this.Host}/${endPoint}` }
-
+    public static get Host(): string { return `http://${JsonRequestWrapper.domain}:${JsonRequestWrapper.port}` }
+    private static getUrl(endPoint: string) { return `${this.Host}/${endPoint}` }
     
-    public get withAuth(): IHttpMethods {
-        // проверка токена на протухание, если протух то перевыпускаем
-        // если не смогли перевыпустить, то возвращаем заглушку выдающую 403 на любые запросы
-        // если токен збс, или смогли перевыпустить, то создаем новый объект и заталкиваем в хидер авторизацию
-        return new FailedAuthDummy();
-        // return new JsonRequestWrapper();
+    public get withAuth(): Promise<IHttpMethods> {
+        const tokens = JsonRequestWrapper.jwtToken;
+        if (!tokens.Refresh) {
+            return Promise.resolve(new FailedAuthDummy()); // рефреш токен отсутствует, авторизация не доступна
+        }
+        const result = new JsonRequestWrapper();
+        if (tokens.Access && tokens.ExpirationTimeout && tokens.ExpirationTimeout > 5 * 1000) {
+            result.predefinedHeaders.set("Authorization", `Bearer ${tokens.Access}`); //access пока не протух
+            return Promise.resolve(result);
+        }
+
+        return JsonRequestWrapper.exec<JwtDTO, null>("auth/refresh-token", {body:JSON.stringify({refreshToken: tokens.Refresh}),  method: "POST", headers: {"Content-type": "application/json; charset=UTF-8"}})
+            .then(res => {
+                if (res.ok) { // схоронили перевыпущеные токены, запихали в заголовок новый
+                    tokens.Access = res.success?.payload.accessToken;
+                    tokens.Refresh = res.success?.payload.refreshToken;
+                    
+                    result.predefinedHeaders.set("Authorization", `Bearer ${tokens.Access}`);
+                    return Promise.resolve(result); 
+                }
+                return Promise.reject(res.failure);
+            })
     }
 
     /**
@@ -30,17 +73,17 @@ class JsonRequestWrapper implements IHttpMethods {
      * @template TErrorBody ожидаемый формат ответа от сервера с ошибками
      * @param endPoint endpoint для запроса
      * @param opt параметры запроса
-     * @return {Promise< IResult<TSuccessBody, TErrorBody> >} промис с наложенным(mapped) результатом ответа
+     * @return {Promise< Result<TSuccessBody, TErrorBody> >} промис с наложенным(mapped) результатом ответа
      * @throws при проблемах с установлением соединения, или при неверном формате ответа сервера
      */
-    public get<TSuccessBody, TErrorBody>(endPoint: string, opt: IRequestOptions = {}): Promise<IResult<TSuccessBody, TErrorBody>> {
+    public get<TSuccessBody, TErrorBody = null>(endPoint: string, opt: RequestOptions = {}): Promise<Result<TSuccessBody, TErrorBody>> {
         const requestOpt: RequestInit = {
                                             ...opt,
                                             method: "GET",
                                             headers: {...this.predefinedHeaders, ...opt.headers }
                                         };
 
-        return this.exec<TSuccessBody, TErrorBody>(endPoint, requestOpt);
+        return JsonRequestWrapper.exec<TSuccessBody, TErrorBody>(endPoint, requestOpt);
     }
 
     /**
@@ -50,25 +93,30 @@ class JsonRequestWrapper implements IHttpMethods {
      * @param endPoint endpoint для запроса
      * @param body тело запроса
      * @param opt параметры запроса
-     * @return {Promise< IResult<TSuccessBody, TErrorBody> >} промис с наложенным(mapped) результатом ответа
+     * @return {Promise< Result<TSuccessBody, TErrorBody> >} промис с наложенным(mapped) результатом ответа
      * @throws при проблемах с установлением соединения, или при неверном формате ответа сервера
      */
-    public post<TSuccessBody, TErrorBody>(endPoint: string, body: BodyInit | object , opt: IRequestOptions = {}) {
+    public post<TSuccessBody, TErrorBody = null>(endPoint: string, body: BodyInit | object , opt: RequestOptions = {}) {
         if (typeof body === "object") {
             body = JSON.stringify(body);
         }
+
+        const headers = opt.headers ? new Headers(opt.headers) : new Headers();
+        this.predefinedHeaders.forEach((value, key) => {
+            headers.set(key, value);
+        })
 
         const requestOpt: RequestInit = {
                                             ...opt,
                                             method: "POST",
                                             body: body,
-                                            headers: {...this.predefinedHeaders, ...opt.headers }
+                                            headers: headers
                                         };
 
-        return this.exec<TSuccessBody, TErrorBody>(endPoint, requestOpt);
+        return JsonRequestWrapper.exec<TSuccessBody, TErrorBody>(endPoint, requestOpt);
     }
 
-    private exec<TSuccessBody, TErrorBody>(endPoint: string, requestOpt: RequestInit): Promise<IResult<TSuccessBody, TErrorBody>> {
+    private static exec<TSuccessBody, TErrorBody>(endPoint: string, requestOpt: RequestInit): Promise<Result<TSuccessBody, TErrorBody>> {
         const url = this.getUrl(endPoint);
 
         return fetch(url, requestOpt)
@@ -94,14 +142,14 @@ class JsonRequestWrapper implements IHttpMethods {
                 throw new Error("Unexpected response type content-type. Json response only!");
             })
             .then((response) => {
-                const result: IResult<TSuccessBody, TErrorBody> = {
+                const result: Result<TSuccessBody, TErrorBody> = {
                     ok: response.ok,
                     code: response.code
                 }
                 if (response.ok) {
-                    result.successBody = response.body as TSuccessBody;
+                    result.success = response.body as TSuccessBody;
                 } else {
-                    result.errorBody = response.body as TErrorBody;
+                    result.failure = response.body as TErrorBody;
                 }
                 return Promise.resolve(result);
             })

@@ -4,16 +4,65 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelope, faKey } from '@fortawesome/free-solid-svg-icons'
 import { SchemaValidation } from "./../../schemas/schemaValidation";
 import { Link } from "react-router-dom";
+import { useAppDispatch } from "./../../../store/hooks";
+import { loginUser } from "./../../../store/account/thunks";
+import { ErrorDTO } from "../../../api/dto/response/ErrorDTO";
+import { nameofPropChecker } from "../../../api/nameofPropChecker";
+import { AuthDTO } from "../../../api/dto/request/AuthDTO";
 
 type Inputs = {
     userPassword: string,
     userEmail: string
 }
 
-function LoginForm() {
-    const { register, handleSubmit, formState: { errors } } = useForm<Inputs>();
+interface LoginFormProps {
+    onSuccessfullyLogin?(): void;
+}
+
+function LoginForm(props: LoginFormProps) {
+    const { register, handleSubmit, setError, reset, formState: { errors } } = useForm<Inputs>();
+    const dispatch = useAppDispatch();
+
     const onSubmit: SubmitHandler<Inputs> = (data) => {
-        alert(JSON.stringify(data));
+            dispatch(loginUser({userEmail: data.userEmail, userPassword: data.userPassword}))
+                .unwrap()
+                .then(res => {
+                    if (props.onSuccessfullyLogin) {
+                        props.onSuccessfullyLogin();
+                    }
+                    reset();
+                })
+                .catch(rejectedErr => { // если только msg - то логин/пароль не верный
+                    // если error не пустой, то там ошибки по полям
+                    if (rejectedErr.payload) {
+                        const errorRes: ErrorDTO = rejectedErr.payload;
+
+                        // ошибки от бэкэнд валидации по конкретным полям
+                        if (errorRes.errors && errorRes.errors.length !== 0) {
+                            errorRes.errors.forEach((error) => {
+                                switch (error.param) {
+                                    case nameofPropChecker<AuthDTO>("email"):
+                                        setError("userEmail", { message: error.msg }, { shouldFocus: true });                                                                                
+                                        break;
+                                    case nameofPropChecker<AuthDTO>("password"):
+                                        setError("userPassword", { message: error.msg }, { shouldFocus: true});
+                                        break;
+                                    default:
+                                        return Promise.reject(rejectedErr);
+                                }
+                            })
+                            return Promise.resolve();
+                        }
+
+                        // с полями все в порядке, не верная пара логин/пароль
+                        if (errorRes.msg) {
+                            setError("userEmail", { message: errorRes.msg });
+                            setError("userPassword", { message: errorRes.msg });
+                            return Promise.resolve();
+                        }
+                    }
+                    return Promise.reject(rejectedErr);
+                })
     }
 
     return (

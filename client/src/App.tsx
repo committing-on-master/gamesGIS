@@ -14,8 +14,8 @@ function App() {
         <Route path="/" element={<MainTemplate />}>
           <Route path="/" element={<HomePage />} />
           <Route path="registration" element={<RegistrationPage />} />
+          <Route path="*" element={<NoMatchPage />} />
         </Route>
-        <Route path="*" element={<NoMatchPage />} />
       </Routes>
     </div>
   );
