@@ -14,8 +14,6 @@ class JwtToken {
     // Закроем глаза, и представить что мы тут храним все секурно. Тестовый проект как никак
     public accessToken?: string;
     private refreshToken?: string;
-    /**Время протухания access токена в миллисекундах по UTC*/
-    private accessExpirationUTC?: number;
     private key: string = "jwtToken";
     private payload?: Token;
 
