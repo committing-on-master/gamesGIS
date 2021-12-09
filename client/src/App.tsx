@@ -1,24 +1,31 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Outlet, Route, Routes } from 'react-router-dom';
+import { Navbar } from './components/navbar/Navbar';
+import { HomePage } from './view/HomePage';
+import { MapPage } from './view/MapPage';
+import { NoMatchPage } from './view/NoMatchPage';
+import { RegistrationPage } from './view/RegistrationPage';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Routes>
+        <Route path="/map" element={<MapPage />} />
+        <Route path="/" element={<MainTemplate />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="registration" element={<RegistrationPage />} />
+          <Route path="*" element={<NoMatchPage />} />
+        </Route>
+      </Routes>
+    </div>
+  );
+}
+
+function MainTemplate() {
+  return (
+    <div className="content">
+      <Navbar />
+      <Outlet />
     </div>
   );
 }

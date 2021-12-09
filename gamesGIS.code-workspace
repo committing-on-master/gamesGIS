@@ -2,7 +2,24 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "client",
+			"name": "frontend"
+		}
+		,
+		{
+			"path": "server",
+			"name": "backend"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.exclude": {
+            // исключаем папки из отображение корневого workspace-а
+            "client": true, // добавлено в workspace как frontend директория
+            "server": true, // добавлено в workspace как backend директория
+            "coverage": true,
+			"static data": true
+        }
+	}
 }
