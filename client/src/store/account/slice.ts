@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { initialState } from "./state";
-import { loginUser, logoutUser } from "./thunks";
+import { loginUser, logoutUser, startUp } from "./thunks";
 
 const accountSlice = createSlice({
     name: "account",
@@ -27,6 +27,12 @@ const accountSlice = createSlice({
             state.status = "logout";
             state.userName = undefined;
             state.userId = undefined;
+        })
+        // start up
+        .addCase(startUp.fulfilled, (state, action) => {
+            state.status = "login";
+            state.userName = action.payload?.userName;
+            state.userId = action.payload?.userId;
         })
     }
 });

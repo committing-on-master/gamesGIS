@@ -16,30 +16,31 @@ interface UserData {
 
 export const loginUser = createAsyncThunk<UserData, LoginThunkArg>(
     "account/Login",
-    (data: LoginThunkArg, thunkApi) => {
+    async (data: LoginThunkArg, thunkApi) => {
         const body: AuthDTO = {
             email: data.userEmail,
             password: data.userPassword
         }
-        return RequestWrapper.post<JwtDTO, ErrorDTO>("auth", body)
-            .then(res => {
-                if (res.ok && res.success?.payload) {
-                    const result = res.success.payload;
-                    RequestWrapper.JwtToken.Access = result.accessToken;
-                    RequestWrapper.JwtToken.Refresh = result.refreshToken;
-                    
-                    const fulfilled: UserData = {
-                        userName: RequestWrapper.JwtToken.Payload!.userName,
-                        userId: RequestWrapper.JwtToken.Payload!.userId
-                    }
-                    return fulfilled;
-                }
-                return thunkApi.rejectWithValue({payload: res.failure});
-            })
-            .catch(error => {
-                console.log(error);
-                return thunkApi.rejectWithValue(error);
-            })
+        try {
+            const res = await RequestWrapper.post<JwtDTO, ErrorDTO>("auth", body);
+            if (res.ok && res.success?.payload) {
+                const result = res.success.payload;
+                RequestWrapper.JwtToken.Access = result.accessToken;
+                RequestWrapper.JwtToken.Refresh = result.refreshToken;
+
+                const fulfilled: UserData = {
+                    userName: RequestWrapper.JwtToken.Payload!.userName,
+                    userId: RequestWrapper.JwtToken.Payload!.userId
+                };
+
+                saveLoginData(fulfilled);
+                return fulfilled;
+            }
+            return thunkApi.rejectWithValue({ payload: res.failure });
+        } catch (error) {
+            console.log(error);
+            return thunkApi.rejectWithValue(error);
+        }
     }
 );
 
@@ -48,5 +49,45 @@ export const logoutUser = createAsyncThunk(
     () => {
         RequestWrapper.JwtToken.Access = undefined;
         RequestWrapper.JwtToken.Refresh = undefined;
+        saveLoginData(undefined);
     }
 )
+
+export const startUp = createAsyncThunk(
+    "account/startUp",
+    (_, thunkApi) => {
+        // TODO: нужен какой-нить сервис по агрегированию работы с хранилищами
+        const data = loadLoginData();
+        if (data && RequestWrapper.JwtToken.Refresh) {
+            return data;
+        }
+        thunkApi.rejectWithValue("Failed loading user data");
+    }
+)
+
+function saveLoginData(data: UserData | undefined) {
+    if (data) {
+        console.log("saving user data");
+        console.log(data);
+        localStorage.setItem("userName", data.userName);
+        localStorage.setItem("userId", data.userId.toString());
+        return;
+    }
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userId");
+}
+
+function loadLoginData(): UserData | undefined {
+    const name = localStorage.getItem("userName");
+    const id = localStorage.getItem("userId");
+    if (name && id) {
+        const result: UserData = {
+            userId: parseInt(id, 10),
+            userName: name
+        }
+        console.log("loaded user data");
+        console.log(result);
+        return result;
+    }
+    return undefined;
+}
