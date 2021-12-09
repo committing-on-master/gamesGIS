@@ -1,4 +1,4 @@
-import {Application} from "express";
+import express from "express";
 import {TokenInjection} from "../../infrastructure/token.injection";
 import {inject, injectable} from "tsyringe";
 import winston from "winston";
@@ -20,23 +20,23 @@ class AuthRoutes extends CommonRoutesConfig {
         this.middleware = middleware;
     }
 
-    protected configureRoute(app: Application): Application {
-        app.post("/auth", // authentication request - "мой логин-пароль, дай мне пару токенов access-refresh"
+    protected configureRoute(route: express.Router): express.Router {
+        route.post("/auth", // authentication request - "мой логин-пароль, дай мне пару токенов access-refresh"
             this.middleware.validateRequestSchema(checkSchema(LoginAuthSchema)),
             this.middleware.verifyUserPassword,
             this.controller.createJWT,
         );
-        app.post("/auth/refresh-token", // authentication request - "мой id и refresh, дай новую пару access-refresh
+        route.post("/auth/refresh-token", // authentication request - "мой id и refresh, дай новую пару access-refresh
             this.middleware.validateRequestSchema(checkSchema(RefreshAuthSchema)),
             this.middleware.verifyRefreshToken,
             this.controller.createJWT,
         );
 
-        app.post("/auth/logout", // отозвать refresh token
+        route.post("/auth/logout", // отозвать refresh token
             this.middleware.jwtTokenValidation(),
             this.controller.revokeRefreshToken,
         );
-        return app;
+        return route;
     }
 }
 

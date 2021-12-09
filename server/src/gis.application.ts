@@ -38,21 +38,26 @@ class GisApplication {
         this.routes = [];
     }
 
+    /* eslint-disable new-cap */
     public async setUp(connectionName: string, jwtSecret: string, jwtExpiration:number, refreshTokenExpiration: number) {
         container.register<winston.Logger>(TokenInjection.LOGGER, {useValue: this.logger});
         container.register(TokenInjection.JWT_SECRET, {useValue: jwtSecret});
         container.register(TokenInjection.JWT_EXPIRATION, {useValue: jwtExpiration});
         container.register(TokenInjection.REFRESH_TOKEN_EXPIRATION, {useValue: refreshTokenExpiration});
 
-        this.app = express();
-
         await this.dbInitialization(connectionName);
 
-        this.addExpressLoggingMiddleware(this.logger);
-        this.serveExpressStaticFiles();
-        this.createExpressRoutes();
+        let expressApp = express();
+        expressApp = this.addExpressLoggingMiddleware(expressApp, this.logger);
 
-        this.server = http.createServer(this.app);
+        const apiRouter = this.createApiRoutes(express.Router());
+        const staticRouter = this.serveStaticFiles(express.Router());
+
+        expressApp.use("/api", apiRouter);
+        expressApp.use(staticRouter);
+
+        this.app = expressApp;
+        this.server = http.createServer(expressApp);
         return this;
     }
 
@@ -66,9 +71,9 @@ class GisApplication {
         container.register<Connection>(Connection, {useValue: this.dbConnection});
     }
 
-    private addExpressLoggingMiddleware(logger: winston.Logger) {
-        if (!this.app) {
-            throw new Error("Express is not created.");
+    private addExpressLoggingMiddleware(app: express.Express, logger: winston.Logger): express.Express {
+        if (!app) {
+            throw new Error("Nullref, app variable is undefined.");
         }
         // expressWinston.requestWhitelist.push('body');
         const expressLoggerOpt: expressWinston.LoggerOptions = {
@@ -78,29 +83,33 @@ class GisApplication {
             requestWhitelist: ["body"],
         };
 
-        this.app.use(expressWinston.logger(expressLoggerOpt));
+        app.use(expressWinston.logger(expressLoggerOpt));
+
+        return app;
     }
 
-    private serveExpressStaticFiles() {
-        if (!this.app) {
-            return;
+    private serveStaticFiles(router: express.Router): express.Router {
+        if (!router) {
+            throw new Error("Nullref, router variable is undefined");
         }
 
         // TODO: разобраться с путями, слишком много относительных путей
-        this.app.use(express.static(__dirname + "./../spa"));
-        this.app.get("/", (request: express.Request, response: express.Response) => {
+        router.use(express.static(__dirname + "./../spa"));
+        router.get("*", (request: express.Request, response: express.Response) => {
             response.sendFile(path.resolve(__dirname, "./../spa/index.html"));
         });
+
+        return router;
     }
 
-    private createExpressRoutes() {
-        if (!this.app) {
+    private createApiRoutes(router: express.Router): express.Router {
+        if (!router) {
             throw new Error("Express is not created.");
         }
-        this.app.use(express.json());
+        router.use(express.json());
         // TODO: вот это вот не точно, но скорее всего придется для SPA и прочей статики отдельный express.js поднимать, поэтому оставим пока так
 
-        this.app.use(cors());
+        router.use(cors());
 
         this.routes.push(
             container.resolve(UsersRoutes),
@@ -109,8 +118,9 @@ class GisApplication {
         );
 
         this.routes.forEach((route) => {
-            route.registerRoutes(this.app as express.Application);
+            route.registerRoutes(router);
         });
+        return router;
     }
 
     public start() {

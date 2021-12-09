@@ -41,7 +41,7 @@ class JsonRequestWrapper implements IHttpMethods {
     })
 
     public static get Host(): string { return `http://${JsonRequestWrapper.domain}:${JsonRequestWrapper.port}` }
-    private static getUrl(endPoint: string) { return `${this.Host}/${endPoint}` }
+    private static getUrl(endPoint: string) { return `${this.Host}/api/${endPoint}` }
     
     public get withAuth(): Promise<IHttpMethods> {
         const tokens = JsonRequestWrapper.jwtToken;

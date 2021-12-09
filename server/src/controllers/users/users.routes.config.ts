@@ -39,8 +39,8 @@ class UsersRoutes extends CommonRoutesConfig {
         this.usersService = usersService;
     }
 
-    protected configureRoute(app: express.Application): express.Application {
-        app
+    protected configureRoute(router: express.Router): express.Router {
+        router
             .route("/users")
             .get(this.usersController.listUsers)
             .post(
@@ -50,9 +50,9 @@ class UsersRoutes extends CommonRoutesConfig {
                 this.usersController.createUser,
             );
 
-        app
+        router
             .param("userId", this.usersMiddleware.extractUserId);
-        app
+        router
             .route("/users/:userId")
             .all(
                 this.authMiddleware.jwtTokenValidation(),
@@ -68,7 +68,7 @@ class UsersRoutes extends CommonRoutesConfig {
                 this.usersController.patchUser, // обычный апдейт, без верификаций паролем и прочих критически важных штук
             );
 
-        app.patch("/users/:userId/permission",
+        router.patch("/users/:userId/permission",
             this.authMiddleware.jwtTokenValidation(),
             this.usersMiddleware.validateUserExists,
             this.permissionMiddleware.extractPermissionFlag,
@@ -76,7 +76,7 @@ class UsersRoutes extends CommonRoutesConfig {
             this.usersController.changeUserPermission,
         );
 
-        return app;
+        return router;
     }
 }
 
