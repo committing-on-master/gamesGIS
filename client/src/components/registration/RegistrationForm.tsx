@@ -4,11 +4,10 @@ import { faEnvelope, faKey, faUser } from '@fortawesome/free-solid-svg-icons'
 
 import { SchemaValidation } from "../schemas/schemaValidation";
 import { RequestWrapper } from "../../api/JsonRequestWrapper";
-import { iCreateUserDto } from "../../api/dto/iCreateUserDto";
-import { iSuccessResponse } from "../../api/dto/iSuccessResponse";
+import { CreateUserDTO } from "../../api/dto/request/CreateUserDTO";
 import { useState } from "react";
 import { nameofPropChecker } from "../../api/nameofPropChecker";
-import { IErrorBody } from "../../api/dto/iErrorBody";
+import { ErrorDTO } from "../../api/dto/response/ErrorDTO";
 
 interface RegistrationFormProps {
     onRegistered?(userData: Inputs): void;
@@ -23,37 +22,38 @@ export type Inputs = {
 }
 
 function RegistrationForm(props: RegistrationFormProps) {
-    const { register, handleSubmit, setError, formState: { errors }, watch } = useForm<Inputs>();
+    const { register, handleSubmit, setError, reset, formState: { errors }, watch } = useForm<Inputs>();
     const [unexpectedError, setUnexpectedError] = useState("");
 
     const onSubmit: SubmitHandler<Inputs> = (data, event) => {
         event?.preventDefault();
 
-        const requestBody: iCreateUserDto = {
+        const requestBody: CreateUserDTO = {
             email: data.userEmail,
             name: data.userName,
             password: data.userPassword
         }
 
-        RequestWrapper.post<iSuccessResponse, IErrorBody>(props.endPoint, requestBody)
+        RequestWrapper.post<null, ErrorDTO>(props.endPoint, requestBody)
             .then(res => {
                 if (res.ok) {
                     if (props.onRegistered) {
                         props.onRegistered(data);
                     }
+                    reset();
                     return Promise.resolve();
                 }
                 switch (res.code) {
                     case 400:
-                        res.errorBody?.errors?.forEach(error => {
+                        res.failure?.errors?.forEach(error => {
                             switch (error.param) {
-                                case nameofPropChecker<iCreateUserDto>("email"):
+                                case nameofPropChecker<CreateUserDTO>("email"):
                                     setError("userEmail", { message: error.msg }, { shouldFocus: true });
                                     break;
-                                case nameofPropChecker<iCreateUserDto>("name"):
+                                case nameofPropChecker<CreateUserDTO>("name"):
                                     setError("userName", { message: error.msg }, { shouldFocus: true });
                                     break;
-                                case nameofPropChecker<iCreateUserDto>("password"):
+                                case nameofPropChecker<CreateUserDTO>("password"):
                                     setError("userPassword", { message: error.msg }, { shouldFocus: true });
                                     break;
                                 default:
@@ -64,8 +64,8 @@ function RegistrationForm(props: RegistrationFormProps) {
                         })
                         return Promise.resolve();
                     default:
-                        console.log(res.errorBody);
-                        setUnexpectedError(res.errorBody?.msg || "Unexpected received response error format");
+                        console.log(res.failure);
+                        setUnexpectedError(res.failure?.msg || "Unexpected received response error format");
                         break;
                 }
                 return Promise.resolve();

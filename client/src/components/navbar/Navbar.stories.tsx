@@ -4,7 +4,7 @@ import { Navbar } from "./Navbar";
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
-  title: 'components/Navbar',
+  title: 'Navbar/Navbar',
   component: Navbar,
 } as ComponentMeta<typeof Navbar>;
 

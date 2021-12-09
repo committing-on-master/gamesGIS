@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from 'react-redux'
 import { UserElement } from "./account/UserElement";
 import logo from "./../../img/logo_nav_64.png"
+import { useAppSelector } from "../../store/hooks";
+import { accountSelectors } from "../../store/account/state";
+import { Link } from "react-router-dom";
 
 export const Navbar = () => {
   const [mNavbarPopup, setmNavbarPopup] = useState(false);
+  const userName = useAppSelector((state) => accountSelectors.UserName(state.account));
 
   const navbarClassName = `navbar-menu is-pulled-right${mNavbarPopup ? " is-active" : ""}`;
   const burgerClassName = `navbar-burger${mNavbarPopup ? " is-active" : ""}`;
@@ -28,19 +31,16 @@ export const Navbar = () => {
 
       <div className={navbarClassName}>
         <div className="navbar-start">
-          <a href="/" className="navbar-item">
-            Home
-          </a>
+          <Link className="navbar-item"  to="/">Home</Link>
+          <Link className="navbar-item"  to="about">About</Link>
 
-          <a className="navbar-item">
-            Documentation
-          </a>
-
+          {userName && <Link className="navbar-item"  to="howto">How to</Link>}
+          {userName && <Link className="navbar-item"  to="mymaps">My maps</Link>}
         </div>
 
         <div className="navbar-end">
           <div className="navbar-item">
-            <UserElement dropdownAlignDirection="right" />
+            <UserElement dropdownAlignDirection="right" userName={userName} />
           </div>
         </div>
       </div>

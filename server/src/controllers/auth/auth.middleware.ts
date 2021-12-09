@@ -7,6 +7,7 @@ import {TokenInjection} from "../../infrastructure/token.injection";
 import winston from "winston";
 import jwt, {VerifyOptions} from "jsonwebtoken";
 import {JwtPayload} from "../common-types/jwt.payload";
+import {ResponseBody} from "../response.body";
 
 @injectable()
 class AuthMiddleware extends CommonMiddleware {
@@ -39,7 +40,7 @@ class AuthMiddleware extends CommonMiddleware {
                     return next();
                 }
             }
-            res.status(403).send({errors: ["Invalid email and/or password"]});
+            res.status(403).send(ResponseBody.jsonError("Invalid email and/or password"));
         } catch (error) {
             this.logger.error(`${this.name}.verifyUserPassword`, error);
             next(error);
@@ -53,19 +54,19 @@ class AuthMiddleware extends CommonMiddleware {
      * @param {express.NextFunction} next
      * @return {void}
      */
-    public verifyRefreshTokenBodyField(
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction,
-    ) {
-        if (req.body?.refreshToken) {
-            return next();
-        } else {
-            return res
-                .status(400)
-                .send({errors: ["Missing required field: refreshToken"]});
-        }
-    }
+    // public verifyRefreshTokenBodyField(
+    //     req: express.Request,
+    //     res: express.Response,
+    //     next: express.NextFunction,
+    // ) {
+    //     if (req.body?.refreshToken) {
+    //         return next();
+    //     } else {
+    //         return res
+    //             .status(400)
+    //             .send({errors: ["Missing required field: refreshToken"]});
+    //     }
+    // }
 
     /**
      * Проверяем полученный refresh token с ранее сгенерированным эталоном
@@ -80,8 +81,8 @@ class AuthMiddleware extends CommonMiddleware {
         next: express.NextFunction,
     ) {
         try {
-            const jwtPayload = res.locals.jwt as JwtPayload;
-            const savedRefreshToken = await this.services.Users.getRefreshTokenByUserId(jwtPayload.userId);
+            const userId = parseInt(req.body.id, 10);
+            const savedRefreshToken = await this.services.Users.getRefreshTokenByUserId(userId);
             if (!savedRefreshToken) {
                 const message = `[${this.name}.validRefreshNeeded] refresh token not found, but access token exist`;
                 this.logger.error(message);
@@ -94,7 +95,7 @@ class AuthMiddleware extends CommonMiddleware {
             if (savedRefreshToken.revoked || ((savedRefreshToken.expiredDate < new Date()))) {
                 return res.status(401).send({errors: ["refresh token was revoked or expired"]});
             }
-            const user = await this.services.Users.getUserById(jwtPayload.userId);
+            const user = await this.services.Users.getUserById(userId);
             if (!user) {
                 const message = `[${this.name}.validRefreshNeeded] refresh token exist, but user don't`;
                 this.logger.error(message);

@@ -66,6 +66,33 @@ class StaticSchemaFactory {
             },
         };
     }
+
+    /**
+     * Схема валидации поля - id
+     * @return {ParamSchema} схема валидации "express-validator"-а
+     */
+    public static createIdSchema(): ParamSchema {
+        return {
+            in: ["body"],
+            exists: {errorMessage: "id body field is missing"},
+            isEmpty: {negated: true, options: {ignore_whitespace: true}, errorMessage: "id body field is empty"},
+            trim: true,
+            isNumeric: true,
+        };
+    }
+
+    /**
+     * Схема валидации поля - id
+     * @return {ParamSchema} схема валидации "express-validator"-а
+     */
+    public static createRefreshTokenSchema(): ParamSchema {
+        return {
+            in: ["body"],
+            exists: {errorMessage: "refreshToken body field is missing"},
+            isEmpty: {negated: true, options: {ignore_whitespace: true}, errorMessage: "refreshToken body field is empty"},
+            trim: true,
+        };
+    }
 }
 
 export {StaticSchemaFactory};

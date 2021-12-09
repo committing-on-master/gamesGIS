@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { HomePage } from "./HomePage";
 
 export default {
-  title: 'Home/HomePage',
+  title: 'Pages/Home',
   component: HomePage,
 } as ComponentMeta<typeof HomePage>;
 

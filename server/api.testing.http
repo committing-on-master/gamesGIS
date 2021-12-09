@@ -11,7 +11,7 @@ POST http://localhost:3000/users HTTP/1.1
 content-type: application/json 
 
 {
-    "email": "mar1cos.henrique@toptal.rot",
+    "email": "marcos.henrique@toptal.rot",
     "password": "Pass43kdw",
     "name": "Macross"
 }

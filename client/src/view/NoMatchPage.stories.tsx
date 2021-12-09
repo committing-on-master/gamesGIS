@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { NoMatchPage } from "./NoMatchPage";
 
 export default {
-  title: '404/NoMatchPage',
+  title: 'Pages/404',
   component: NoMatchPage,
 } as ComponentMeta<typeof NoMatchPage>;
 

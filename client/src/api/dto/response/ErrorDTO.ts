@@ -1,5 +1,7 @@
+import { ErrorResponse } from './../ErrorResponse'
+
 /** Формат ошибок express-validator */
-export interface IError {
+interface Payload {
     /** Сообщение об ошибке */
     msg: string;
 
@@ -10,3 +12,5 @@ export interface IError {
     /** Расположение параметра в запросе body | params | header etc*/
     location?: string;
 }
+
+export interface ErrorDTO extends ErrorResponse<Payload[]> {};

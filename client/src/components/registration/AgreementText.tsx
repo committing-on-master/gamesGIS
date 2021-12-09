@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { RequestWrapper } from "./../../api/JsonRequestWrapper";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
-import { agreementDto } from "../../api/dto/agreementDto";
-import { iSuccessResponse } from "../../api/dto/iSuccessResponse";
+import { AgreementDTO } from "../../api/dto/response/AgreementDTO";
 
 interface AgreementTextProps {
     endPoint: string;
@@ -17,11 +16,11 @@ function AgreementText(props: AgreementTextProps) {
     const [text, setText] = useState("Loading agreement text...");
 
     useEffect(() => {
-        RequestWrapper.get<iSuccessResponse<agreementDto>, {}>(props.endPoint)
+        RequestWrapper.get<AgreementDTO>(props.endPoint)
             .then(response => {
-                if (response.ok && response.successBody) {
+                if (response.ok && response.success) {
                     setComponentStatus("loaded");
-                    setText(response.successBody.payload.agreementText);
+                    setText(response.success?.payload?.agreementText);
                     props.onTextLoaded();
                     return Promise.resolve();
                 } else {
@@ -32,7 +31,7 @@ function AgreementText(props: AgreementTextProps) {
                             break;
                         default:
                             console.log(`response code: ${response.code}`)
-                            console.log(response.errorBody);
+                            console.log(response.failure);
                             setComponentStatus("failed");
                             setText("Server makes \"Oops\". Please try again later ¯\\_(ツ)_/¯");
                             break;
