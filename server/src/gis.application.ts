@@ -51,10 +51,12 @@ class GisApplication {
         expressApp = this.addExpressLoggingMiddleware(expressApp, this.logger);
 
         const apiRouter = this.createApiRoutes(express.Router());
-        const staticRouter = this.serveStaticFiles(express.Router());
+        const spaRouter = this.serveSPA(express.Router());
+        const mapsRouter = this.serveMaps(express.Router());
 
         expressApp.use("/api", apiRouter);
-        expressApp.use(staticRouter);
+        expressApp.use("/maps", mapsRouter);
+        expressApp.use(spaRouter);
 
         this.app = expressApp;
         this.server = http.createServer(expressApp);
@@ -88,7 +90,7 @@ class GisApplication {
         return app;
     }
 
-    private serveStaticFiles(router: express.Router): express.Router {
+    private serveSPA(router: express.Router): express.Router {
         if (!router) {
             throw new Error("Nullref, router variable is undefined");
         }
@@ -99,6 +101,15 @@ class GisApplication {
             response.sendFile(path.resolve(__dirname, "./../spa/index.html"));
         });
 
+        return router;
+    }
+
+    private serveMaps(router: express.Router): express.Router {
+        if (!router) {
+            throw new Error("Nullref, router variable is undefined");
+        }
+        // TODO: разобраться с путями, слишком много относительных путей
+        router.use(express.static(__dirname + "./../../maps"));
         return router;
     }
 
