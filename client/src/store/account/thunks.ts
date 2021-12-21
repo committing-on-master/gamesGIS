@@ -67,8 +67,6 @@ export const startUp = createAsyncThunk(
 
 function saveLoginData(data: UserData | undefined) {
     if (data) {
-        console.log("saving user data");
-        console.log(data);
         localStorage.setItem("userName", data.userName);
         localStorage.setItem("userId", data.userId.toString());
         return;

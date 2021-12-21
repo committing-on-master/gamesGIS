@@ -6,9 +6,7 @@ import { JwtToken } from "./jwtToken";
 
 class JsonRequestWrapper implements IHttpMethods {
     private static jwtToken = new JwtToken();
-    private static domain = "localhost";
-    private static port = 3000;
-
+    private static api = process.env.REACT_APP_API_URL || "localhost:3000/api"
     
     public get JwtToken() : JwtToken {
         return JsonRequestWrapper.jwtToken;
@@ -40,8 +38,7 @@ class JsonRequestWrapper implements IHttpMethods {
         "Content-type": "application/json; charset=UTF-8"
     })
 
-    public static get Host(): string { return `http://${JsonRequestWrapper.domain}:${JsonRequestWrapper.port}` }
-    private static getUrl(endPoint: string) { return `${this.Host}/api/${endPoint}` }
+    private static getUrl(endPoint: string) { return `http://${this.api}/${endPoint}` }
     
     public get withAuth(): Promise<IHttpMethods> {
         const tokens = JsonRequestWrapper.jwtToken;

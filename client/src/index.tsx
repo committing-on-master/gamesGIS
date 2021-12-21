@@ -11,7 +11,6 @@ import { store } from "./store/store"
 import { startUp } from './store/account/thunks';
 store.dispatch(startUp());
 
-
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>

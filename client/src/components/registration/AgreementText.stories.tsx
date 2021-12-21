@@ -20,7 +20,7 @@ SuccessScenario.play = () => {
     fetchMock
         .restore()
         .get(
-            "http://localhost:3000/SuccessScenario",
+            "http://localhost:3000/api/SuccessScenario",
             {
                 status: 200,
                 headers: { "Content-Type": "application/json" },
@@ -42,7 +42,7 @@ Success3sDelay.play = () => {
     fetchMock
         .restore()
         .get(
-            "http://localhost:3000/Success3sDelay",
+            "http://localhost:3000/api/Success3sDelay",
             {
                 status: 200,
                 headers: { "Content-Type": "application/json" },
@@ -67,7 +67,7 @@ Faluire404.play = () => {
     fetchMock
         .restore()
         .get(
-            "http://localhost:3000/Faluire404",
+            "http://localhost:3000/api/Faluire404",
             {
                 status: 404,
                 headers: { "Content-Type": "application/json" },
@@ -85,7 +85,7 @@ Faluire500.play = () => {
     fetchMock
         .restore()
         .get(
-            "http://localhost:3000/Faluire500",
+            "http://localhost:3000/api/Faluire500",
             {
                 status: 500,
                 headers: { "Content-Type": "application/json" },
@@ -103,7 +103,7 @@ FailureNetworkError.play = () => {
     fetchMock
         .restore()
         .get(
-            "http://localhost:3000/NetworkError",
+            "http://localhost:3000/api/NetworkError",
             {
                 throws: new Error("DNS blah-blah something")
             },

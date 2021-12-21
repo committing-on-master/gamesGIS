@@ -1,16 +1,23 @@
-import React from 'react';
-import { Outlet, Route, Routes } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { Navbar } from './components/navbar/Navbar';
 import { HomePage } from './view/HomePage';
 import { MapPage } from './view/MapPage';
 import { NoMatchPage } from './view/NoMatchPage';
 import { RegistrationPage } from './view/RegistrationPage';
+import "./App.css"
 
 function App() {
+  // test
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate("map/woods");    
+  }, [navigate])
+  //
   return (
     <div className="App">
       <Routes>
-        <Route path="/map" element={<MapPage />} />
+        <Route path="/map/:profileName" element={<MapPage />} />
         <Route path="/" element={<MainTemplate />}>
           <Route path="/" element={<HomePage />} />
           <Route path="registration" element={<RegistrationPage />} />

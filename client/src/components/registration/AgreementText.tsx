@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { RequestWrapper } from "./../../api/JsonRequestWrapper";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { AgreementDTO } from "../../api/dto/response/AgreementDTO";
+import { AwaitingComponent } from "../AwaitingComponent";
+import { WarningComponent } from "../WarningComponent";
 
 interface AgreementTextProps {
     endPoint: string;
@@ -10,6 +10,7 @@ interface AgreementTextProps {
 }
 
 type LoadingStatus = "loading" | "loaded" | "failed";
+
 
 function AgreementText(props: AgreementTextProps) {
     const [componentStatus, setComponentStatus] = useState<LoadingStatus>("loading");
@@ -52,23 +53,21 @@ function AgreementText(props: AgreementTextProps) {
     switch (componentStatus) {
         case "loading":
             content =
-                <div className="content has-text-centered">
-                    <FontAwesomeIcon className="icon is-large fa-pulse" icon={faSpinner} />
+                <AwaitingComponent>
                     <p>{text}</p>
-                </div>
+                </AwaitingComponent>
             break;
         case "loaded":
             content = <div className="content">{text}</div>;
             break;
         default:
             content =
-                <div className="content has-text-centered">
-                    <FontAwesomeIcon className="icon is-large" icon={faExclamationTriangle} />
+                <WarningComponent>
                     <p>{text}</p>
-                </div>
+                </WarningComponent>
             break;
     }
-    
+
     return (
         <section className="modal-card-body">
             {content}
