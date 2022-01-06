@@ -5,6 +5,7 @@ import { Point } from "../../api/dto/types/Point";
 export type AreaType = {
     id: number,
     name: string,
+    description: string,
     position: Point,
     color: string;
     bound: LatLngExpression[]

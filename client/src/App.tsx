@@ -5,7 +5,7 @@ import { HomePage } from './view/HomePage';
 import { MapPage } from './view/MapPage';
 import { NoMatchPage } from './view/NoMatchPage';
 import { RegistrationPage } from './view/RegistrationPage';
-import "./App.css"
+import "./App.scss"
 
 function App() {
   // test

@@ -2,6 +2,8 @@ import React, { MouseEventHandler } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser } from '@fortawesome/free-solid-svg-icons'
 
+import "./UserName.scss"
+
 export interface IUserProps {
     userName?: string;
 
@@ -12,14 +14,12 @@ export interface IUserProps {
 const UserName = (props: IUserProps) => {
 
     return (
-        <div className="dropdown-trigger">
-            <button className="button" onClick={props.onClick}>
-                <span className="icon is-small is-left">
-                    <FontAwesomeIcon icon={faUser} />
-                </span>
-                <span>{props.userName ? props.userName : "Login"}</span>
-            </button>
-        </div >
+        <button className="user-name-container" onClick={props.onClick}>
+            <span>
+                <FontAwesomeIcon icon={faUser} />
+            </span>
+            <span>{props.userName ? props.userName : "Login"}</span>
+        </button>
     )
 }
 

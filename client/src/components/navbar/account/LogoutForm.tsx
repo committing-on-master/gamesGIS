@@ -2,6 +2,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSignOutAlt, faUserCog } from '@fortawesome/free-solid-svg-icons'
 import { useAppDispatch } from '../../../store/hooks'
 import { logoutUser } from '../../../store/account/thunks';
+import "./LogoutForm.scss";
+import { Button } from '../../Button';
+import { Link } from 'react-router-dom';
 
 interface LogoutProps {
     onSuccessfullyProcess?(): void;
@@ -18,18 +21,21 @@ function LogoutForm(props: LogoutProps) {
     }
 
     return (
-        <div className="p-3">
-
-            <a href="#" className="dropdown-item">
+        <div className="logout-form">
+            <Link to={"/profile"}>Profile</Link>
+            <hr/>
+            <span className="icon is-small">
+                <FontAwesomeIcon icon={faSignOutAlt} />
+            </span>
+            <Button size='small' label="Logout" onClick={handleLogout}/>
+            {/* <a href="#" className="dropdown-item">
                 <span className="icon is-small">
                     <FontAwesomeIcon icon={faUserCog} />
                 </span>
                 <span> Settings</span>
             </a>
 
-            <hr className="dropdown-divider" />
-
-            <div className="dropdown-item">
+            <div>
                 <button className="button is-link" onClick={handleLogout} >
                     <span className="icon is-small">
                         <FontAwesomeIcon icon={faSignOutAlt} />
@@ -38,7 +44,7 @@ function LogoutForm(props: LogoutProps) {
                         Logout
                     </span>
                 </button>
-            </div>
+            </div> */}
         </div>
     )
 }

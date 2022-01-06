@@ -4,6 +4,7 @@ import { Popup, Marker } from "react-leaflet";
 import { selectAreaById } from "../../store/areas/slice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { removeSpotlightArea, setSpotlightArea } from "../../store/map/slice";
+import { PopupBody } from "./AreaPopup/PopupBody";
 import { markerIcon } from "./markerIcon";
 
 interface MarkerProps {
@@ -45,10 +46,7 @@ function AriaMarker(props: MarkerProps) {
 				onOpen={handlePopupOpen}
 				onClose={handlePopupClose}
 			>
-				{marker.name} <br />
-				A pretty CSS3 popup. <br />
-				Easily customizable.
-				{/* <PopupBody /> */}
+				< PopupBody markerId={marker.id} />
 			</Popup>
 		</Marker>
 	)

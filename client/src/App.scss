@@ -1,5 +1,7 @@
+@import-normalize;
+
 .App {    
-    flex-direction: column;
+    flex-direction: row;
     display: flex;
     height: 100vh;
     min-height: 580px;
@@ -10,3 +12,4 @@
     width: 100%;
     height: 100%;
   }
+  

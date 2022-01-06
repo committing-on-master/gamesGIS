@@ -9,6 +9,7 @@ import { loginUser } from "./../../../store/account/thunks";
 import { ErrorDTO } from "../../../api/dto/response/ErrorDTO";
 import { nameofPropChecker } from "../../../api/nameofPropChecker";
 import { AuthDTO } from "../../../api/dto/request/AuthDTO";
+import "./LoginForm.scss";
 
 type Inputs = {
     userPassword: string,

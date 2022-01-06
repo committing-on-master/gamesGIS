@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
+import classNames from "classnames"
 import { LoginForm } from "./LoginForm";
 import { LogoutForm } from "./LogoutForm";
 import { UserName } from "./UserName";
+import "./UserElement.scss"
 
 interface UserProps {
     /**
@@ -14,16 +16,16 @@ interface UserProps {
      * undefined | left - по левому краю
      * right - по правому краю
      */
-    dropdownAlignDirection?: "right" | "left";
+    // dropdownAlignDirection?: "right" | "left";
 }
 
 function UserElement(props: UserProps) {
     const [dropdownVisibility, setDropdownVisibility] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     
-    const dropdownAlignClass = (props.dropdownAlignDirection === "right") ? "is-right" : "";
-    const dropdownVisibilityClass = dropdownVisibility ? "is-active" : "";
-    const dropdownClass = `dropdown ${dropdownVisibilityClass} ${dropdownAlignClass}`;
+    const dropDownCSS = classNames(
+        dropdownVisibility ? "dropdown-menu--is-active" : "dropdown-menu"
+    )    
 
     const handleDropdownSuccessfullyEvent = () => {
         setDropdownVisibility(false);
@@ -58,9 +60,9 @@ function UserElement(props: UserProps) {
 
 
     return (
-        <div className={dropdownClass} >
+        <div className="dropdown-container" >
             <UserName userName={props.userName} onClick={switchDropdownVisivility} />
-            <div className="dropdown-menu">
+            <div className={dropDownCSS}>
                 <div ref={dropdownRef} className={`dropdown-content`}>
                     {dropDownContent}
                 </div>

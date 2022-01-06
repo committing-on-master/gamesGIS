@@ -1,0 +1,19 @@
+@import "@fortawesome/fontawesome-svg-core/styles.css";
+
+.user-name-container {
+    font-family: 'Nunito Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 700;
+    padding: 10px;
+    border: 0;
+    border-radius: 1em;
+    cursor: pointer;
+    display: inline-block;
+    line-height: 1;
+    background-color: lightskyblue;
+
+    span {
+        svg {
+            margin-right: 5px;
+        }
+    }
+}
