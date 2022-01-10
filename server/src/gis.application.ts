@@ -58,9 +58,23 @@ class GisApplication {
         expressApp.use("/maps", mapsRouter);
         expressApp.use(spaRouter);
 
+        expressApp.use(this.programErrorHandler);
+
         this.app = expressApp;
         this.server = http.createServer(expressApp);
         return this;
+    }
+
+    /**
+     * Обработчик верхнего уровня Express.js-а
+     * @param {Error} error объект с ошибкой
+     * @param {express.Request} req запрос, который привел к ошибке
+     * @param {express.Response} res объект ответа
+     */
+    private programErrorHandler(error: Error, req: express.Request, res: express.Response) {
+        this.logger.error(error);
+        // TODO: для ВАХ эффекта, можно в зависимости от типа ошибки, перезапускать сервер
+        res.status(500).send({});
     }
 
     private async dbInitialization(connectionName: string) {
@@ -131,6 +145,7 @@ class GisApplication {
         this.routes.forEach((route) => {
             route.registerRoutes(router);
         });
+
         return router;
     }
 

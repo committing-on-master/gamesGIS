@@ -15,6 +15,7 @@ import {UsersService} from "./../../services-layer/users/users.service";
 import {asyncNameValidation} from "./models.schema/async.name.validation";
 import {AuthMiddleware} from "../auth/auth.middleware";
 import {PermissionFlag} from "./../../services-layer/users/models/permission.flag";
+import {asyncWrapper} from "../asyncHandler";
 
 @injectable()
 class UsersRoutes extends CommonRoutesConfig {
@@ -44,10 +45,10 @@ class UsersRoutes extends CommonRoutesConfig {
             .route("/users")
             .get(this.usersController.listUsers)
             .post(
-                this.usersMiddleware.validateRequestSchema(checkSchema(createUserDtoSchema)),
-                this.usersMiddleware.validateRequestSchema(asyncEmailValidation(this.usersService)),
-                this.usersMiddleware.validateRequestSchema(asyncNameValidation(this.usersService)),
-                this.usersController.createUser,
+                asyncWrapper(this.usersMiddleware.validateRequestSchema(checkSchema(createUserDtoSchema))),
+                asyncWrapper(this.usersMiddleware.validateRequestSchema(asyncEmailValidation(this.usersService))),
+                asyncWrapper(this.usersMiddleware.validateRequestSchema(asyncNameValidation(this.usersService))),
+                asyncWrapper(this.usersController.createUser),
             );
 
         router
@@ -56,25 +57,27 @@ class UsersRoutes extends CommonRoutesConfig {
             .route("/users/:userId")
             .all(
                 this.authMiddleware.jwtTokenValidation(),
-                this.usersMiddleware.validateUserExists,
-                this.permissionMiddleware.onlySameUserOrAdminCanDoThisAction,
+                asyncWrapper(this.usersMiddleware.validateUserExists),
+                asyncWrapper(this.permissionMiddleware.onlySameUserOrAdminCanDoThisAction),
             )
-            .get(this.usersController.getUser)
+            .get(asyncWrapper(this.usersController.getUser))
             .patch(
                 this.usersMiddleware.earlyReturnPatchUser,
-                this.usersMiddleware.validateRequestSchema(checkSchema(patchUserDtoSchema)),
-                this.usersMiddleware.validateRequestSchema(asyncEmailValidation(this.usersService, true)),
-                this.usersMiddleware.validateRequestSchema(asyncNameValidation(this.usersService, true)),
-                this.usersController.patchUser, // обычный апдейт, без верификаций паролем и прочих критически важных штук
+                asyncWrapper(this.usersMiddleware.validateRequestSchema(checkSchema(patchUserDtoSchema))),
+                asyncWrapper(this.usersMiddleware.validateRequestSchema(asyncEmailValidation(this.usersService, true))),
+                asyncWrapper(this.usersMiddleware.validateRequestSchema(asyncNameValidation(this.usersService, true))),
+                asyncWrapper(this.usersController.patchUser), // обычный апдейт, без верификаций паролем и прочих критически важных штук
             );
 
         router.patch("/users/:userId/permission",
             this.authMiddleware.jwtTokenValidation(),
-            this.usersMiddleware.validateUserExists,
+            asyncWrapper(this.usersMiddleware.validateUserExists),
             this.permissionMiddleware.extractPermissionFlag,
             this.permissionMiddleware.permissionFlagRequired(PermissionFlag.ADMIN_PERMISSION),
-            this.usersController.changeUserPermission,
+            asyncWrapper(this.usersController.changeUserPermission),
         );
+
+        router.use(this.usersMiddleware.handleOperationalErrors);
 
         return router;
     }

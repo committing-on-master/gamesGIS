@@ -1,6 +1,7 @@
 import express from "express";
 import {inject, singleton} from "tsyringe";
 import winston from "winston";
+import httpError from "http-errors";
 
 import {TokenInjection} from "./../infrastructure/token.injection";
 import {PermissionFlag} from "./../services-layer/users/models/permission.flag";
@@ -27,9 +28,8 @@ class PermissionMiddleware extends CommonMiddleware {
             const userPermissionFlag = res.locals.jwt.permissionFlag;
             if (userPermissionFlag & requiredFlag) {
                 return next();
-            } else {
-                res.status(403).send();
             }
+            throw new httpError.Forbidden();
         };
     }
 
@@ -45,7 +45,7 @@ class PermissionMiddleware extends CommonMiddleware {
             if (userPermissionFlag & PermissionFlag.ADMIN_PERMISSION) {
                 return next();
             } else {
-                return res.status(403).send();
+                throw new httpError.Forbidden();
             }
         }
     }
@@ -63,15 +63,11 @@ class PermissionMiddleware extends CommonMiddleware {
         next: express.NextFunction,
     ) {
         if (Number.isNaN(req.body?.permissionFlag)) {
-            return res.status(400).send({
-                error: "Permission null or have incorrect format",
-            });
+            throw new httpError.BadRequest("Permission null or have incorrect format");
         }
         const permission = parseInt(req.body.permissionFlag, 10);
         if ( !(permission in PermissionFlag) ) {
-            return res.status(400).send({
-                error: "Incorrect value for permission level",
-            });
+            throw new httpError.BadRequest("Incorrect value for permission level");
         }
 
         res.locals.permissionFlag = permission;

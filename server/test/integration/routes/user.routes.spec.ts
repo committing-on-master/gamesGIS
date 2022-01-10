@@ -49,12 +49,11 @@ class UserTestDataBuilder extends TestDataBuilder<TestData, UsersRoutes> {
     get TestedInstance(): UsersRoutes {
         this.Data.serviceLayer.addMock((layer) => when(layer.Users).thenReturn(this.Data.userService.Instance));
 
-        this.usersMiddleware = new UsersMiddleware(this.Data.logger.Instance,
-            this.Data.serviceLayer.Instance);
-        this.usersController = new UsersController(this.Data.logger.Instance,
-            this.Data.serviceLayer.Instance);
+        this.usersMiddleware = new UsersMiddleware(this.Data.logger.Instance, this.Data.serviceLayer.Instance);
+        this.usersController = new UsersController(this.Data.logger.Instance, this.Data.serviceLayer.Instance);
         this.permissionMiddleware = new PermissionMiddleware(this.Data.logger.Instance);
-        this.authMiddleware = new AuthMiddleware(this.Data.logger.Instance,
+        this.authMiddleware = new AuthMiddleware(
+            this.Data.logger.Instance,
             this.Data.jwtSecret,
             this.Data.serviceLayer.Instance);
 
@@ -86,7 +85,7 @@ describe("User Routes", function() {
             manualResetTestInstances();
             builder.TestedInstance.registerRoutes(expressApp);
         });
-        const requestsBody: {msg: string, body: string, expected: {code: number, problemField: string }}[] = [
+        const requestsBody: { msg: string, body: string, expected: { code: number, problemField: string } }[] = [
             {
                 msg: "Отсутствует поле пароля",
                 body: JSON.stringify({email: "marcos.henrique@toptal.com", name: "Leha"}),
@@ -139,7 +138,7 @@ describe("User Routes", function() {
                 expect(response.statusCode).equal(testCase.expected.code);
                 expect(response.body, "Свойство errors отсутствует в ответе").have.property("errors");
                 expect(
-                    (response.body.errors as Array<{param: string}>).some((item) => item.param === testCase.expected.problemField),
+                    (response.body.errors as Array<{ param: string }>).some((item) => item.param === testCase.expected.problemField),
                     `ожидали получить ошибочный ответ с полем: ${testCase.expected.problemField}`,
                 ).to.be.true;
             });

@@ -1,6 +1,7 @@
 import express from "express";
 import {inject, injectable} from "tsyringe";
 import winston from "winston";
+import httpError from "http-errors";
 
 import {ServicesLayer} from "../../services-layer/services.layer";
 import {CommonMiddleware} from "../common.middleware";
@@ -55,13 +56,10 @@ class UsersMiddleware extends CommonMiddleware {
         next: express.NextFunction,
     ) {
         const userExist = await this.services.Users.isUserExist(res.locals.userId);
-        if (userExist) {
-            return next();
-        } else {
-            res.status(404).send({
-                error: `User ${req.params.userId} not found`,
-            });
+        if (!userExist) {
+            throw new httpError.NotFound(`User ${req.params.userId} not found`);
         }
+        return next();
     }
 
     public async extractUserId(

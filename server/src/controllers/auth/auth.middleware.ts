@@ -7,7 +7,7 @@ import {TokenInjection} from "../../infrastructure/token.injection";
 import winston from "winston";
 import jwt, {VerifyOptions} from "jsonwebtoken";
 import {JwtPayload} from "../common-types/jwt.payload";
-import {ResponseBody} from "../response.body";
+import httpError from "http-errors";
 
 @injectable()
 class AuthMiddleware extends CommonMiddleware {
@@ -31,20 +31,15 @@ class AuthMiddleware extends CommonMiddleware {
         res: express.Response,
         next: express.NextFunction,
     ) {
-        try {
-            const user = await this.services.Users.getUserByEmail(req.body.email);
-            if (user) {
-                const passwordHash = user.passwordHash;
-                if (await argon2.verify(passwordHash, req.body.password)) {
-                    res.locals.user = user;
-                    return next();
-                }
+        const user = await this.services.Users.getUserByEmail(req.body.email);
+        if (user) {
+            const passwordHash = user.passwordHash;
+            if (await argon2.verify(passwordHash, req.body.password)) {
+                res.locals.user = user;
+                return next();
             }
-            res.status(403).send(ResponseBody.jsonError("Invalid email and/or password"));
-        } catch (error) {
-            this.logger.error(`${this.name}.verifyUserPassword`, error);
-            next(error);
         }
+        throw new httpError.Forbidden("Invalid email and/or password");
     }
 
     /**
@@ -80,33 +75,27 @@ class AuthMiddleware extends CommonMiddleware {
         res: express.Response,
         next: express.NextFunction,
     ) {
-        try {
-            const userId = parseInt(req.body.id, 10);
-            const savedRefreshToken = await this.services.Users.getRefreshTokenByUserId(userId);
-            if (!savedRefreshToken) {
-                const message = `[${this.name}.validRefreshNeeded] refresh token not found, but access token exist`;
-                this.logger.error(message);
-                return next({errors: [message]});
-            }
-            if (req.body?.refreshToken !== savedRefreshToken.token) {
-                return res.status(400).send({errors: ["Invalid refresh token"]});
-            }
-            // проверка на отзыва refresh токена
-            if (savedRefreshToken.revoked || ((savedRefreshToken.expiredDate < new Date()))) {
-                return res.status(401).send({errors: ["refresh token was revoked or expired"]});
-            }
-            const user = await this.services.Users.getUserById(userId);
-            if (!user) {
-                const message = `[${this.name}.validRefreshNeeded] refresh token exist, but user don't`;
-                this.logger.error(message);
-                return next({errors: [message]});
-            }
-            res.locals.user = user;
-            return next();
-        } catch (error) {
-            this.logger.error(`[${this.name}.validRefreshNeeded]`, error);
-            return next(error);
+        const userId = parseInt(req.body.id, 10);
+        const savedRefreshToken = await this.services.Users.getRefreshTokenByUserId(userId);
+        if (!savedRefreshToken) {
+            throw new httpError.InternalServerError(`[${this.name}.validRefreshNeeded] refresh token not found, but access token exist`);
         }
+
+        if (req.body?.refreshToken !== savedRefreshToken.token) {
+            throw new httpError.BadRequest("Invalid refresh token");
+        }
+
+        // проверка на отзыва refresh токена
+        if (savedRefreshToken.revoked || ((savedRefreshToken.expiredDate < new Date()))) {
+            throw new httpError.Unauthorized("refresh token was revoked or expired");
+        }
+        const user = await this.services.Users.getUserById(userId);
+        if (!user) {
+            throw new httpError.InternalServerError(`[${this.name}.validRefreshNeeded] refresh token exist, but user don't`);
+        }
+
+        res.locals.user = user;
+        return next();
     }
 
     /**
@@ -123,23 +112,19 @@ class AuthMiddleware extends CommonMiddleware {
             res: express.Response,
             next: express.NextFunction) {
             if (req.headers["authorization"]) {
-                try {
-                    const authorization = req.headers["authorization"].split(" ");
-                    if (authorization[0] !== "Bearer") {
-                        return res.status(401).send();
-                    } else {
-                        res.locals.jwt = jwt.verify(
-                            authorization[1],
-                            execParam.jwtSecret,
-                            execParam.options,
-                        ) as JwtPayload;
-                        return next();
-                    }
-                } catch (err) {
-                    return next(err);
+                const authorization = req.headers["authorization"].split(" ");
+                if (authorization[0] !== "Bearer") {
+                    throw new httpError.Unauthorized();
+                } else {
+                    res.locals.jwt = jwt.verify(
+                        authorization[1],
+                        execParam.jwtSecret,
+                        execParam.options,
+                    ) as JwtPayload;
+                    return next();
                 }
             } else {
-                return res.status(401).send({});
+                throw new httpError.Unauthorized();
             }
         };
     }

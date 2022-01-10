@@ -1,6 +1,7 @@
 import express from "express";
 import {inject, injectable} from "tsyringe";
 import winston from "winston";
+import httpError from "http-errors";
 
 import {ServicesLayer} from "./../../services-layer/services.layer";
 import {CommonController} from "./../common.controller";
@@ -31,13 +32,8 @@ class UsersController extends CommonController {
      * @return {void}
      * */
     public async createUser(req: express.Request, res: express.Response) {
-        try {
-            await this.services.Users.createUser(req.body);
-            return res.status(201).send(ResponseBody.jsonOk("user registered"));
-        } catch (error) {
-            this.logger.error(`${this.name}.createUser error`, error);
-            return res.status(500).send({});
-        }
+        await this.services.Users.createUser(req.body);
+        return res.status(201).send(ResponseBody.jsonOk("user registered"));
     }
 
     /**
@@ -47,22 +43,17 @@ class UsersController extends CommonController {
      * @return {void}
      * */
     public async getUser(req: express.Request, res: express.Response) {
-        try {
-            const user = await this.services.Users.getUserById(res.locals.userId);
-            if (!user) {
-                return res.status(404).send({error: `User ${req.params.userId} not found`});
-            }
-            const responseData: GetUserDto = {
-                email: user.email,
-                name: user.name,
-                permissionFlag: user.permissionFlag,
-                registrationDate: user.registrationDate,
-            };
-            res.status(200).send({user: responseData});
-        } catch (error) {
-            this.logger.error(`${this.name}.getUserById`, error);
-            return res.status(500).send({});
+        const user = await this.services.Users.getUserById(res.locals.userId);
+        if (!user) {
+            throw new httpError.NotFound(`User ${req.params.userId} not found`);
         }
+        const responseData: GetUserDto = {
+            email: user.email,
+            name: user.name,
+            permissionFlag: user.permissionFlag,
+            registrationDate: user.registrationDate,
+        };
+        res.status(200).send({user: responseData});
     }
 
     /**
@@ -72,24 +63,14 @@ class UsersController extends CommonController {
      * @return {void}
      */
     public async patchUser(req: express.Request, res: express.Response) {
-        try {
-            await this.services.Users.updateUserById(res.locals.userId, req.body);
-            return res.status(200).send({msg: "user data updates successfully"});
-        } catch (error) {
-            this.logger.error(`${this.name}.patchUser`, error);
-            return res.status(500).send({});
-        }
+        await this.services.Users.updateUserById(res.locals.userId, req.body);
+        return res.status(200).send({msg: "user data updates successfully"});
     }
     public async changeUserPermission(req: express.Request, res: express.Response) {
-        try {
-            const targetUser: number = res.locals.userId;
-            const newPermission: number = res.locals.permissionFlag;
-            await this.services.Users.updateUserPermission(targetUser, newPermission);
-            return res.status(200).send({msg: "user permission successfully changed"});
-        } catch (error) {
-            this.logger.error(`${this.name}.changeUserPermission`, error);
-            return res.status(500).send({});
-        }
+        const targetUser: number = res.locals.userId;
+        const newPermission: number = res.locals.permissionFlag;
+        await this.services.Users.updateUserPermission(targetUser, newPermission);
+        return res.status(200).send({msg: "user permission successfully changed"});
     }
 
     // TODO: удолить после тестов

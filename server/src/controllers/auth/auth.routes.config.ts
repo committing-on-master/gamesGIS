@@ -8,6 +8,7 @@ import {AuthMiddleware} from "./auth.middleware";
 import {checkSchema} from "express-validator";
 import {LoginAuthSchema} from "./models.schema/login.auth.schema";
 import {RefreshAuthSchema} from "./models.schema/refresh.auth.schema";
+import {asyncWrapper} from "../asyncHandler";
 
 @injectable()
 class AuthRoutes extends CommonRoutesConfig {
@@ -22,20 +23,22 @@ class AuthRoutes extends CommonRoutesConfig {
 
     protected configureRoute(route: express.Router): express.Router {
         route.post("/auth", // authentication request - "мой логин-пароль, дай мне пару токенов access-refresh"
-            this.middleware.validateRequestSchema(checkSchema(LoginAuthSchema)),
-            this.middleware.verifyUserPassword,
-            this.controller.createJWT,
+            asyncWrapper(this.middleware.validateRequestSchema(checkSchema(LoginAuthSchema))),
+            asyncWrapper(this.middleware.verifyUserPassword),
+            asyncWrapper(this.controller.createJWT),
         );
         route.post("/auth/refresh-token", // authentication request - "мой id и refresh, дай новую пару access-refresh
-            this.middleware.validateRequestSchema(checkSchema(RefreshAuthSchema)),
-            this.middleware.verifyRefreshToken,
-            this.controller.createJWT,
+            asyncWrapper(this.middleware.validateRequestSchema(checkSchema(RefreshAuthSchema))),
+            asyncWrapper(this.middleware.verifyRefreshToken),
+            asyncWrapper(this.controller.createJWT),
         );
 
         route.post("/auth/logout", // отозвать refresh token
             this.middleware.jwtTokenValidation(),
             this.controller.revokeRefreshToken,
         );
+
+        route.use(this.middleware.handleOperationalErrors);
         return route;
     }
 }

@@ -43,3 +43,9 @@ process.on("SIGINT", () => {
     gisApp.stop();
     process.exit(0);
 });
+
+process.on("uncaughtException", (error: Error) => {
+    logger.error("Server is shuting down, uncaught Exception at top level", error);
+    gisApp.stop();
+    process.exit(0);
+});
