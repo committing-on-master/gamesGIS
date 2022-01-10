@@ -10,11 +10,12 @@ import { AwaitingComponent } from "../components/AwaitingComponent";
 import { WarningComponent } from "../components/WarningComponent";
 import { profileFetching } from "../store/profile/thunks";
 
-import "./../api/fetchMockStub"
 import { selectAllAreas } from "../store/areas/slice";
 import { AriaMarker } from "../components/maps/AriaMarker";
 import { mapSelectors } from "../store/map/state";
 import { SpotlightArea } from "../components/maps/SpotlightArea";
+
+// import "./../api/fetchMockStub"
 
 type LoadingState = {
     status: "idle" | "loading" | "succeeded" | "failed",

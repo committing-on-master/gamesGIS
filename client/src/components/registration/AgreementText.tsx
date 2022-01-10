@@ -17,7 +17,7 @@ function AgreementText(props: AgreementTextProps) {
     const [text, setText] = useState("Loading agreement text...");
 
     useEffect(() => {
-        RequestWrapper.get<AgreementDTO>(props.endPoint)
+        RequestWrapper.endPoint(props.endPoint).get().send<AgreementDTO>()
             .then(response => {
                 if (response.ok && response.success) {
                     setComponentStatus("loaded");

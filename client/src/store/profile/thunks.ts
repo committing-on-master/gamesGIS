@@ -14,7 +14,7 @@ export const profileFetching = createAsyncThunk<fetchingProfileAction, string>(
     "profile/Fetching",
     async (profileName: string, thunkApi) => {
         try {
-            const response = await RequestWrapper.get<ProfileMapDTO, {}>(`maps/${profileName}`)
+            const response = await RequestWrapper.endPoint(`maps/${profileName}`).get().send<ProfileMapDTO>()
             if (response.ok && response.success) {
                 const responsePayload = response.success.payload;
 
@@ -30,6 +30,8 @@ export const profileFetching = createAsyncThunk<fetchingProfileAction, string>(
                     const mapped: AreaType = {
                         id: area.id,
                         name: area.name,
+                        // TODO поправить алгоритм получения данных, описание пусть сам компонент подтягивает
+                        description: "some description",
                         position: area.center,
                         bound: mappedBound,
                         color: area.color

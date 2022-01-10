@@ -74,7 +74,7 @@ class GisApplication {
     private programErrorHandler(error: Error, req: express.Request, res: express.Response) {
         this.logger.error(error);
         // TODO: для ВАХ эффекта, можно в зависимости от типа ошибки, перезапускать сервер
-        res.status(500).send({});
+        res.status(500).header("Content-Type", "application/json").send({});
     }
 
     private async dbInitialization(connectionName: string) {

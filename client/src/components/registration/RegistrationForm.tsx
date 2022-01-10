@@ -34,9 +34,9 @@ function RegistrationForm(props: RegistrationFormProps) {
             password: data.userPassword
         }
 
-        RequestWrapper.post<null, ErrorDTO>(props.endPoint, requestBody)
+        RequestWrapper.endPoint(props.endPoint).post(requestBody).send<null, ErrorDTO>()
             .then(res => {
-                if (res.ok) {
+                if (res.ok) {                    
                     if (props.onRegistered) {
                         props.onRegistered(data);
                     }

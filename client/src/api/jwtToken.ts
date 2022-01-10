@@ -12,7 +12,7 @@ interface Token {
 
 class JwtToken {
     // Закроем глаза, и представить что мы тут храним все секурно. Тестовый проект как никак
-    public accessToken?: string;
+    private accessToken?: string;
     private refreshToken?: string;
     private key: string = "jwtToken";
     private payload?: Token;

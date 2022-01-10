@@ -1,121 +1,145 @@
 import { JwtDTO } from "./dto/response/JwtDTO";
-import { IHttpMethods } from "./iHttpMethods";
 import { RequestOptions } from "./RequestOptions";
 import { Result } from "./iResult ";
 import { JwtToken } from "./jwtToken";
 
-class JsonRequestWrapper implements IHttpMethods {
+interface IRequestWrapper extends IRequestMethods {
+    withAuth(): IRequestWrapper
+}
+
+interface ISend {
+    send<TSuccessBody,TErrorBody = {}>(opt?: RequestOptions): Promise<Result<TSuccessBody, TErrorBody>>;
+}
+
+interface IRequestMethods {
+    get(): ISend;
+    post(body: BodyInit | object): ISend;
+    put(body: BodyInit | object): ISend;
+}
+
+type Options = {
+    method?: "post" | "get" | "put";
+    url: string;
+    authToken: boolean;
+    headers: Headers;
+    body?: BodyInit;
+}
+
+class RequestWrapper implements IRequestWrapper {
     private static jwtToken = new JwtToken();
-    private static api = process.env.REACT_APP_API_URL || "localhost:3000/api"
-    
-    public get JwtToken() : JwtToken {
-        return JsonRequestWrapper.jwtToken;
+
+    public static get JwtToken() : JwtToken {
+        return RequestWrapper.jwtToken;
     }
 
-    public static async LoadToken() {
-        const tokens = this.jwtToken;
-        if (tokens.Access) {
-            if (tokens.ExpirationTimeout && tokens.ExpirationTimeout > 5 * 1000) {
-                return; // access токен есть и срок его жизни превышает 5 секунд, то обновлять не надо
-            }
+    private opt: Options;
+    
+    private constructor(url: string) {
+        this.opt = {
+            url : url,
+            authToken: false,
+            headers: new Headers()
         }
-
-        if (!tokens.Refresh) {
-            return; // refresh токена нет, отправлять нечего
-        }
-        this.exec<JwtDTO, null>("auth/refresh-token", {body:JSON.stringify({refreshToken: tokens.Refresh}),  method: "POST", headers: {"Content-type": "application/json; charset=UTF-8"}})
-            .then(res => {
-                if (res.ok) {
-                    tokens.Access = res.success?.payload.accessToken;
-                    tokens.Refresh = res.success?.payload.refreshToken;
-                    return Promise.resolve();
-                }
-                return Promise.reject(res.failure);
-            })
+    }    
+    
+    public static endPoint(endPoint: string) {        
+        return new RequestWrapper(this.getUrl(endPoint));
     }
     
-    private predefinedHeaders = new Headers ({
-        "Content-type": "application/json; charset=UTF-8"
-    })
-
-    private static getUrl(endPoint: string) { return `http://${this.api}/${endPoint}` }
     
-    public get withAuth(): Promise<IHttpMethods> {
-        const tokens = JsonRequestWrapper.jwtToken;
-        if (!tokens.Refresh) {
-            return Promise.resolve(new FailedAuthDummy()); // рефреш токен отсутствует, авторизация не доступна
+    private static getUrl(endPoint: string) {
+        const api = process.env.REACT_APP_API_URL;
+        if (!api) {
+            throw new Error("REACT_APP_API_URL variable is undefined");
         }
-        const result = new JsonRequestWrapper();
-        if (tokens.Access && tokens.ExpirationTimeout && tokens.ExpirationTimeout > 5 * 1000) {
-            result.predefinedHeaders.set("Authorization", `Bearer ${tokens.Access}`); //access пока не протух
-            return Promise.resolve(result);
-        }
-
-        return JsonRequestWrapper.exec<JwtDTO, null>("auth/refresh-token", {body:JSON.stringify({refreshToken: tokens.Refresh}),  method: "POST", headers: {"Content-type": "application/json; charset=UTF-8"}})
-            .then(res => {
-                if (res.ok) { // схоронили перевыпущеные токены, запихали в заголовок новый
-                    tokens.Access = res.success?.payload.accessToken;
-                    tokens.Refresh = res.success?.payload.refreshToken;
-                    
-                    result.predefinedHeaders.set("Authorization", `Bearer ${tokens.Access}`);
-                    return Promise.resolve(result); 
-                }
-                return Promise.reject(res.failure);
-            })
+        return `http://${api}/${endPoint}`;
     }
 
-    /**
-     * Обертка над get запросом. Получаем пакеты только в application/json формате
-     * @template TSuccessBody ожидаемый формат ответа от сервера в случае успеха (коды 200-299)
-     * @template TErrorBody ожидаемый формат ответа от сервера с ошибками
-     * @param endPoint endpoint для запроса
-     * @param opt параметры запроса
-     * @return {Promise< Result<TSuccessBody, TErrorBody> >} промис с наложенным(mapped) результатом ответа
-     * @throws при проблемах с установлением соединения, или при неверном формате ответа сервера
-     */
-    public get<TSuccessBody, TErrorBody = null>(endPoint: string, opt: RequestOptions = {}): Promise<Result<TSuccessBody, TErrorBody>> {
-        const requestOpt: RequestInit = {
-                                            ...opt,
-                                            method: "GET",
-                                            headers: {...this.predefinedHeaders, ...opt.headers }
-                                        };
-
-        return JsonRequestWrapper.exec<TSuccessBody, TErrorBody>(endPoint, requestOpt);
+    withAuth(): IRequestWrapper {
+        this.opt.authToken = true;
+        return this;
     }
 
-    /**
-     * Обертка над post запросом. Отправляем и получаем пакеты только в application/json формате
-     * @template TSuccessBody ожидаемый формат ответа от сервера в случае успеха (коды 200-299)
-     * @template TErrorBody ожидаемый формат ответа от сервера с ошибками
-     * @param endPoint endpoint для запроса
-     * @param body тело запроса
-     * @param opt параметры запроса
-     * @return {Promise< Result<TSuccessBody, TErrorBody> >} промис с наложенным(mapped) результатом ответа
-     * @throws при проблемах с установлением соединения, или при неверном формате ответа сервера
-     */
-    public post<TSuccessBody, TErrorBody = null>(endPoint: string, body: BodyInit | object , opt: RequestOptions = {}) {
+    public get(): ISend {
+        this.opt.method = "get";
+        return this;
+    }
+    public post(body: BodyInit | object = {}): ISend {
+        this.opt.method = "post";
         if (typeof body === "object") {
             body = JSON.stringify(body);
         }
+        this.opt.body = body;
+        this.opt.headers.set("Content-type", "application/json")
+        return this;
+    }
+    public put(body: BodyInit | object = {}): ISend {
+        this.opt.method = "put";
+        if (typeof body === "object") {
+            body = JSON.stringify(body);
+        }
+        this.opt.body = body;
+        this.opt.headers.set("Content-type", "application/json")
+        return this;
+    }
+
+    public async send<TSuccessBody, TErrorBody>(opt: RequestOptions = {}): Promise<Result<TSuccessBody, TErrorBody>> {
+        if (this.opt.authToken) {
+            await this.addBearerHeader();
+        }
 
         const headers = opt.headers ? new Headers(opt.headers) : new Headers();
-        this.predefinedHeaders.forEach((value, key) => {
+        this.opt.headers.forEach((value, key) => {
             headers.set(key, value);
         })
 
         const requestOpt: RequestInit = {
-                                            ...opt,
-                                            method: "POST",
-                                            body: body,
-                                            headers: headers
-                                        };
+            ...opt,
+            method: this.opt.method,
+            body: this.opt.body,
+            headers: headers
+        };
 
-        return JsonRequestWrapper.exec<TSuccessBody, TErrorBody>(endPoint, requestOpt);
+        return this.exec<TSuccessBody, TErrorBody>(this.opt.url, requestOpt);
     }
 
-    private static exec<TSuccessBody, TErrorBody>(endPoint: string, requestOpt: RequestInit): Promise<Result<TSuccessBody, TErrorBody>> {
-        const url = this.getUrl(endPoint);
+    private async addBearerHeader() {
+        this.getAccessToken()
+        .then(token => {
+            if(token) {
+                this.opt.headers.set("Authorization", `Bearer ${token}`);
+                return Promise.resolve();
+            }
+            return Promise.reject();
+        })
+    }
 
+    private async getAccessToken() {
+        const tokens = RequestWrapper.jwtToken;
+        if (tokens.Access) {
+            if (tokens.ExpirationTimeout && tokens.ExpirationTimeout > 10 * 1000) {
+                this.opt.headers.set("Authorization", `Bearer ${tokens.Access}`);
+                return Promise.resolve(tokens.Access); // access токен есть и срок его жизни превышает 10 секунд, должно хватить
+            }
+        }
+
+        if (!tokens.Refresh) {
+            return Promise.reject("Refresh token not found. Manual relogin required."); // refresh токена нет, новый access получить не можем
+        }
+
+        return this.exec<JwtDTO, null>(RequestWrapper.getUrl("auth/refresh-token"), {body:JSON.stringify({refreshToken: tokens.Refresh}),  method: "POST", headers: {"Content-type": "application/json; charset=UTF-8"}})
+            .then(res => {
+                if (res.ok) {
+                    tokens.Access = res.success?.payload.accessToken;
+                    tokens.Refresh = res.success?.payload.refreshToken;
+                    return Promise.resolve(tokens.Access);
+                }
+                return Promise.reject(res.failure);
+            })
+    }
+
+
+    private exec<TSuccessBody, TErrorBody>(url: string, requestOpt: RequestInit): Promise<Result<TSuccessBody, TErrorBody>> {
         return fetch(url, requestOpt)
             .then(response => {
                 const contentHeader = response.headers.get("Content-Type");
@@ -153,11 +177,4 @@ class JsonRequestWrapper implements IHttpMethods {
     }
 }
 
-class FailedAuthDummy implements IHttpMethods {
-    private static rejectPromise = Promise.resolve({ ok: false, code: 401 });
-    
-    get = () => FailedAuthDummy.rejectPromise;
-    post = () => FailedAuthDummy.rejectPromise;
-}
-
-export const RequestWrapper = new JsonRequestWrapper();
+export { RequestWrapper };

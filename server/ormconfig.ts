@@ -5,7 +5,7 @@ module.exports = [
         database: ":memory:",
         synchronize: true,
         entities: [__dirname + "\\dist\\src\\data-layer\\models\\*.dao.js"],
-        logging: ["query", "error", "info", "log"]
+        logging: ["query", "error", "info", "log"],
     },
     {
         name: "production",
@@ -14,6 +14,6 @@ module.exports = [
         // dropSchema: true,
         // synchronize: true,
         entities: [__dirname + "\\dist\\src\\data-layer\\models\\*.dao.js"],
-        logging: ["query", "error", "info", "log"]
-    }
-]
+        logging: ["query", "error", "info", "log"],
+    },
+];

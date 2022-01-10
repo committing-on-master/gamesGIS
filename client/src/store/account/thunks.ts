@@ -22,7 +22,7 @@ export const loginUser = createAsyncThunk<UserData, LoginThunkArg>(
             password: data.userPassword
         }
         try {
-            const res = await RequestWrapper.post<JwtDTO, ErrorDTO>("auth", body);
+            const res = await RequestWrapper.endPoint("auth").post(body).send<JwtDTO, ErrorDTO>();
             if (res.ok && res.success?.payload) {
                 const result = res.success.payload;
                 RequestWrapper.JwtToken.Access = result.accessToken;

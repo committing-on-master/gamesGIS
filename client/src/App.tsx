@@ -11,7 +11,7 @@ function App() {
   // test
   const navigate = useNavigate();
   useEffect(() => {
-    navigate("map/woods");    
+    // navigate("map/woods");
   }, [navigate])
   //
   return (
