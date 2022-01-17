@@ -27,7 +27,6 @@ function MapProfileCreationForm(props: ProfileCreationProps) {
         }
         RequestWrapper.endPoint(`map-profile/${data.profileName}`).withAuth().post(body).send<null, ErrorDTO>()
             .then(res => {
-                console.log("get creation response");
                 if (res.ok) {
                     if (props.onCreated) {
                         props.onCreated(data.profileName);

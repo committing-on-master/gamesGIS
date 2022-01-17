@@ -83,8 +83,6 @@ function loadLoginData(): UserData | undefined {
             userId: parseInt(id, 10),
             userName: name
         }
-        console.log("loaded user data");
-        console.log(result);
         return result;
     }
     return undefined;

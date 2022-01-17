@@ -14,15 +14,21 @@ import { selectAllAreas } from "../store/areas/slice";
 import { AriaMarker } from "../components/maps/AriaMarker";
 import { mapSelectors } from "../store/map/state";
 import { SpotlightArea } from "../components/maps/SpotlightArea";
+import { Sidenav } from "../components/navbar/Sidenav";
 
 // import "./../api/fetchMockStub"
 
 type LoadingState = {
-    status: "idle" | "loading" | "succeeded" | "failed",
-    msg? : string;
+    status: "idle" | "loading" | "succeeded" | "failed";
+    msg?: string;
 }
 
-function MapPage() {
+interface MapProps {
+    editable: boolean;
+}
+
+function MapPage(props: MapProps) {
+    console.log(props);
     const { profileName } = useParams();
     const navigate = useNavigate();
     if (!profileName) {
@@ -64,6 +70,7 @@ function MapPage() {
     }
 
     return (
+        <>
         <MapContainer
             // Coordinates in CRS.Simple take the form of [y, x] instead of [x, y], in the same way Leaflet uses [lat, lng] instead of [lng, lat]
             crs={CRS.Simple}
@@ -91,6 +98,18 @@ function MapPage() {
             <SpotlightArea />
 
         </MapContainer>
+        <Sidenav
+            visibility={props.editable}
+            header="Markers"
+        >
+            <ul>
+                <li>test</li>
+                <li>test 2</li>
+                <li>test 3</li>
+                <li>test 4</li>
+            </ul>
+        </Sidenav>
+        </>
     );
 }
 

@@ -1,0 +1,57 @@
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    right: 0;
+    background-color: rgb(153, 153, 153);
+    overflow-x: visible;
+    transition: 0.5s;
+
+    &--active {
+        width: 250px;
+    }
+
+    h2 {
+        text-align: center;
+    }
+
+    .arrowContainer{
+        position: relative;
+        top: 0px;
+        right: 35px;
+        width: 25px;
+        height: 35px;
+        padding: 0 4px;
+        background-color: black;
+        transition: 0.5s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &--right {
+            right: 0px;
+            background-color: white;
+        }
+        
+        .arrow {
+            border: solid white;
+            border-width: 0 4px 4px 0;
+            transform: rotate(135deg);
+            cursor: pointer;
+            transition: 0.5s;
+            padding: 8px;
+    
+            &--right {
+                border: solid black;
+                border-width: 0 4px 4px 0;
+                transform: rotate(-45deg);
+            }
+        }
+    }
+
+    .navbody {
+        margin: 8px;
+    }
+}
