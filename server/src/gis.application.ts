@@ -17,6 +17,7 @@ import {TokenInjection} from "./infrastructure/token.injection";
 import {Connection, createConnection, getConnectionOptions} from "typeorm";
 import {AuthRoutes} from "./controllers/auth/auth.routes.config";
 import {AgreementsRoutes} from "./controllers/agreements/agreements.routes.config";
+import {MapProfileRoutes} from "./controllers/map-profiles/map.profile.routes.config";
 
 class GisApplication {
     readonly port: number;
@@ -36,6 +37,8 @@ class GisApplication {
         this.port = port;
         this.host = host ?? "localhost";
         this.routes = [];
+
+        this.programErrorHandler = this.programErrorHandler.bind(this);
     }
 
     /* eslint-disable new-cap */
@@ -65,20 +68,21 @@ class GisApplication {
         return this;
     }
 
+    // eslint-disable-next-line valid-jsdoc
     /**
      * Обработчик верхнего уровня Express.js-а
      * @param {Error} error объект с ошибкой
      * @param {express.Request} req запрос, который привел к ошибке
      * @param {express.Response} res объект ответа
      */
-    private programErrorHandler(error: Error, req: express.Request, res: express.Response) {
+    private programErrorHandler(error: Error, req: express.Request, res: express.Response, next: express.NextFunction) {
         this.logger.error(error);
         // TODO: для ВАХ эффекта, можно в зависимости от типа ошибки, перезапускать сервер
         res.status(500).header("Content-Type", "application/json").send({});
     }
 
     private async dbInitialization(connectionName: string) {
-        const winstonOrm = new WinstonAdaptor(this.logger, "all");
+        const winstonOrm = new WinstonAdaptor(this.logger, ["warn", "error"]);
         // Берем конфигу из ormconfig файла, и подменяем логгер на уже созданный единый логгер приложения
         this.dbConnection = await getConnectionOptions(connectionName)
             .then((connectionOpt) => {
@@ -123,23 +127,22 @@ class GisApplication {
             throw new Error("Nullref, router variable is undefined");
         }
         // TODO: разобраться с путями, слишком много относительных путей
-        router.use(express.static(__dirname + "./../../maps"));
+        router.use(express.static(__dirname + "./../maps"));
         return router;
     }
 
     private createApiRoutes(router: express.Router): express.Router {
         if (!router) {
-            throw new Error("Express is not created.");
+            throw new Error("Router is empty.");
         }
         router.use(express.json());
-        // TODO: вот это вот не точно, но скорее всего придется для SPA и прочей статики отдельный express.js поднимать, поэтому оставим пока так
-
         router.use(cors());
 
         this.routes.push(
             container.resolve(UsersRoutes),
             container.resolve(AuthRoutes),
             container.resolve(AgreementsRoutes),
+            container.resolve(MapProfileRoutes),
         );
 
         this.routes.forEach((route) => {

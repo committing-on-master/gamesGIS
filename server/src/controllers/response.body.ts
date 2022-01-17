@@ -1,5 +1,5 @@
 interface IResponseBody {
-    msg?: string;
+    message?: string;
 }
 
 interface IErrorBody extends IResponseBody {
@@ -32,7 +32,7 @@ abstract class ResponseBody {
         const result: ISuccessBody<T> = {};
 
         if (message) {
-            result.msg = message;
+            result.message = message;
         }
 
         if (dto) {
@@ -45,7 +45,7 @@ abstract class ResponseBody {
         const result: IErrorBody = {};
 
         if (message) {
-            result.msg = message;
+            result.message = message;
         }
 
         if (errors && errors.length !== 0) {

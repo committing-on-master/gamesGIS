@@ -16,7 +16,7 @@ const Template: ComponentStory<typeof LoginForm> = () => <LoginForm />;
 export const SuccessLogin = Template.bind({});
 SuccessLogin.play = () => {
   const resultBody: JwtDTO = {
-    msg: "successfully login",
+    message: "successfully login",
     payload: {
       accessToken: "totallySuccess",
       refreshToken: "totallyRefresh"
@@ -39,7 +39,7 @@ SuccessLogin.play = () => {
 export const Failure = Template.bind({});
 Failure.play = () => {
   const resultBody: ErrorDTO = {
-    msg: "Invalid email or password",
+    message: "Invalid email or password",
   }
   
   fetchMock

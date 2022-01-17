@@ -1,5 +1,6 @@
-import {AbstractRepository, EntityRepository} from "typeorm";
-import {RefreshTokensDao} from "../models/refresh.tokens.dao";
+import {nameofPropChecker} from "./../../infrastructure/name.of.prop.checker";
+import {AbstractRepository, EntityRepository, FindOneOptions} from "typeorm";
+import {RefreshTokensDao} from "./../models/refresh.tokens.dao";
 
 // eslint-disable-next-line new-cap
 @EntityRepository(RefreshTokensDao)
@@ -10,11 +11,19 @@ class RefreshTokensRepository extends AbstractRepository<RefreshTokensDao> {
      * @return {Promise<RefreshTokensDao | undefined>} найденная запись или undefined в случае её отсутствия в базе
      */
     public async findTokenByUserId(userId: number): Promise<RefreshTokensDao | undefined> {
-        return await this.repository.findOne({where: {user: {id: userId}}});
+        return this.repository.findOne({where: {user: {id: userId}}});
+    }
+
+    public async getRefreshToken(token: string, relation: boolean = false) {
+        const options: FindOneOptions = {
+            where: {token: token},
+            ...(relation && {relations: [nameofPropChecker<RefreshTokensDao>("user")]}),
+        };
+        return this.repository.findOne(options);
     }
 
     public async addToken(token: RefreshTokensDao): Promise<RefreshTokensDao> {
-        return await this.repository.save(token);
+        return this.repository.save(token);
     }
 
     public async updateToken(token: RefreshTokensDao): Promise<void> {

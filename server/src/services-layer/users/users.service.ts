@@ -50,7 +50,7 @@ class UsersService {
     }
 
     public async isNameAvailable(name: string): Promise<boolean> {
-        return !await this.dataLayer.usersRepository.isNameAlreadyExist(name);
+        return !this.dataLayer.usersRepository.isNameAlreadyExist(name);
     }
 
     public async isUserExist(userId: number): Promise<boolean> {
@@ -114,7 +114,11 @@ class UsersService {
     }
 
     public async getRefreshTokenByUserId(userId: number): Promise<RefreshTokensDao | undefined> {
-        return await this.dataLayer.refreshTokensRepository.findTokenByUserId(userId);
+        return this.dataLayer.refreshTokensRepository.findTokenByUserId(userId);
+    }
+
+    public async getRefreshToken(token: string): Promise<RefreshTokensDao | undefined> {
+        return this.dataLayer.refreshTokensRepository.getRefreshToken(token, true);
     }
 
     public async getUserByEmail(email: string) {
@@ -135,7 +139,7 @@ class UsersService {
     }
 
     async list(limit: number, page: number) {
-        return await this.dataLayer.usersRepository.getUsers();
+        return this.dataLayer.usersRepository.getUsers();
     }
 }
 

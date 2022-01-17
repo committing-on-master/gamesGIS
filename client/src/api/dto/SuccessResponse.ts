@@ -1,4 +1,4 @@
 export interface SuccessResponse<DTO={}> {
-    msg: string;
+    message: string;
     payload: DTO;
 }

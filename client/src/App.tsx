@@ -5,7 +5,10 @@ import { HomePage } from './view/HomePage';
 import { MapPage } from './view/MapPage';
 import { NoMatchPage } from './view/NoMatchPage';
 import { RegistrationPage } from './view/RegistrationPage';
+import { EditingMapProfilePage } from './view/EditingMapProfilePage';
+
 import "./App.scss"
+import MyMapsPage from './view/MyMapsPage';
 
 function App() {
   // test
@@ -17,10 +20,12 @@ function App() {
   return (
     <div className="App">
       <Routes>
+        <Route path="/map/:profileName/editing" element={<EditingMapProfilePage />} />
         <Route path="/map/:profileName" element={<MapPage />} />
         <Route path="/" element={<MainTemplate />}>
           <Route path="/" element={<HomePage />} />
           <Route path="registration" element={<RegistrationPage />} />
+          <Route path="mymaps" element={<MyMapsPage/>} />
           <Route path="*" element={<NoMatchPage />} />
         </Route>
       </Routes>

@@ -62,6 +62,7 @@ class UsersMiddleware extends CommonMiddleware {
         return next();
     }
 
+    // TODO переделай на common
     public async extractUserId(
         req: express.Request,
         res: express.Response,

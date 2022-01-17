@@ -8,7 +8,6 @@ import {CommonController} from "../common.controller";
 import {ServicesLayer} from "../../services-layer/services.layer";
 import {JwtPayload} from "../common-types/jwt.payload";
 import {UsersDAO} from "./../../data-layer/models/users.dao";
-import {ResponseBody} from "../response.body";
 
 @singleton()
 class AuthController extends CommonController {
@@ -56,9 +55,10 @@ class AuthController extends CommonController {
             refreshToken: refreshToken,
         };
 
+        this.logger.info(`User with id: ${user.id} recreated tokens`);
         return res
             .status(201)
-            .send(ResponseBody.jsonOk("jwt created", jwtResponseDTO));
+            .json({message: "jwt created", payload: jwtResponseDTO});
     }
 
     /**

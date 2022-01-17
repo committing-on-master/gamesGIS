@@ -65,7 +65,7 @@ function RegistrationForm(props: RegistrationFormProps) {
                         return Promise.resolve();
                     default:
                         console.log(res.failure);
-                        setUnexpectedError(res.failure?.msg || "Unexpected received response error format");
+                        setUnexpectedError(res.failure?.message || "Unexpected received response error format");
                         break;
                 }
                 return Promise.resolve();

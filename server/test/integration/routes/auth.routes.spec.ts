@@ -234,12 +234,15 @@ describe("Сценарии создания JWT токена", function() {
         before(async function() {
             manualResetTestInstances();
             builder
-                .addStep((data) => data.refreshTokenStub.addMock((token) => when(token.token).thenReturn(refreshToken))
-                    .addMock((token) => when(token.revoked).thenReturn(false))
-                    .addMock((token) => when(token.expiredDate).thenReturn(new Date(2042, 2, 23))))
                 .addStep((data) => data.usersStub.addMock((user) => when(user.id).thenReturn(userId))
                     .addMock((user) => when(user.email).thenReturn(email)))
-                .addStep((data) => data.userService.addMock((service) => when(service.getRefreshTokenByUserId(userId)).thenResolve(data.refreshTokenStub.Instance))
+
+                .addStep((data) => data.refreshTokenStub.addMock((token) => when(token.token).thenReturn(refreshToken))
+                    .addMock((token) => when(token.revoked).thenReturn(false))
+                    .addMock((token) => when(token.expiredDate).thenReturn(new Date(2042, 2, 23)))
+                    .addMock((token) => when(token.user).thenReturn(data.usersStub.Instance)))
+
+                .addStep((data) => data.userService.addMock((service) => when(service.getRefreshToken(refreshToken)).thenResolve(data.refreshTokenStub.Instance))
                     .addMock((service) => when(service.getUserById(userId)).thenResolve(data.usersStub.Instance)))
 
                 .TestedInstance.registerRoutes(expressApp);
@@ -252,7 +255,7 @@ describe("Сценарии создания JWT токена", function() {
             const response = await supertestServ(expressApp)
                 .post("/auth/refresh-token")
                 .set("Content-Type", "application/json")
-                .send({id: userId, refreshToken: refreshToken});
+                .send({refreshToken: refreshToken});
 
             expect(response.statusCode).to.be.equal(201);
 
@@ -278,7 +281,6 @@ describe("Сценарии создания JWT токена", function() {
         before(async function() {
             manualResetTestInstances();
             builder
-                // .addStep(data => data.usersStub.addMock(user => when))
                 .addStep((data) => data.userService.addMock((service) => when(service.getUserById(userId)).thenResolve(data.usersStub.Instance))
                     .addMock((service) => when(service.getRefreshTokenByUserId(userId)).thenResolve(data.refreshTokenStub.Instance)))
                 .TestedInstance.registerRoutes(expressApp);

@@ -4,7 +4,24 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
+        {
+            "name": "Launch via ts-node",
+            "request": "launch",
+            "type": "node",
+            "runtimeExecutable": "node",
+            "skipFiles": [
+                "<node_internals>/**",
+                "node_modules/**"
+            ],
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register"
+            ],
+            "args": [
+                "${workspaceFolder}/index.ts"
+            ],
+            "console": "integratedTerminal"
+        },
         {
             "type": "pwa-node",
             "request": "launch",
@@ -15,7 +32,8 @@
             "program": "${workspaceFolder}\\dist\\index.js",
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
-            ]
+            ],
+            "console": "integratedTerminal"
         },
         {
             "name": "Mocha Tests",
@@ -57,7 +75,5 @@
         //       "quiet": "false"
         //     }
         //   },
-
-
     ]
 }

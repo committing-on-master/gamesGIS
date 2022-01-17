@@ -93,6 +93,34 @@ class StaticSchemaFactory {
             trim: true,
         };
     }
+
+    public static createMapSchema(): ParamSchema {
+        return {
+            in: ["body"],
+
+            exists: {negated: true, errorMessage: "map body field is missing"},
+            isNumeric: {
+                negated: true,
+                options: {no_symbols: true},
+                errorMessage: "map body field numeric only"},
+        };
+    }
+
+    public static createProfileNameSchema(): ParamSchema {
+        return {
+            in: ["body"],
+
+            exists: {negated: true, errorMessage: "profileName body field is missing"},
+            isEmpty: {negated: true, options: {ignore_whitespace: true}, errorMessage: "profileName body field is empty"},
+            isLength: {
+                options: {
+                    min: 3,
+                    max: 255,
+                },
+                errorMessage: "profileName should not be greater than 255 symbols or shorter than 3 symbols",
+            },
+        };
+    }
 }
 
 export {StaticSchemaFactory};

@@ -23,6 +23,7 @@ class AuthMiddleware extends CommonMiddleware {
 
         this.verifyUserPassword = this.verifyUserPassword.bind(this);
         this.verifyRefreshToken = this.verifyRefreshToken.bind(this);
+        this.jwtTokenValidation = this.jwtTokenValidation.bind(this);
         // this.validJWTNeeded = this.validJWTNeeded.bind(this);
     }
 
@@ -75,21 +76,17 @@ class AuthMiddleware extends CommonMiddleware {
         res: express.Response,
         next: express.NextFunction,
     ) {
-        const userId = parseInt(req.body.id, 10);
-        const savedRefreshToken = await this.services.Users.getRefreshTokenByUserId(userId);
+        const savedRefreshToken = await this.services.Users.getRefreshToken(req.body?.refreshToken);
         if (!savedRefreshToken) {
-            throw new httpError.InternalServerError(`[${this.name}.validRefreshNeeded] refresh token not found, but access token exist`);
-        }
-
-        if (req.body?.refreshToken !== savedRefreshToken.token) {
-            throw new httpError.BadRequest("Invalid refresh token");
+            throw new httpError.NotFound("refresh token not found");
         }
 
         // проверка на отзыва refresh токена
-        if (savedRefreshToken.revoked || ((savedRefreshToken.expiredDate < new Date()))) {
+        // TODO феерическая проблема с датками, закоменти и реши позже
+        if (savedRefreshToken.revoked) { // || ((savedRefreshToken.expiredDate < new Date()))) {
             throw new httpError.Unauthorized("refresh token was revoked or expired");
         }
-        const user = await this.services.Users.getUserById(userId);
+        const user = savedRefreshToken.user;
         if (!user) {
             throw new httpError.InternalServerError(`[${this.name}.validRefreshNeeded] refresh token exist, but user don't`);
         }

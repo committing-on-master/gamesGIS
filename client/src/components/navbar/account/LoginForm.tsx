@@ -56,9 +56,9 @@ function LoginForm(props: LoginFormProps) {
                         }
 
                         // с полями все в порядке, не верная пара логин/пароль
-                        if (errorRes.msg) {
-                            setError("userEmail", { message: errorRes.msg });
-                            setError("userPassword", { message: errorRes.msg });
+                        if (errorRes.message) {
+                            setError("userEmail", { message: errorRes.message });
+                            setError("userPassword", { message: errorRes.message });
                             return Promise.resolve();
                         }
                     }

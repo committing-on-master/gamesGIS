@@ -40,6 +40,19 @@ abstract class CommonMiddleware {
         };
     }
 
+    public extractParamToBody(
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction,
+        value: string,
+        paramName: string,
+    ) {
+        if (value) {
+            req.body[paramName] = value;
+        }
+        next();
+    }
+
     public handleOperationalErrors(error: Error, req: express.Request, res: express.Response, next: NextFunction) {
         if (!httpError.isHttpError(error) || error.status === 500) {
             next(error);

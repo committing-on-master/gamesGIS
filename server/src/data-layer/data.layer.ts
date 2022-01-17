@@ -6,6 +6,11 @@ import {UsersRepository} from "./repositories/users.repository";
 import {TokenInjection} from "../infrastructure/token.injection";
 import {RefreshTokensRepository} from "./repositories/refresh.tokens.repository";
 import {AgreementsRepository} from "./repositories/agreements.repository";
+import {CoordinatesRepository} from "./repositories/coordinates.repository";
+import {GalleryRepository} from "./repositories/gallery.repository";
+import {MapProfileRepository} from "./repositories/map.profile.repository";
+import {MarkerRepository} from "./repositories/marker.repository";
+import {MapRepository} from "./repositories/map.repository";
 
 @singleton()
 class DataLayer {
@@ -28,6 +33,26 @@ class DataLayer {
 
     public get agreementsRepository(): AgreementsRepository {
         return this.dbContext.getCustomRepository(AgreementsRepository);
+    }
+
+    public get coordinatesRepository(): CoordinatesRepository {
+        return this.dbContext.getCustomRepository(CoordinatesRepository);
+    }
+
+    public get galleyRepository(): GalleryRepository {
+        return this.dbContext.getCustomRepository(GalleryRepository);
+    }
+
+    public get mapProfileRepository(): MapProfileRepository {
+        return this.dbContext.getCustomRepository(MapProfileRepository);
+    }
+
+    public get markerRepository(): MarkerRepository {
+        return this.dbContext.getCustomRepository(MarkerRepository);
+    }
+
+    public get mapRepository(): MapRepository {
+        return this.dbContext.getCustomRepository(MapRepository);
     }
 }
 

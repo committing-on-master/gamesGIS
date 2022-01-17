@@ -14,7 +14,7 @@ class JwtToken {
     // Закроем глаза, и представить что мы тут храним все секурно. Тестовый проект как никак
     private accessToken?: string;
     private refreshToken?: string;
-    private key: string = "jwtToken";
+    private refreshKey: string = "jwtToken";
     private payload?: Token;
 
     
@@ -49,20 +49,20 @@ class JwtToken {
     public set Refresh(token: string | undefined) {
         this.refreshToken = token;
         if (token) {
-            localStorage.setItem(this.key, token);
+            localStorage.setItem(this.refreshKey, token);
         } else {
-            localStorage.removeItem(this.key);
+            localStorage.removeItem(this.refreshKey);
         }
     }
 
     public get Refresh(): string | undefined {
-        if (!this.refreshToken) {
-            const saved = localStorage.getItem(this.key);
-            return saved ? saved : undefined;
-        }
         if (this.refreshToken) {
             return this.refreshToken;
         }
+        
+        const saved = localStorage.getItem(this.refreshKey);
+        this.refreshToken = saved ? saved : undefined;
+        return this.refreshToken;
     }
 }
 

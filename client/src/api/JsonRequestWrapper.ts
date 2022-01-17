@@ -2,6 +2,7 @@ import { JwtDTO } from "./dto/response/JwtDTO";
 import { RequestOptions } from "./RequestOptions";
 import { Result } from "./iResult ";
 import { JwtToken } from "./jwtToken";
+import { ErrorResponse } from "./dto/ErrorResponse";
 
 interface IRequestWrapper extends IRequestMethods {
     withAuth(): IRequestWrapper
@@ -18,7 +19,7 @@ interface IRequestMethods {
 }
 
 type Options = {
-    method?: "post" | "get" | "put";
+    method?: "POST" | "GET" | "PUT";
     url: string;
     authToken: boolean;
     headers: Headers;
@@ -61,11 +62,11 @@ class RequestWrapper implements IRequestWrapper {
     }
 
     public get(): ISend {
-        this.opt.method = "get";
+        this.opt.method = "GET";
         return this;
     }
     public post(body: BodyInit | object = {}): ISend {
-        this.opt.method = "post";
+        this.opt.method = "POST";
         if (typeof body === "object") {
             body = JSON.stringify(body);
         }
@@ -74,7 +75,7 @@ class RequestWrapper implements IRequestWrapper {
         return this;
     }
     public put(body: BodyInit | object = {}): ISend {
-        this.opt.method = "put";
+        this.opt.method = "PUT";
         if (typeof body === "object") {
             body = JSON.stringify(body);
         }
@@ -99,19 +100,18 @@ class RequestWrapper implements IRequestWrapper {
             body: this.opt.body,
             headers: headers
         };
-
         return this.exec<TSuccessBody, TErrorBody>(this.opt.url, requestOpt);
     }
 
     private async addBearerHeader() {
-        this.getAccessToken()
-        .then(token => {
-            if(token) {
-                this.opt.headers.set("Authorization", `Bearer ${token}`);
-                return Promise.resolve();
-            }
-            return Promise.reject();
-        })
+        return this.getAccessToken()
+            .then(token => {
+                if(token) {
+                    this.opt.headers.set("Authorization", `Bearer ${token}`);
+                    return;
+                }
+                throw new Error("jwt token is undefined");
+            })
     }
 
     private async getAccessToken() {
@@ -127,14 +127,14 @@ class RequestWrapper implements IRequestWrapper {
             return Promise.reject("Refresh token not found. Manual relogin required."); // refresh токена нет, новый access получить не можем
         }
 
-        return this.exec<JwtDTO, null>(RequestWrapper.getUrl("auth/refresh-token"), {body:JSON.stringify({refreshToken: tokens.Refresh}),  method: "POST", headers: {"Content-type": "application/json; charset=UTF-8"}})
+        return this.exec<JwtDTO, ErrorResponse>(RequestWrapper.getUrl("auth/refresh-token"), {body:JSON.stringify({refreshToken: tokens.Refresh}),  method: "POST", headers: {"Content-type": "application/json; charset=UTF-8"}})
             .then(res => {
                 if (res.ok) {
                     tokens.Access = res.success?.payload.accessToken;
                     tokens.Refresh = res.success?.payload.refreshToken;
-                    return Promise.resolve(tokens.Access);
+                    return tokens.Access;
                 }
-                return Promise.reject(res.failure);
+                throw new Error(res.failure?.message);
             })
     }
 
@@ -146,17 +146,17 @@ class RequestWrapper implements IRequestWrapper {
                 if (contentHeader && contentHeader.indexOf("application/json") !== -1) {
                     if (response.ok) {
                         // 200-299
-                        return Promise
-                            .resolve(response.json()) // резолвимся промисом на json success дтошки
-                            .then((okJson) => {
-                                return Promise.resolve({ ok: true, code: response.status, body: okJson }) // заворачиваем тело с кодом в success объект
+                        return response
+                            .json() // резолвимся промисом на body success дтошки
+                            .then((okJson) => { // body подъехал
+                                return { ok: true, code: response.status, body: okJson }; // заворачиваем тело с кодом в success объект
                             })
                     } else {
                         // другие error коды, ответ от сервера пришел в штатном режиме
-                        return Promise
-                            .resolve(response.json()) // резолвимся промисом на json штатного error-а
-                            .then((errorJson) => {
-                                return Promise.resolve({ ok: false, code: response.status, body: errorJson }) // заворачиваем код ответа с телом штатного error-а в отклоненный промис
+                        return response
+                            .json() // резолвимся промисом на body штатного error-а
+                            .then((errorJson) => { // body подъехал
+                                return { ok: false, code: response.status, body: errorJson }; // заворачиваем код ответа с телом штатного error-а в не ok промис
                             });
                     }
                 } 
@@ -172,7 +172,7 @@ class RequestWrapper implements IRequestWrapper {
                 } else {
                     result.failure = response.body as TErrorBody;
                 }
-                return Promise.resolve(result);
+                return result;
             })
     }
 }

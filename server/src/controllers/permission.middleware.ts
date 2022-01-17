@@ -25,7 +25,7 @@ class PermissionMiddleware extends CommonMiddleware {
             res: express.Response,
             next: express.NextFunction,
         ) {
-            const userPermissionFlag = res.locals.jwt.permissionFlag;
+            const userPermissionFlag = parseInt(res.locals.jwt.permissionFlag, 10);
             if (userPermissionFlag & requiredFlag) {
                 return next();
             }

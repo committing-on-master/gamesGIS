@@ -14,7 +14,7 @@ export const profileFetching = createAsyncThunk<fetchingProfileAction, string>(
     "profile/Fetching",
     async (profileName: string, thunkApi) => {
         try {
-            const response = await RequestWrapper.endPoint(`maps/${profileName}`).get().send<ProfileMapDTO>()
+            const response = await RequestWrapper.endPoint(`map-profile/${profileName}`).get().send<ProfileMapDTO>()
             if (response.ok && response.success) {
                 const responsePayload = response.success.payload;
 
@@ -25,20 +25,20 @@ export const profileFetching = createAsyncThunk<fetchingProfileAction, string>(
 
                 thunkApi.dispatch(setMap(responsePayload.mapType, responsePayload.center, responsePayload.bound));
 
-                const resAreas = responsePayload.points.map((area) => {
-                    const mappedBound: LatLngExpression[] = area.aria.map((point) => [point.x, point.y]);
-                    const mapped: AreaType = {
-                        id: area.id,
-                        name: area.name,
-                        // TODO поправить алгоритм получения данных, описание пусть сам компонент подтягивает
-                        description: "some description",
-                        position: area.center,
-                        bound: mappedBound,
-                        color: area.color
-                    }
-                    return mapped;
-                })
-                thunkApi.dispatch(addAreas(resAreas));
+                // const resAreas = responsePayload.points.map((area) => {
+                //     const mappedBound: LatLngExpression[] = area.aria.map((point) => [point.x, point.y]);
+                //     const mapped: AreaType = {
+                //         id: area.id,
+                //         name: area.name,
+                //         // TODO поправить алгоритм получения данных, описание пусть сам компонент подтягивает
+                //         description: "some description",
+                //         position: area.center,
+                //         bound: mappedBound,
+                //         color: area.color
+                //     }
+                //     return mapped;
+                // })
+                // thunkApi.dispatch(addAreas(resAreas));
                 return result;
 
             }
