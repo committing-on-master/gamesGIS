@@ -13,9 +13,10 @@ function App() {
   return (
     <div className="App">
       <Routes>
-
-        <Route path="/map/:profileName/editing" element={<MapPage editable={true} />} />
-        <Route path="/map/:profileName" element={<MapPage editable={false} />}>
+        <Route path="/map/:profileName">
+          <Route path="editing" element={<MapPage editable={true} />} />
+          <Route path="" element={<MapPage editable={false} />}>
+        </Route>
 
         </Route>
         <Route path="/" element={<MainTemplate />}>

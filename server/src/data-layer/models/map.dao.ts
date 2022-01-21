@@ -11,6 +11,12 @@ class MapDao {
     @Column()
         name!: string;
 
+    @Column()
+        layers!: number;
+
+    @Column()
+        defaultLayer!: number;
+
     @Column(() => Coordinate)
         center!: Coordinate;
 
@@ -19,6 +25,12 @@ class MapDao {
 
     @Column(() => Coordinate)
         rightTop!: Coordinate;
+
+    @Column()
+        minZoom!: number;
+
+    @Column()
+        maxZoom!: number;
 
     @OneToMany(() => MapProfileDao, (profile) => profile.map)
         mapProfile?: MapProfileDao;

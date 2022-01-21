@@ -13,12 +13,17 @@ export interface MapAreas {
 
 interface Payload {
     id: number;
+    userId: number;
     name: string;
     
     mapType: MapType;
     center: Point;
     bound: MapBound;
-    points: MapAreas[];
+    maxLayers: number;
+    currentLayer: number;
+
+    minZoom: number,
+    maxZoom: number,
 }
 
 export interface ProfileMapDTO extends SuccessResponse<Payload> {}

@@ -1,6 +1,6 @@
 import { CRS } from "leaflet"
 import { MapContainer } from "react-leaflet"
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
 
 import { MapLayerWrapper } from "../components/maps/MapLayerWrapper"
@@ -8,13 +8,18 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { useEffect, useState } from "react";
 import { AwaitingComponent } from "../components/AwaitingComponent";
 import { WarningComponent } from "../components/WarningComponent";
-import { profileFetching } from "../store/profile/thunks";
 
-import { selectAllAreas } from "../store/areas/slice";
+import { selectAllMarkers } from "../store/markers/slice";
 import { AriaMarker } from "../components/maps/AriaMarker";
-import { mapSelectors } from "../store/map/state";
+import { mapSelectors } from "../store/mapProfile/state";
 import { SpotlightArea } from "../components/maps/SpotlightArea";
 import { Sidenav } from "../components/navbar/Sidenav";
+import { fetchMapProfile } from "../store/mapProfile/thunks";
+import { accountSelectors } from "../store/account/state";
+import { AddingMarker } from "../components/maps/AddingMarker";
+import EditingMarker from "../components/maps/EditingMarker";
+import { MapClickHandler } from "../components/maps/MapClickHandler";
+import { EventHubProvider } from "../components/maps/EventHubProvider";
 
 // import "./../api/fetchMockStub"
 
@@ -31,30 +36,29 @@ function MapPage(props: MapProps) {
     console.log(props);
     const { profileName } = useParams();
     const navigate = useNavigate();
-    if (!profileName) {
-        navigate("404");
-    }
-    
-    const [loadingState, setLoadingState] = useState<LoadingState>({status: "idle", msg: "Profile loading, please wait."});
-    const dispatch = useAppDispatch();
-    const markerAreas = useAppSelector(state => selectAllAreas(state.areas));
-    const mapCenter = useAppSelector(state => mapSelectors.center(state.map));
+    const [loadingState, setLoadingState] = useState<LoadingState>({ status: "idle", msg: "Profile loading, please wait." });
 
-    const mapHost = process.env.REACT_APP_TILES_URL || "localhost:3000/map"
-    const mapLayer = 0;    
+    const dispatch = useAppDispatch();
+    const mapParams = useAppSelector(state => mapSelectors.containerParams(state.map));
+    const editable = useAppSelector(state => accountSelectors.UserId(state.account)) === mapParams.authorId;
 
     useEffect(() => {
-        dispatch(profileFetching(profileName!))
+        if (!profileName) {
+            navigate("404");
+        }
+        dispatch(fetchMapProfile(profileName!))
             .unwrap()
             .then(res => {
-                setLoadingState({status: "succeeded", msg: "profile loaded"});
-            });
-    }, [dispatch, profileName]);
-
-    
+                setLoadingState({ status: "succeeded", msg: "profile loaded" });
+            })
+            .catch(error => {
+                console.log(error);
+                setLoadingState({ status: "failed", msg: "profile loading failed" });
+            })
+    }, [dispatch, navigate, profileName]);
 
     if (loadingState.status === "idle" || loadingState.status === "loading") {
-        return(
+        return (
             <AwaitingComponent>
                 {loadingState.msg ?? <p>{loadingState.msg}</p>}
             </AwaitingComponent>
@@ -62,55 +66,57 @@ function MapPage(props: MapProps) {
     }
 
     if (loadingState.status === "failed") {
-        return(
+        return (
             <WarningComponent>
                 {loadingState.msg ?? <p>{loadingState.msg}</p>}
             </WarningComponent>
         );
     }
 
+    const EditButton = (editable && !props.editable) ? <Link to="editing">Еdit</Link> : undefined;
+
     return (
-        <>
-        <MapContainer
-            // Coordinates in CRS.Simple take the form of [y, x] instead of [x, y], in the same way Leaflet uses [lat, lng] instead of [lng, lat]
-            crs={CRS.Simple}
-            center={[mapCenter!.x, mapCenter!.y]}
+        <EventHubProvider>
+            <MapContainer
+                // Coordinates in CRS.Simple take the form of [y, x] instead of [x, y], in the same way Leaflet uses [lat, lng] instead of [lng, lat]
+                crs={CRS.Simple}
+                center={[mapParams.center.x, mapParams.center.y]}
 
-            zoom={0}
-            minZoom={0}
-            maxZoom={4}
-            zoomSnap={1}
-            scrollWheelZoom={true} 
-            doubleClickZoom={true} >
+                zoom={mapParams.zoom.min}
+                minZoom={mapParams.zoom.min}
+                maxZoom={mapParams.zoom.max}
+                zoomSnap={1}
+                scrollWheelZoom={true}
+                doubleClickZoom={true}
+            >
+                <MapLayerWrapper />
 
-            <MapLayerWrapper
-                mapHost={mapHost}
-                mapLayer={mapLayer}
-            />
-
-            {markerAreas.map((value, index) => {
+                {/* {markerAreas.map((value, index) => {
                 return <AriaMarker 
                     key={value.id}
                     markerId={value.id} 
                     />
-            })}
+            })} */}
 
-            <SpotlightArea />
+                <SpotlightArea />
+            </MapContainer>
+            <Sidenav
+                visibility={props.editable}
+                header="Markers"
+            >
+                {EditButton && EditButton}
+                {!EditButton &&
+                    <>
+                        <hr />
+                        <AddingMarker />
+                        <hr />
+                        <EditingMarker />
+                    </>
+                }
 
-        </MapContainer>
-        <Sidenav
-            visibility={props.editable}
-            header="Markers"
-        >
-            <ul>
-                <li>test</li>
-                <li>test 2</li>
-                <li>test 3</li>
-                <li>test 4</li>
-            </ul>
-        </Sidenav>
-        </>
+            </Sidenav>
+        </EventHubProvider>
     );
 }
 
-export { MapPage }
+export { MapPage };

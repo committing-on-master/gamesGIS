@@ -1,17 +1,15 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 
 import { accountReducer } from "./account/slice";
-import { areasReducer } from "./areas/slice";
-import { mapReducer } from "./map/slice";
-import { profileReducer } from "./profile/slice";
+import { markersReducer } from "./markers/slice";
+import { mapReducer } from "./mapProfile/slice";
 // let reducers = combineReducers({accountSlice});
 
 export const store = configureStore({
     reducer: {
         account: accountReducer,
         map: mapReducer,
-        areas: areasReducer,
-        profile: profileReducer
+        markers: markersReducer
     },
     devTools: process.env.NODE_ENV !== "production",
     // middleware: (getDefaultMiddleware) =>

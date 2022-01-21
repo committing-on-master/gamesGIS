@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { selectAreaById } from "../../../store/areas/slice";
+import { selectMarkerById } from "../../../store/markers/slice";
 import { useAppSelector } from "../../../store/hooks";
 import { AreaImages } from "./AreaImages";
 
@@ -10,7 +10,7 @@ interface PopupBodyProps {
 }
 
 function PopupBody(props: PopupBodyProps) {
-    const marker = useAppSelector(state => selectAreaById(state.areas, props.markerId));
+    const marker = useAppSelector(state => selectMarkerById(state.markers, props.markerId));
     const [areaGalleryVisability, setAreaGalleryVisability] = useState(false);
     if (!marker) {
         return null;

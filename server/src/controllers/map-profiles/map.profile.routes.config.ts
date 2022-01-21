@@ -49,6 +49,18 @@ class MapProfileRoutes extends CommonRoutesConfig {
                 asyncWrapper(this.mapProfileController.createProfile),
             );
 
+        route
+            .route("/map-profile/:profileName/markers")
+            .get(asyncWrapper(this.mapProfileController.getMarkers))
+            .post(asyncWrapper(this.mapProfileController.createMarker));
+
+        route
+            .param("markerId", this.mapProfileMiddleware.extractParamToBody);
+
+        route
+            .route("/map-profile/:profileName/markers/:markerId")
+            .put(asyncWrapper(this.mapProfileController.updateMarker));
+
         route.use(this.mapProfileMiddleware.handleOperationalErrors);
         return route;
     }

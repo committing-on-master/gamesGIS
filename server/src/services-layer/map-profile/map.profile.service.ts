@@ -21,7 +21,7 @@ class MapProfileService {
     }
 
     public async getProfile(profileName: string) {
-        const profile = await this.dataLayer.mapProfileRepository.findProfileByName(profileName, ["map"]);
+        const profile = await this.dataLayer.mapProfileRepository.findProfileByName(profileName, ["map", "user"]);
         if (!profile) {
             return profile;
         }
@@ -47,6 +47,12 @@ class MapProfileService {
                     y: profile.map.rightTop.Y,
                 },
             ],
+            maxLayers: profile.map.layers,
+            currentLayer: profile.map.defaultLayer,
+            userId: profile.user.id,
+
+            minZoom: profile.map.minZoom,
+            maxZoom: profile.map.maxZoom,
         };
         return result;
     }

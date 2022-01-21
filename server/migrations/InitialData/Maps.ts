@@ -17,6 +17,10 @@ const maps: MapDao[] = [
             X: 0,
             Y: 256,
         },
+        layers: 0,
+        defaultLayer: 0,
+        maxZoom: 4,
+        minZoom: 0,
     },
 
     // Factory

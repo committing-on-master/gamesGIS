@@ -1,26 +1,25 @@
-import { TileLayer } from "react-leaflet";
-import { MapType } from "../../api/dto/types/MapType";
+import { LeafletMouseEvent } from "leaflet";
+import { TileLayer, useMapEvent } from "react-leaflet";
 import { useAppSelector } from "../../store/hooks";
-import { mapSelectors } from "../../store/map/state";
+import { mapSelectors } from "../../store/mapProfile/state";
+import { useEventHub } from "./EventHubProvider";
 
 
-interface MapLayerWrapperProps {
-    mapHost: string;
-    mapLayer: number;
-}
-function MapLayerWrapper(props: MapLayerWrapperProps) {
-    const mapType = useAppSelector((state) => mapSelectors.name(state.map));
-    const mapBound = useAppSelector((state) => mapSelectors.bounds(state.map));
+function MapLayerWrapper() {
+    const mapParams = useAppSelector((state) => mapSelectors.layerParams(state.map));
+    const mapLayer = useAppSelector((state) => mapSelectors.currentLayer(state.map));
+    useMapEvent("click", (eventArg) => {
+        eventHub.publish({x: eventArg.latlng.lng, y: eventArg.latlng.lat});
+    })
+    const eventHub = useEventHub();
 
-    if (mapType === MapType.Undefined || !mapBound) {
-        return (null);
-    }
-    
-    const mapUrl = `http://${props.mapHost}/${mapType}/${props.mapLayer}/{z}/tile_{x}_{y}.png`;
+    const mapHost = process.env.REACT_APP_TILES_URL || "localhost:3000/map"
+    const mapUrl = `http://${mapHost}/${mapParams.map}/${mapLayer}/{z}/tile_{x}_{y}.png`;
     // const mapUrl = `http://develop.constantine.keenetic.name/maps/${props.mapName}/${props.mapLayer}/{z}/tile_{x}_{y}.png`;
-    
-    const leftBottom = mapBound[0];
-    const rightTop = mapBound[1];
+
+
+    const leftBottom = mapParams.bounds[0];
+    const rightTop = mapParams.bounds[1];
 
     return (
         <TileLayer

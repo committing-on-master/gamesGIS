@@ -18,6 +18,9 @@ class MapProfileController extends CommonController {
 
         this.createProfile = this.createProfile.bind(this);
         this.getProfile = this.getProfile.bind(this);
+        this.getMarkers = this.getMarkers.bind(this);
+        this.createMarker = this.createMarker.bind(this);
+        this.updateMarker = this.updateMarker.bind(this);
     }
     public async createProfile(req: express.Request, res: express.Response) {
         const userId = (res.locals.jwt as JwtPayload).userId;
@@ -35,6 +38,18 @@ class MapProfileController extends CommonController {
         return res
             .status(200)
             .json({payload: profile});
+    }
+
+    public async getMarkers(req: express.Request, res: express.Response) {
+        throw new Error("Method not implemented.");
+    }
+
+    public async createMarker(req: express.Request, res: express.Response) {
+        throw new Error("Method not implemented.");
+    }
+
+    public async updateMarker(req: express.Request, res: express.Response) {
+        throw new Error("Method not implemented.");
     }
 }
 
