@@ -25,7 +25,7 @@ const markersSlice = createSlice({
     reducers: {
         addMarker: markersAdapter.addOne,
         addMarkers: markersAdapter.addMany,
-        insertOrUpdateMarker: markersAdapter.setOne,
+        insertOrReplaceMarker: markersAdapter.setOne,
         updateMarker: markersAdapter.updateOne,
         createMarker: (state, action: PayloadAction<string>) => {
             const marker: MarkerType = {
@@ -50,6 +50,11 @@ export const {
 export const selectEditableMarker = (state: EntityState<MarkerType>) => {
     const entities = selectAllMarkers(state);
     return entities.find((value) => value.state === MarkerState.Editable);
+}
+
+// оче плохое название, оче плохая организация
+export const selectIsEdit = (state: EntityState<MarkerType>) => {
+    return selectEditableMarker(state) ? true : false;
 }
 
 export const markersReducer = markersSlice.reducer;

@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { AwaitingComponent } from "../components/AwaitingComponent";
 import { WarningComponent } from "../components/WarningComponent";
 
-import { selectAllMarkers } from "../store/markers/slice";
+import { selectAllMarkers, selectIsEdit } from "../store/markers/slice";
 import { AriaMarker } from "../components/maps/AriaMarker";
 import { mapSelectors } from "../store/mapProfile/state";
 import { SpotlightArea } from "../components/maps/SpotlightArea";
@@ -41,6 +41,8 @@ function MapPage(props: MapProps) {
     const dispatch = useAppDispatch();
     const mapParams = useAppSelector(state => mapSelectors.containerParams(state.map));
     const editable = useAppSelector(state => accountSelectors.UserId(state.account)) === mapParams.authorId;
+    const isEditingNow = useAppSelector(state => selectIsEdit(state.markers));
+
 
     useEffect(() => {
         if (!profileName) {
@@ -108,9 +110,7 @@ function MapPage(props: MapProps) {
                 {!EditButton &&
                     <>
                         <hr />
-                        <AddingMarker />
-                        <hr />
-                        <EditingMarker />
+                        {isEditingNow ? <EditingMarker /> : <AddingMarker />}
                     </>
                 }
 
