@@ -1,29 +1,22 @@
 import { LeafletEventHandlerFnMap, Popup as LPopup } from "leaflet";
 import { useRef } from "react";
 import { Popup, Marker } from "react-leaflet";
-import { selectMarkerById } from "../../store/markers/slice";
+import { Point } from "../../api/dto/types/Point";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 // import { removeSpotlightArea, setSpotlightArea } from "../../store/mapProfile/slice";
 import { PopupBody } from "./AreaPopup/PopupBody";
 import { markerIcon } from "./markerIcon";
 
 interface MarkerProps {
-	markerId: number;
+	name: string;
+	position: Point;
 }
 
 function AriaMarker(props: MarkerProps) {
-	return (null);
-	// const marker = useAppSelector(state => selectAreaById(state.areas, props.markerId));
-	// const dispatch = useAppDispatch();
 	// const popupRef = useRef<LPopup>(null);
-
-	// if (!marker) {
-	// 	return (null);
-	// }
 
 	// const handlePopupOpen = () => { dispatch(setSpotlightArea(marker.id)) }
 	// const handlePopupClose = () => { dispatch(removeSpotlightArea(marker.id)) }
-
 	// const markerEventsHandlers: LeafletEventHandlerFnMap = {
 	// 	mouseover: () => {
 	// 		dispatch(setSpotlightArea(marker.id));
@@ -35,22 +28,22 @@ function AriaMarker(props: MarkerProps) {
 	// 	}
 	// }
 
-	// return (
-	// 	<Marker
-	// 		position={[marker.position.x, marker.position.y]}
-	// 		icon={markerIcon}
-	// 		title={marker.name}
-	// 		eventHandlers={markerEventsHandlers}
-	// 	>
-	// 		<Popup
-	// 			ref={popupRef}
-	// 			onOpen={handlePopupOpen}
-	// 			onClose={handlePopupClose}
-	// 		>
-	// 			< PopupBody markerId={marker.id} />
-	// 		</Popup>
-	// 	</Marker>
-	// )
+	return (
+		<Marker
+			position={[props.position.x, props.position.y]}
+			icon={markerIcon}
+			title={props.name}
+			// eventHandlers={markerEventsHandlers}
+		>
+			{/* <Popup
+				ref={popupRef}
+				onOpen={handlePopupOpen}
+				onClose={handlePopupClose}
+			>
+				< PopupBody markerId={marker.id} />
+			</Popup> */}
+		</Marker>
+	)
 }
 
 export { AriaMarker }

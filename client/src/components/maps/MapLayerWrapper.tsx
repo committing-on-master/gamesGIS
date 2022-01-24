@@ -9,7 +9,7 @@ function MapLayerWrapper() {
     const mapParams = useAppSelector((state) => mapSelectors.layerParams(state.map));
     const mapLayer = useAppSelector((state) => mapSelectors.currentLayer(state.map));
     useMapEvent("click", (eventArg) => {
-        eventHub.publish({x: eventArg.latlng.lng, y: eventArg.latlng.lat});
+        eventHub.publish({x: eventArg.latlng.lat, y: eventArg.latlng.lng});
     })
     const eventHub = useEventHub();
 

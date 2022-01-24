@@ -1,5 +1,5 @@
 import { useAppDispatch } from "../../store/hooks";
-import { createMarker } from "../../store/markers/slice";
+import { createNewMarker } from "../../store/markers/slice";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { SchemaValidation } from "../schemas/schemaValidation";
 
@@ -11,7 +11,7 @@ function AddingMarker() {
     const { register, handleSubmit, watch, formState: { errors } } = useForm<Inputs>();
     const dispatch = useAppDispatch();
     const onSubmit: SubmitHandler<Inputs> = data => {
-        dispatch(createMarker(data.name));
+        dispatch(createNewMarker(data.name));
     }
 
     return (

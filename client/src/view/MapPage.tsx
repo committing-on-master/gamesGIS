@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { AwaitingComponent } from "../components/AwaitingComponent";
 import { WarningComponent } from "../components/WarningComponent";
 
-import { selectAllMarkers, selectIsEdit } from "../store/markers/slice";
+import { selectAllMarkers, selectIsEditingMode } from "../store/markers/slice";
 import { AriaMarker } from "../components/maps/AriaMarker";
 import { mapSelectors } from "../store/mapProfile/state";
 import { SpotlightArea } from "../components/maps/SpotlightArea";
@@ -17,9 +17,9 @@ import { Sidenav } from "../components/navbar/Sidenav";
 import { fetchMapProfile } from "../store/mapProfile/thunks";
 import { accountSelectors } from "../store/account/state";
 import { AddingMarker } from "../components/maps/AddingMarker";
-import EditingMarker from "../components/maps/EditingMarker";
-import { MapClickHandler } from "../components/maps/MapClickHandler";
+import { EditingMarker } from "../components/maps/EditingMarker";
 import { EventHubProvider } from "../components/maps/EventHubProvider";
+import { MarkersLayerWrapper } from "../components/maps/MarkersLayerWrapper";
 
 // import "./../api/fetchMockStub"
 
@@ -33,7 +33,6 @@ interface MapProps {
 }
 
 function MapPage(props: MapProps) {
-    console.log(props);
     const { profileName } = useParams();
     const navigate = useNavigate();
     const [loadingState, setLoadingState] = useState<LoadingState>({ status: "idle", msg: "Profile loading, please wait." });
@@ -41,7 +40,7 @@ function MapPage(props: MapProps) {
     const dispatch = useAppDispatch();
     const mapParams = useAppSelector(state => mapSelectors.containerParams(state.map));
     const editable = useAppSelector(state => accountSelectors.UserId(state.account)) === mapParams.authorId;
-    const isEditingNow = useAppSelector(state => selectIsEdit(state.markers));
+    const isEditingNow = useAppSelector(state => selectIsEditingMode(state.markers));
 
 
     useEffect(() => {
@@ -92,15 +91,9 @@ function MapPage(props: MapProps) {
                 doubleClickZoom={true}
             >
                 <MapLayerWrapper />
+                <MarkersLayerWrapper />
 
-                {/* {markerAreas.map((value, index) => {
-                return <AriaMarker 
-                    key={value.id}
-                    markerId={value.id} 
-                    />
-            })} */}
-
-                <SpotlightArea />
+                {/* <SpotlightArea /> */}
             </MapContainer>
             <Sidenav
                 visibility={props.editable}
