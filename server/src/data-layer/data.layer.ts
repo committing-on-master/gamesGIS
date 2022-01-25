@@ -54,6 +54,10 @@ class DataLayer {
     public get mapRepository(): MapRepository {
         return this.dbContext.getCustomRepository(MapRepository);
     }
+
+    public get ContextManager() {
+        return this.dbContext.manager;
+    }
 }
 
 export {DataLayer};

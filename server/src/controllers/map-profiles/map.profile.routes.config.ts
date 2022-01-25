@@ -11,6 +11,8 @@ import {MapProfileMiddleware} from "./map.profile.middleware";
 import {asyncWrapper} from "../asyncHandler";
 import {asyncMapProfileValidation} from "./models.schema/async.map.profile.validation";
 import {ServicesLayer} from "./../../services-layer/services.layer";
+import {markerDtoSchema} from "./models.schema/marker.dto.schema";
+import {checkSchema} from "express-validator";
 
 @injectable()
 class MapProfileRoutes extends CommonRoutesConfig {
@@ -52,7 +54,13 @@ class MapProfileRoutes extends CommonRoutesConfig {
         route
             .route("/map-profile/:profileName/markers")
             .get(asyncWrapper(this.mapProfileController.getMarkers))
-            .post(asyncWrapper(this.mapProfileController.createMarker));
+            .post(
+                this.authMiddleware.jwtTokenValidation(),
+                this.permissionMiddleware.permissionFlagRequired(PermissionFlag.APPROVED_USER),
+                asyncWrapper(this.mapProfileMiddleware.validateProfileAuthorship),
+                asyncWrapper(this.mapProfileMiddleware.validateRequestSchema(checkSchema(markerDtoSchema))),
+                asyncWrapper(this.mapProfileController.createMarker),
+            );
 
         route
             .param("markerId", this.mapProfileMiddleware.extractParamToBody);

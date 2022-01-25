@@ -7,8 +7,8 @@ class CoordinatesDao {
     @PrimaryGeneratedColumn()
         id!: number;
 
-    @Column()
-        order!: number;
+    // @Column()
+    //     order!: number;
 
     @Column({type: "decimal"})
         xCoordinate!: number;

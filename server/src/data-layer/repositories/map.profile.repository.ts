@@ -13,11 +13,21 @@ class MapProfileRepository extends AbstractRepository<MapProfileDao> {
         };
         return this.repository.findOne(options);
     }
+
     public async createProfile(mapProfileDao: MapProfileDao) {
         return this.repository.insert(mapProfileDao);
     }
+
     public async isProfileExist(profileName: string): Promise<boolean> {
         return await this.repository.findOne({where: {name: profileName}}) ? true : false;
+    }
+
+    public async getAuthorIdByProfileName(profileName: string): Promise<number | undefined> {
+        return this.repository.createQueryBuilder()
+            .select("MapProfileDao.user.id")
+            .where("MapProfileDao.name = :name", {name: profileName})
+            .getRawOne<{MapProfileDao_userId: number}>()
+            .then((res) => res?.MapProfileDao_userId);
     }
 }
 

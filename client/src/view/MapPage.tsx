@@ -93,7 +93,7 @@ function MapPage(props: MapProps) {
                 <MapLayerWrapper />
                 <MarkersLayerWrapper />
 
-                {/* <SpotlightArea /> */}
+                <SpotlightArea />
             </MapContainer>
             <Sidenav
                 visibility={props.editable}
@@ -103,7 +103,7 @@ function MapPage(props: MapProps) {
                 {!EditButton &&
                     <>
                         <hr />
-                        {isEditingNow ? <EditingMarker /> : <AddingMarker />}
+                        {isEditingNow && profileName ? <EditingMarker profileName={profileName} /> : <AddingMarker />}
                     </>
                 }
 

@@ -1,9 +1,10 @@
 import { createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from "@reduxjs/toolkit";
 import { Point } from "../../api/dto/types/Point";
+import { saveMarker } from "./thunks";
 
-import { EditingMarkerType, MarkerState, MarkerType } from "./types";
+import { EditingMarkerType, EditingState, MarkerType } from "./types";
 
-interface MarkersState {
+export interface MarkersState {
     editable: EditingMarkerType;
     saved: EntityState<MarkerType>;
 }
@@ -26,7 +27,7 @@ const markersAdapter = createEntityAdapter<MarkerType>({
 });
 
 const initialState: MarkersState = {
-    editable: { state: MarkerState.Undefined },
+    editable: { state: EditingState.Undefined, color: "#0409ff" },
     saved: markersAdapter.getInitialState(),
 }
 
@@ -35,7 +36,7 @@ const markersSlice = createSlice({
     initialState: initialState,
     reducers: {
         createNewMarker: (state: MarkersState, action: PayloadAction<string>) => {
-            state.editable.state = MarkerState.New;
+            state.editable.state = EditingState.New;
             state.editable.name = action.payload;
         },
         updateMarkerPosition: (state: MarkersState, action: PayloadAction<Point>) => {
@@ -54,13 +55,25 @@ const markersSlice = createSlice({
         setMarkerDescription: (state: MarkersState, action: PayloadAction<string>) =>{
             state.editable.description = action.payload;
         },
+        resetMarker: (state: MarkersState) => {
+            state.editable = initialState.editable;
+        },
 
-        addMarker: (state, action: PayloadAction<MarkerType>) => {
-            markersAdapter.addOne(state.saved, action)
+        addMarker: (state: MarkersState, action: PayloadAction<MarkerType>) => {
+            markersAdapter.addOne(state.saved, action);
         },
-        addMarkers: (state, action: PayloadAction<MarkerType[]>) => {
-            markersAdapter.addMany(state.saved, action)
+        addMarkers: (state: MarkersState, action: PayloadAction<MarkerType[]>) => {
+            markersAdapter.addMany(state.saved, action);
         },
+        removeMarker: (state: MarkersState, action: PayloadAction<number>) => {
+            markersAdapter.removeOne(state.saved, action.payload);
+        }
+    },
+    extraReducers: (builder) => { builder
+        .addCase(saveMarker.fulfilled, (state: MarkersState, action: PayloadAction<MarkerType>,) => {
+            markersAdapter.setOne(state.saved, action.payload);
+            state.editable = initialState.editable;
+        })
     }
 });
 
@@ -68,7 +81,7 @@ export const selectMarkerById = (state: MarkersState, id: number) => markersAdap
 export const selectAllMarkers = (state: MarkersState) => markersAdapter.getSelectors().selectAll(state.saved);
 
 export const selectEditableMarker = (state: MarkersState) => {
-    if (state.editable.state === MarkerState.Undefined) {
+    if (state.editable.state === EditingState.Undefined) {
         return undefined;
     }
     return state.editable;
@@ -76,6 +89,10 @@ export const selectEditableMarker = (state: MarkersState) => {
 
 export const selectEditableCoordinates = (state: MarkersState) => {
     return state.editable.bound;
+}
+
+export const selectEditableColor = (state: MarkersState) => {
+    return state.editable.color;
 }
 
 // TODO test
@@ -93,10 +110,11 @@ export const selectEditingMarkerIconParams = createSelector(
     }
 );
 
+export const selectEditingMarker = (state: MarkersState) => state.editable;
 
 // оче плохое название, оче плохая организация
 export const selectIsEditingMode = (state: MarkersState) => {
-    return state.editable.state !== MarkerState.Undefined;
+    return state.editable.state !== EditingState.Undefined;
 }
 
 export const markersReducer = markersSlice.reducer;

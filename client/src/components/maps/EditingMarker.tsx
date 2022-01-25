@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Point } from '../../api/dto/types/Point';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { selectEditableMarker, updateMarkerPosition } from '../../store/markers/slice';
+import { addAreaCoordinates, createNewMarker, selectEditableMarker, setAreaColor, updateMarkerPosition } from '../../store/markers/slice';
 import { SchemaValidation } from '../schemas/schemaValidation';
 import { useEventHub } from './EventHubProvider';
 
 import "./EditingMarker.scss";
+import { CoordinatesList } from './CoordinatesList';
+import { saveMarker } from '../../store/markers/thunks';
 
 type Inputs = {
     name: string,
@@ -18,11 +19,15 @@ type Inputs = {
 
 enum FocusElement {
     Another = 0,
-    Position,
-    Bound
+    Position = 1,
+    Bound = 2
 }
 
-function EditingMarker() {
+interface EditingMarkerProps {
+    profileName: string
+} 
+
+function EditingMarker(props: EditingMarkerProps) {
     const marker = useAppSelector(state => selectEditableMarker(state.markers));
     const dispatch = useAppDispatch();
     const { register, handleSubmit, formState: { errors } } = useForm<Inputs>({
@@ -36,7 +41,7 @@ function EditingMarker() {
     const [elementFocus, setElementFocus] = useState(FocusElement.Another);
     const stateRef = useRef(elementFocus);
     const eventHub = useEventHub();
-
+    
     function setFocus(focus: FocusElement) {
         stateRef.current = focus;
         setElementFocus(focus);
@@ -47,13 +52,10 @@ function EditingMarker() {
         function onMapClick(eventArg: { x: number, y: number }) {
             switch (stateRef.current) {
                 case FocusElement.Position:
-                    setFocus(FocusElement.Another);
-                    dispatch(updateMarkerPosition({
-                        x: eventArg.x,
-                        y: eventArg.y
-                    }));
+                    dispatch(updateMarkerPosition(eventArg));
                     break;
                 case FocusElement.Bound:
+                    dispatch(addAreaCoordinates(eventArg));
                     break;
                 default:
                     break;
@@ -68,9 +70,14 @@ function EditingMarker() {
         return (null);
     }
 
+    const handleColorChange = (arg: React.ChangeEvent<HTMLInputElement>) => {
+        const color = arg.target.value;
+        dispatch(setAreaColor(color));
+    }
+
     const onSubmit: SubmitHandler<Inputs> = data => {
-        // dispatch(createMarker(data.name));
-        alert(JSON.stringify(data, null, 4));
+        dispatch(saveMarker(props.profileName));
+        
     }
 
     const positionText = marker.position ? `x: ${marker.position.x.toFixed(3)} y: ${marker.position.y.toFixed(3)}` : "";
@@ -81,23 +88,33 @@ function EditingMarker() {
             {errors.name && <p>{errors.name.message}</p>}
 
             <label>Description</label>
-            <input type="text" placeholder="...description" {...register("description", SchemaValidation.MarkerDescription)} />
+            <textarea placeholder="...description" {...register("description", SchemaValidation.MarkerDescription)} />
             {errors.description && <p>{errors.description.message}</p>}
 
-            <input type="color" {...register("color", SchemaValidation.MarkerColor)} />
+            <input type="color" {...register("color", {onChange: handleColorChange, ...SchemaValidation.MarkerColor} )} />
             {errors.color && <p>{errors.color.message}</p>}
-            <input type="submit" />
 
+            <hr />
             <label>Marker position</label>
             <input
                 type={"text"}
                 placeholder="...set focus and map click"
                 readOnly={true}
                 value={positionText}
-                onFocus={() => {
-                    setFocus(FocusElement.Position);
-                }}
+                onClick={() => setFocus(elementFocus === FocusElement.Position ? FocusElement.Another : FocusElement.Position)}
             />
+
+            <hr />
+            <label>Area coordinates</label>
+            <input
+                type={"text"}
+                placeholder="...set focus and map click"
+                readOnly={true}
+                onClick={() => setFocus(elementFocus === FocusElement.Bound ? FocusElement.Another : FocusElement.Bound)}
+            />
+            <CoordinatesList />
+            <hr />
+            <input type="submit" />
         </form>
     );
 }

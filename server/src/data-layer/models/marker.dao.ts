@@ -28,6 +28,9 @@ class MarkerDao {
     @CreateDateColumn()
         creationDate!: Date;
 
+    @Column()
+        areaColor!: string;
+
     @ManyToOne(() => MapProfileDao, (profile) => profile.markers)
         profile!: MapProfileDao;
 
