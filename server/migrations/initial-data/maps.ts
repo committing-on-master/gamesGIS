@@ -1,4 +1,4 @@
-import {MapDao} from "./../../src/data-layer/models/map.dao";
+import {MapDao} from "../../src/data-layer/models/map.dao";
 
 const maps: MapDao[] = [
     // Woods,

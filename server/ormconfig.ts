@@ -16,7 +16,7 @@ module.exports = [
         type: "sqlite",
         database: "database/test.db",
         // dropSchema: true,
-        // synchronize: true,
+        synchronize: true,
         entities: ["./src/data-layer/models/*.dao.ts"],
         logging: ["query", "error", "info", "log"],
         migrations: ["./migrations/*.ts"],
