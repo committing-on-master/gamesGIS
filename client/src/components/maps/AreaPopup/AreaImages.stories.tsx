@@ -14,3 +14,4 @@ const Template: ComponentStory<typeof AreaImages> = (props) => <AreaImages {...p
 
 // export const Primary = Template.bind({});
 // Primary.args = { areaPhotosIds: [567, 568, 569, 570, 571] };
+// export {};

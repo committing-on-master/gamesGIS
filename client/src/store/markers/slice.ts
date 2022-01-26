@@ -1,6 +1,6 @@
 import { createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from "@reduxjs/toolkit";
 import { Point } from "../../api/dto/types/Point";
-import { saveMarker } from "./thunks";
+import { fetchProfileMarkers, saveMarker } from "./thunks";
 
 import { EditingMarkerType, EditingState, MarkerType } from "./types";
 
@@ -70,9 +70,14 @@ const markersSlice = createSlice({
         }
     },
     extraReducers: (builder) => { builder
-        .addCase(saveMarker.fulfilled, (state: MarkersState, action: PayloadAction<MarkerType>,) => {
+        .addCase(saveMarker.fulfilled, (state, action: PayloadAction<MarkerType>) => {
             markersAdapter.setOne(state.saved, action.payload);
             state.editable = initialState.editable;
+        })
+
+        .addCase(fetchProfileMarkers.fulfilled, (state, action: PayloadAction<MarkerType[]>) => {
+            state.editable = initialState.editable;
+            markersAdapter.setAll(state.saved, action.payload)
         })
     }
 });

@@ -1,5 +1,5 @@
 import L from 'leaflet';
-import pepeimg from "./../../img/altyn-pepe.png"
+import pepeimg from "./../../../../../img/altyn-pepe.png"
 
 const markerIcon = new L.Icon({
     iconUrl: pepeimg,

@@ -10,4 +10,6 @@ interface Payload {
     bound: Point[];
 }
 
-export interface MarkerDTO extends SuccessResponse<Payload> {}
+export interface MarkerDTO extends SuccessResponse<Payload> {};
+
+export interface MarkersDTO extends SuccessResponse<Payload[]> {};

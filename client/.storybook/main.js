@@ -1,15 +1,18 @@
 module.exports = {
-  stories: [
-    "./../src/**/*.stories.mdx",
-    "./../src/**/*.stories.@(js|jsx|ts|tsx)"
+  "stories": [
+    "../src/**/*.stories.mdx",
+    "../src/**/*.stories.@(js|jsx|ts|tsx)"
   ],
-  addons: [
+  "addons": [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
-    "@storybook/preset-create-react-app",
-    "storybook-addon-pseudo-states"
+    "@storybook/preset-create-react-app"
   ],
-  staticDir: [
+  "staticDir": [
     "./../public"
-  ]
+  ],
+  "framework": "@storybook/react",
+  "core": {
+    "builder": "webpack5"
+  }
 }

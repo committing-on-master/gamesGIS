@@ -1,10 +1,10 @@
 import { LeafletEventHandlerFnMap, Popup as LPopup } from "leaflet";
 import { useRef } from "react";
 import { Popup, Marker } from "react-leaflet";
-import { Point } from "../../api/dto/types/Point";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { Point } from "../../../../../api/dto/types/Point";
+import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 // import { removeSpotlightArea, setSpotlightArea } from "../../store/mapProfile/slice";
-import { PopupBody } from "./AreaPopup/PopupBody";
+import { PopupBody } from "../../../AreaPopup/PopupBody";
 import { markerIcon } from "./markerIcon";
 
 interface MarkerProps {
@@ -46,4 +46,4 @@ function AriaMarker(props: MarkerProps) {
 	)
 }
 
-export { AriaMarker }
+export { AriaMarker };

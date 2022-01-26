@@ -1,6 +1,7 @@
-@import 'swiper/swiper.scss';
-@import 'swiper/modules/navigation/navigation.scss';
-// @import 'swiper/modules/pagination/pagination.scss';
+// @import "swiper/scss";
+// @import "swiper/scss/navigation";
+@import '~swiper/swiper.scss'; // core Swiper
+@import '~swiper/modules/navigation/navigation.scss'; // Navigation module
 
 .area-images {
     max-width: 800px;

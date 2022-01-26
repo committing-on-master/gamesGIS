@@ -6,20 +6,22 @@ import "leaflet/dist/leaflet.css";
 import { MapLayerWrapper } from "../components/maps/MapLayerWrapper"
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { useEffect, useState } from "react";
-import { AwaitingComponent } from "../components/AwaitingComponent";
-import { WarningComponent } from "../components/WarningComponent";
+import { AwaitingComponent } from "../components/common/AwaitingComponent";
+import { WarningComponent } from "../components/common/WarningComponent";
 
 import { selectAllMarkers, selectIsEditingMode } from "../store/markers/slice";
-import { AriaMarker } from "../components/maps/AriaMarker";
+// import { AriaMarker } from "../components/maps/AriaMarker";
 import { mapSelectors } from "../store/mapProfile/state";
-import { SpotlightArea } from "../components/maps/SpotlightArea";
+// import { SpotlightArea } from "../components/maps/SpotlightArea";
 import { Sidenav } from "../components/navbar/Sidenav";
 import { fetchMapProfile } from "../store/mapProfile/thunks";
 import { accountSelectors } from "../store/account/state";
 import { AddingMarker } from "../components/maps/AddingMarker";
 import { EditingMarker } from "../components/maps/EditingMarker";
 import { EventHubProvider } from "../components/maps/EventHubProvider";
-import { MarkersLayerWrapper } from "../components/maps/MarkersLayerWrapper";
+import { LeafletComponent } from "../components/maps/LeafletComponent";
+import { fetchProfileMarkers } from "../store/markers/thunks";
+// import { MarkersLayerWrapper } from "../components/maps/MarkersLayerWrapper";
 
 // import "./../api/fetchMockStub"
 
@@ -49,13 +51,18 @@ function MapPage(props: MapProps) {
         }
         dispatch(fetchMapProfile(profileName!))
             .unwrap()
-            .then(res => {
-                setLoadingState({ status: "succeeded", msg: "profile loaded" });
+            .then(() => {
+                dispatch(fetchProfileMarkers(profileName!))
+                .unwrap()
+                .then(() => {
+                    setLoadingState({ status: "succeeded", msg: "profile loaded" });
+                })
             })
             .catch(error => {
                 console.log(error);
                 setLoadingState({ status: "failed", msg: "profile loading failed" });
             })
+        
     }, [dispatch, navigate, profileName]);
 
     if (loadingState.status === "idle" || loadingState.status === "loading") {
@@ -78,23 +85,7 @@ function MapPage(props: MapProps) {
 
     return (
         <EventHubProvider>
-            <MapContainer
-                // Coordinates in CRS.Simple take the form of [y, x] instead of [x, y], in the same way Leaflet uses [lat, lng] instead of [lng, lat]
-                crs={CRS.Simple}
-                center={[mapParams.center.x, mapParams.center.y]}
-
-                zoom={mapParams.zoom.min}
-                minZoom={mapParams.zoom.min}
-                maxZoom={mapParams.zoom.max}
-                zoomSnap={1}
-                scrollWheelZoom={true}
-                doubleClickZoom={true}
-            >
-                <MapLayerWrapper />
-                <MarkersLayerWrapper />
-
-                <SpotlightArea />
-            </MapContainer>
+            <LeafletComponent />
             <Sidenav
                 visibility={props.editable}
                 header="Markers"

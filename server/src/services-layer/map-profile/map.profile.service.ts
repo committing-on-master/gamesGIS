@@ -119,5 +119,9 @@ class MapProfileService {
             return saved;
         });
     }
+
+    public async getMarkersByProfileName(profileName: string) {
+        return this.dataLayer.markerRepository.getMarkersWithAreasByProfileName(profileName);
+    }
 }
 export {MapProfileService};

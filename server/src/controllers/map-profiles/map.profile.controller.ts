@@ -8,6 +8,7 @@ import {ServicesLayer} from "./../../services-layer/services.layer";
 import {CommonController} from "../common.controller";
 import {JwtPayload} from "../common-types/jwt.payload";
 import {MarkerDto} from "./../../services-layer/map-profile/models/marker.dto";
+import {MarkerDao} from "src/data-layer/models/marker.dao";
 
 @singleton()
 class MapProfileController extends CommonController {
@@ -42,31 +43,39 @@ class MapProfileController extends CommonController {
     }
 
     public async getMarkers(req: express.Request, res: express.Response) {
-        throw new Error("Method not implemented.");
+        const profileName: string = req.body.profileName;
+        const markers = await this.services.MapProfiles.getMarkersByProfileName(profileName);
+        const response = markers.map((value) => this.mapMarker(value));
+        return res.status(200).json({message: "ok", payload: response});
     }
 
     public async createMarker(req: express.Request, res: express.Response) {
         const profileName: string = req.body.profileName;
 
         const saved = await this.services.MapProfiles.createMarker(profileName, req.body);
-        const response: MarkerDto = {
-            id: saved.id,
-            name: saved.name,
-            description: saved.description,
-            color: saved.areaColor,
+        const response: MarkerDto = this.mapMarker(saved);
+
+        this.logger.info(`New marker with id - name: ${response.id} - ${response.name} for profile: ${profileName} is created`);
+        return res.status(200).json({message: "ok", payload: response});
+    }
+
+    private mapMarker(marker: MarkerDao): MarkerDto {
+        return {
+            id: marker.id,
+            name: marker.name,
+            description: marker.description,
+            color: marker.areaColor,
             position: {
-                x: saved.xCoordinate,
-                y: saved.yCoordinate,
+                x: marker.xCoordinate,
+                y: marker.yCoordinate,
             },
-            bound: saved.area.map((value) => {
+            bound: marker.area.map((value) => {
                 return {
                     x: value.xCoordinate,
                     y: value.yCoordinate,
                 };
             }),
         };
-        this.logger.info(`New marker with id - name: ${response.id} - ${response.name} for profile: ${profileName} is created`);
-        return res.status(200).json({msg: "marker saved", payload: response});
     }
 
     public async updateMarker(req: express.Request, res: express.Response) {
