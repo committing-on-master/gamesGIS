@@ -1,4 +1,5 @@
-import {AbstractRepository, EntityRepository} from "typeorm";
+import {OnlyObjectProperties} from "src/infrastructure/only.object.properties";
+import {AbstractRepository, EntityRepository, FindOneOptions} from "typeorm";
 import {MarkerDao} from "../models/marker.dao";
 
 
@@ -19,8 +20,12 @@ class MarkerRepository extends AbstractRepository<MarkerDao> {
         return this.repository.insert(newEntry);
     }
 
-    getMarkersByProfileId(id: number): MarkerDao[] | PromiseLike<MarkerDao[]> {
-        throw new Error("Method findMarkersByProfileId not implemented.");
+    findMarkerById(markerId: number, relations?: OnlyObjectProperties<MarkerDao>) {
+        const options: FindOneOptions = {
+            where: {id: markerId},
+            ...((relations && relations.length !==0 ) && {relations: relations}),
+        };
+        return this.repository.findOne(options);
     }
 }
 

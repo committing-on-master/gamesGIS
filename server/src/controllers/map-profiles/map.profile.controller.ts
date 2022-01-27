@@ -55,7 +55,18 @@ class MapProfileController extends CommonController {
         const saved = await this.services.MapProfiles.createMarker(profileName, req.body);
         const response: MarkerDto = this.mapMarker(saved);
 
-        this.logger.info(`New marker with id - name: ${response.id} - ${response.name} for profile: ${profileName} is created`);
+        this.logger.info(`Create. New marker with id - name: ${response.id} - ${response.name} for profile: ${profileName} is created`);
+        return res.status(200).json({message: "ok", payload: response});
+    }
+
+    public async updateMarker(req: express.Request, res: express.Response) {
+        const profileName: string = req.body.profileName;
+        const markerId: number = req.body.markerId;
+
+        const updated = await this.services.MapProfiles.updateMarker(profileName, markerId, req.body);
+        const response: MarkerDto = this.mapMarker(updated);
+
+        this.logger.info(`Updated. Marker with id - name: ${response.id} - ${response.name} for profile: ${profileName} is updated`);
         return res.status(200).json({message: "ok", payload: response});
     }
 
@@ -76,10 +87,6 @@ class MapProfileController extends CommonController {
                 };
             }),
         };
-    }
-
-    public async updateMarker(req: express.Request, res: express.Response) {
-        throw new Error("Method not implemented.");
     }
 }
 

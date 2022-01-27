@@ -58,6 +58,10 @@ class DataLayer {
     public get ContextManager() {
         return this.dbContext.manager;
     }
+
+    public createQueryRunner() {
+        return this.dbContext.createQueryRunner("master");
+    }
 }
 
 export {DataLayer};

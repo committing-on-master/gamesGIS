@@ -1,11 +1,12 @@
 import {DataLayer} from "./../../data-layer/data.layer";
 import winston from "winston";
 import {inject, singleton} from "tsyringe";
+import httpErrors from "http-errors";
 
 import {MapProfileDto} from "./models/map.profile.dto";
 import {TokenInjection} from "./../../infrastructure/token.injection";
 import {MapProfileDao} from "./../../data-layer/models/map.profile.dao";
-import {Profile} from "./models/profile";
+import {Point, Profile} from "./models/profile";
 import {MarkerDto} from "./models/marker.dto";
 import {MarkerDao} from "./../../data-layer/models/marker.dao";
 import {CoordinatesDao} from "./../../data-layer/models/coordinates.dao";
@@ -29,7 +30,7 @@ class MapProfileService {
             return profile;
         }
         if (!profile.map) {
-            throw new Error(`There is no param for mapType: ${profile.map}`);
+            throw new httpErrors.NotFound(`There is no param for mapType: ${profile.map}`);
         }
         const result: Profile = {
             id: profile.id,
@@ -64,15 +65,15 @@ class MapProfileService {
         this.logger.info(`Creating map profile with name: ${dto.profileName}.`);
         const user = await this.dataLayer.usersRepository.findUserById(userId);
         if (!user) {
-            throw new Error(`User with id: ${userId} not found.`);
+            throw new httpErrors.NotFound(`User with id: ${userId} not found.`);
         }
 
         const map = await this.dataLayer.mapRepository.getMapByType(dto.map);
         if (!map) {
-            throw new Error(`There is no data for given map type: ${dto.map}.`);
+            throw new httpErrors.NotFound(`There is no data for given map type: ${dto.map}.`);
         }
 
-        const mapProfileDao= new MapProfileDao();
+        const mapProfileDao = new MapProfileDao();
         mapProfileDao.name = dto.profileName;
         mapProfileDao.map = map;
         mapProfileDao.user = user;
@@ -92,24 +93,10 @@ class MapProfileService {
     public async createMarker(profileName: string, marker: MarkerDto) {
         const profile = await this.dataLayer.mapProfileRepository.findProfileByName(profileName);
         if (!profile) {
-            throw new Error(`map profile with name: "${profileName}" not found`);
+            throw new httpErrors.NotFound(`map profile with name: "${profileName}" not found`);
         }
 
-        const newEntry = new MarkerDao();
-        newEntry.name = marker.name;
-        newEntry.description = marker.description ? marker.description : "";
-        newEntry.xCoordinate = marker.position.x;
-        newEntry.yCoordinate = marker.position.y;
-        newEntry.areaColor = marker.color;
-
-        newEntry.area = marker.bound.map((value, index) => {
-            const point = new CoordinatesDao();
-            point.xCoordinate = value.x;
-            point.yCoordinate = value.y;
-            point.marker = newEntry;
-            return point;
-        });
-
+        const newEntry = this.mapMarkerDtoToDao(marker);
         newEntry.gallery = [];
         newEntry.profile = profile;
 
@@ -120,8 +107,67 @@ class MapProfileService {
         });
     }
 
+    public async updateMarker(profileName: string, markerId: number, updatedMarker: MarkerDto): Promise<MarkerDao> {
+        const profile = await this.dataLayer.mapProfileRepository.findProfileByName(profileName);
+        if (!profile) {
+            throw new httpErrors.NotFound(`map profile with name: "${profileName}" not found`);
+        }
+
+        let saved = await this.dataLayer.markerRepository.findMarkerById(markerId, ["area"]);
+        if (!saved) {
+            throw new httpErrors.NotFound(`marker with id: ${markerId} not found`);
+        }
+
+        saved.name = updatedMarker.name;
+        saved.description = updatedMarker.description ? updatedMarker.description : "";
+        saved.areaColor = updatedMarker.color;
+        saved.xCoordinate = updatedMarker.position.x;
+        saved.yCoordinate = updatedMarker.position.y;
+
+        const newArea = this.mapAreaCoordinatesDtoToDao(updatedMarker.bound);
+
+        const queryRunner = this.dataLayer.createQueryRunner();
+        try {
+            queryRunner.startTransaction();
+            await queryRunner.manager.remove(saved.area);
+            saved = await queryRunner.manager.save(saved);
+            newArea.forEach((value) => value.marker = saved!);
+            saved.area = await queryRunner.manager.save(newArea);
+
+            await queryRunner.commitTransaction();
+            return saved;
+        } catch (err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
     public async getMarkersByProfileName(profileName: string) {
         return this.dataLayer.markerRepository.getMarkersWithAreasByProfileName(profileName);
+    }
+
+    private mapMarkerDtoToDao(marker: MarkerDto): MarkerDao {
+        const newEntry = new MarkerDao();
+        newEntry.name = marker.name;
+        newEntry.description = marker.description ? marker.description : "";
+        newEntry.xCoordinate = marker.position.x;
+        newEntry.yCoordinate = marker.position.y;
+        newEntry.areaColor = marker.color;
+
+        newEntry.area = this.mapAreaCoordinatesDtoToDao(marker.bound);
+        newEntry.area.forEach((value) => value.marker = newEntry);
+        return newEntry;
+    }
+
+    private mapAreaCoordinatesDtoToDao(points: Point[]): CoordinatesDao[] {
+        return points.map((value, index) => {
+            const point = new CoordinatesDao();
+            point.xCoordinate = value.x;
+            point.yCoordinate = value.y;
+            return point;
+        });
     }
 }
 export {MapProfileService};
