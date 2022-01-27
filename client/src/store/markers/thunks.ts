@@ -6,10 +6,18 @@ import { RequestWrapper } from "../../api/JsonRequestWrapper";
 import { RootState } from "../store";
 import { EditingState, MarkerType } from "./types";
 
-export const saveMarker = createAsyncThunk<MarkerType, string, {state: RootState}>(
+type ThunkArg = {
+    name: string;
+    description: string;
+}
+
+export const saveEditingMarker = createAsyncThunk<MarkerType, ThunkArg, {state: RootState}>(
     "markers/saving",
-    async (profileName: string, thunkApi) => {
+    async (thunkArg, thunkApi) => {
         const marker = thunkApi.getState().markers.editable;
+        marker.name = thunkArg.name;
+        marker.description = thunkArg.description;
+        const profileName = thunkApi.getState().map.name;
         
         let response: Result<MarkerDTO, ErrorDTO>;
         if (marker.state === EditingState.New) {

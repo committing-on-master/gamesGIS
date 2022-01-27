@@ -1,6 +1,6 @@
 import { createEntityAdapter, createSelector, createSlice, EntityState, PayloadAction } from "@reduxjs/toolkit";
 import { Point } from "../../api/dto/types/Point";
-import { fetchProfileMarkers, saveMarker } from "./thunks";
+import { fetchProfileMarkers, saveEditingMarker } from "./thunks";
 
 import { EditingMarkerType, EditingState, MarkerType } from "./types";
 
@@ -36,8 +36,16 @@ const markersSlice = createSlice({
     initialState: initialState,
     reducers: {
         createNewMarker: (state: MarkersState, action: PayloadAction<string>) => {
+            state.editable = {...initialState.editable};
             state.editable.state = EditingState.New;
             state.editable.name = action.payload;
+        },
+        editSavedMarker: (state, action: PayloadAction<number>) => {
+            const marker = selectMarkerById(state, action.payload);
+            if (!marker) {
+                return;
+            }
+            state.editable = {...marker, state: EditingState.Saved};
         },
         updateMarkerPosition: (state: MarkersState, action: PayloadAction<Point>) => {
             state.editable.position = action.payload;
@@ -56,7 +64,7 @@ const markersSlice = createSlice({
             state.editable.description = action.payload;
         },
         resetMarker: (state: MarkersState) => {
-            state.editable = initialState.editable;
+            state.editable = {...initialState.editable};
         },
 
         addMarker: (state: MarkersState, action: PayloadAction<MarkerType>) => {
@@ -70,13 +78,13 @@ const markersSlice = createSlice({
         }
     },
     extraReducers: (builder) => { builder
-        .addCase(saveMarker.fulfilled, (state, action: PayloadAction<MarkerType>) => {
+        .addCase(saveEditingMarker.fulfilled, (state, action: PayloadAction<MarkerType>) => {
             markersAdapter.setOne(state.saved, action.payload);
-            state.editable = initialState.editable;
+            state.editable = {...initialState.editable};
         })
 
         .addCase(fetchProfileMarkers.fulfilled, (state, action: PayloadAction<MarkerType[]>) => {
-            state.editable = initialState.editable;
+            state.editable = {...initialState.editable};
             markersAdapter.setAll(state.saved, action.payload)
         })
     }
@@ -124,4 +132,12 @@ export const selectIsEditingMode = (state: MarkersState) => {
 
 export const markersReducer = markersSlice.reducer;
 
-export const { addMarker, addMarkers, createNewMarker, updateMarkerPosition, addAreaCoordinates, setAreaColor } = markersSlice.actions;
+export const { 
+    addMarker,
+    addMarkers,
+    createNewMarker,
+    updateMarkerPosition,
+    addAreaCoordinates,
+    setAreaColor,
+    editSavedMarker
+} = markersSlice.actions;

@@ -1,20 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useForm, SubmitHandler } from "react-hook-form";
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { addAreaCoordinates, createNewMarker, selectEditableMarker, setAreaColor, updateMarkerPosition } from '../../store/markers/slice';
-import { SchemaValidation } from '../schemas/schemaValidation';
-import { useEventHub } from './EventHubProvider';
-
-import "./EditingMarker.scss";
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
+import { addAreaCoordinates, selectEditableMarker, setAreaColor, updateMarkerPosition } from '../../../../store/markers/slice';
+import { saveEditingMarker } from '../../../../store/markers/thunks';
+import { useEventHub } from '../../../maps/EventHubProvider';
+import { EditSchemaValidation } from './SchemaValidation';
 import { CoordinatesList } from './CoordinatesList';
-import { saveMarker } from '../../store/markers/thunks';
+
+import "./EditMarker.scss";
 
 type Inputs = {
-    name: string,
-    description: string,
-    // position?: Point,
+    name: string;
+    description: string;
     color: string;
-    // bound: Point[]
 };
 
 enum FocusElement {
@@ -23,11 +21,7 @@ enum FocusElement {
     Bound = 2
 }
 
-interface EditingMarkerProps {
-    profileName: string
-} 
-
-function EditingMarker(props: EditingMarkerProps) {
+function EditMarker() {
     const marker = useAppSelector(state => selectEditableMarker(state.markers));
     const dispatch = useAppDispatch();
     const { register, handleSubmit, formState: { errors } } = useForm<Inputs>({
@@ -48,7 +42,6 @@ function EditingMarker(props: EditingMarkerProps) {
     }
 
     useEffect(() => {
-
         function onMapClick(eventArg: { x: number, y: number }) {
             switch (stateRef.current) {
                 case FocusElement.Position:
@@ -76,22 +69,21 @@ function EditingMarker(props: EditingMarkerProps) {
     }
 
     const onSubmit: SubmitHandler<Inputs> = data => {
-        dispatch(saveMarker(props.profileName));
-        
+        dispatch(saveEditingMarker({name: data.name, description: data.description}));
     }
 
     const positionText = marker.position ? `x: ${marker.position.x.toFixed(3)} y: ${marker.position.y.toFixed(3)}` : "";
     return (
         <form onSubmit={handleSubmit(onSubmit)} >
             <label>Marker name</label>
-            <input type="text" placeholder="...marker name" {...register("name", SchemaValidation.MarkerName)} />
+            <input type="text" placeholder="...marker name" {...register("name", EditSchemaValidation.MarkerName)} />
             {errors.name && <p>{errors.name.message}</p>}
 
             <label>Description</label>
-            <textarea placeholder="...description" {...register("description", SchemaValidation.MarkerDescription)} />
+            <textarea placeholder="...description" {...register("description", EditSchemaValidation.MarkerDescription)} />
             {errors.description && <p>{errors.description.message}</p>}
 
-            <input type="color" {...register("color", {onChange: handleColorChange, ...SchemaValidation.MarkerColor} )} />
+            <input type="color" {...register("color", {onChange: handleColorChange, ...EditSchemaValidation.MarkerColor} )} />
             {errors.color && <p>{errors.color.message}</p>}
 
             <hr />
@@ -119,4 +111,4 @@ function EditingMarker(props: EditingMarkerProps) {
     );
 }
 
-export { EditingMarker };
+export { EditMarker };

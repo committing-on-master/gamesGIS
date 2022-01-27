@@ -1,47 +1,33 @@
-import { CRS } from "leaflet"
-import { MapContainer } from "react-leaflet"
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
 
-import { MapLayerWrapper } from "../components/maps/MapLayerWrapper"
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { useEffect, useState } from "react";
 import { AwaitingComponent } from "../components/common/AwaitingComponent";
 import { WarningComponent } from "../components/common/WarningComponent";
 
-import { selectAllMarkers, selectIsEditingMode } from "../store/markers/slice";
-// import { AriaMarker } from "../components/maps/AriaMarker";
+import { selectIsEditingMode } from "../store/markers/slice";
 import { mapSelectors } from "../store/mapProfile/state";
-// import { SpotlightArea } from "../components/maps/SpotlightArea";
 import { Sidenav } from "../components/navbar/Sidenav";
 import { fetchMapProfile } from "../store/mapProfile/thunks";
-import { accountSelectors } from "../store/account/state";
-import { AddingMarker } from "../components/maps/AddingMarker";
-import { EditingMarker } from "../components/maps/EditingMarker";
 import { EventHubProvider } from "../components/maps/EventHubProvider";
 import { LeafletComponent } from "../components/maps/LeafletComponent";
 import { fetchProfileMarkers } from "../store/markers/thunks";
-// import { MarkersLayerWrapper } from "../components/maps/MarkersLayerWrapper";
-
-// import "./../api/fetchMockStub"
+import { MapPanel } from "../components/panels/MapPanel";
 
 type LoadingState = {
     status: "idle" | "loading" | "succeeded" | "failed";
     msg?: string;
 }
 
-interface MapProps {
-    editable: boolean;
-}
-
-function MapPage(props: MapProps) {
+function MapPage() {
     const { profileName } = useParams();
     const navigate = useNavigate();
     const [loadingState, setLoadingState] = useState<LoadingState>({ status: "idle", msg: "Profile loading, please wait." });
 
     const dispatch = useAppDispatch();
     const mapParams = useAppSelector(state => mapSelectors.containerParams(state.map));
-    const editable = useAppSelector(state => accountSelectors.UserId(state.account)) === mapParams.authorId;
+    // const editable = useAppSelector(state => accountSelectors.UserId(state.account)) === mapParams.authorId;
     const isEditingNow = useAppSelector(state => selectIsEditingMode(state.markers));
 
 
@@ -81,23 +67,14 @@ function MapPage(props: MapProps) {
         );
     }
 
-    const EditButton = (editable && !props.editable) ? <Link to="editing">Еdit</Link> : undefined;
-
     return (
         <EventHubProvider>
             <LeafletComponent />
             <Sidenav
-                visibility={props.editable}
+                visibility={true}
                 header="Markers"
             >
-                {EditButton && EditButton}
-                {!EditButton &&
-                    <>
-                        <hr />
-                        {isEditingNow && profileName ? <EditingMarker profileName={profileName} /> : <AddingMarker />}
-                    </>
-                }
-
+                <MapPanel />
             </Sidenav>
         </EventHubProvider>
     );

@@ -1,6 +1,7 @@
 import React from 'react';
-import { useAppSelector } from '../../store/hooks';
-import { selectEditableCoordinates } from '../../store/markers/slice';
+import { useAppSelector } from '../../../../../store/hooks';
+import { selectEditableCoordinates } from '../../../../../store/markers/slice';
+import "./CoordinatesList.scss";
 
 function CoordinatesList() {
     const list = useAppSelector(state => selectEditableCoordinates(state.markers));

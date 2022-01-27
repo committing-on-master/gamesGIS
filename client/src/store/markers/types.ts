@@ -3,7 +3,7 @@ import { Point } from "../../api/dto/types/Point";
 export enum EditingState {
     Undefined = 0,
     New = 1,
-    Editable = 2
+    Saved = 2
 }
 
 export type EditingMarkerType = Partial<MarkerType> & {
