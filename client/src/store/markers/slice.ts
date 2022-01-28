@@ -63,7 +63,7 @@ const markersSlice = createSlice({
         setMarkerDescription: (state: MarkersState, action: PayloadAction<string>) =>{
             state.editable.description = action.payload;
         },
-        resetMarker: (state: MarkersState) => {
+        cancelEditionMode: (state: MarkersState) => {
             state.editable = {...initialState.editable};
         },
 
@@ -139,5 +139,6 @@ export const {
     updateMarkerPosition,
     addAreaCoordinates,
     setAreaColor,
-    editSavedMarker
+    editSavedMarker,
+    cancelEditionMode
 } = markersSlice.actions;

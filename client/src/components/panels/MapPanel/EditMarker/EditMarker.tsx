@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
-import { addAreaCoordinates, selectEditableMarker, setAreaColor, updateMarkerPosition } from '../../../../store/markers/slice';
+import { addAreaCoordinates, cancelEditionMode, selectEditableMarker, setAreaColor, updateMarkerPosition } from '../../../../store/markers/slice';
 import { saveEditingMarker } from '../../../../store/markers/thunks';
 import { useEventHub } from '../../../maps/EventHubProvider';
 import { EditSchemaValidation } from './SchemaValidation';
@@ -71,6 +71,10 @@ function EditMarker() {
     const onSubmit: SubmitHandler<Inputs> = data => {
         dispatch(saveEditingMarker({name: data.name, description: data.description}));
     }
+    const onCancel = (eventArg: React.MouseEvent<HTMLButtonElement>) => {
+        eventArg.preventDefault();
+        dispatch(cancelEditionMode());
+    }
 
     const positionText = marker.position ? `x: ${marker.position.x.toFixed(3)} y: ${marker.position.y.toFixed(3)}` : "";
     return (
@@ -107,6 +111,7 @@ function EditMarker() {
             <CoordinatesList />
             <hr />
             <input type="submit" />
+            <button onClick={onCancel}>Cancel</button>
         </form>
     );
 }
