@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useAppSelector } from '../../../../store/hooks';
-import { selectAllMarkers } from '../../../../store/markers/slice';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
+import { selectAllMarkers, turnOffSpotlightBlur, turnOnSpotlightHover } from '../../../../store/markers/slice';
 import { EditSpanComponent } from '../../../common/EditSpanComponent';
 import { CreationMarker } from './CreationMarker';
 
@@ -29,11 +29,22 @@ function List(props: {
     editable: boolean;
     onEditClick(markerId: number): void;
 }) {
-    const markers = useAppSelector(state => selectAllMarkers(state.markers));
+    const markers = useAppSelector(state => selectAllMarkers(state.markers.saved));
+    const dispatch = useAppDispatch();
     const filtered = props.filter === "" ? markers : markers.filter((value) => value.name.toLowerCase().includes(props.filter.toLowerCase()));
+    const turnOnSpotlightArea = (id: number) => {
+        dispatch(turnOnSpotlightHover(id));
+    }
+    const turnOffSpotlightArea = () => {
+        dispatch(turnOffSpotlightBlur());
+    }
     const listElements = filtered.map((value) => {
         return (
-            <li key={value.id}>
+            <li 
+                key={value.id}
+                onMouseEnter={() => turnOnSpotlightArea(value.id)}
+                onMouseLeave={turnOffSpotlightArea}
+            >
                 {value.name}
                 {props.editable ? <EditSpanComponent id={value.id} onClick={props.onEditClick} /> : null}
             </li>

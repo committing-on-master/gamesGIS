@@ -10,7 +10,7 @@ interface PopupBodyProps {
 }
 
 function PopupBody(props: PopupBodyProps) {
-    const marker = useAppSelector(state => selectMarkerById(state.markers, props.markerId));
+    const marker = useAppSelector(state => selectMarkerById(state.markers.saved, props.markerId));
     const [areaGalleryVisability, setAreaGalleryVisability] = useState(false);
     if (!marker) {
         return null;

@@ -2,11 +2,12 @@ import { createEntityAdapter, createSelector, createSlice, EntityState, PayloadA
 import { Point } from "../../api/dto/types/Point";
 import { fetchProfileMarkers, saveEditingMarker } from "./thunks";
 
-import { EditingMarkerType, EditingState, MarkerType } from "./types";
+import { EditingMarkerType, EditingState, MarkerType, SpotlightStatus, SpotlightType } from "./types";
 
 export interface MarkersState {
     editable: EditingMarkerType;
     saved: EntityState<MarkerType>;
+    spotlight: SpotlightType;
 }
 
 const markersAdapter = createEntityAdapter<MarkerType>({
@@ -27,8 +28,14 @@ const markersAdapter = createEntityAdapter<MarkerType>({
 });
 
 const initialState: MarkersState = {
-    editable: { state: EditingState.Undefined, color: "#0409ff" },
+    editable: {
+        state: EditingState.Undefined, color: "#0409ff"
+    },
     saved: markersAdapter.getInitialState(),
+    spotlight: {
+        markerId: undefined,
+        state: SpotlightStatus.Undefined
+    }
 }
 
 const markersSlice = createSlice({
@@ -36,16 +43,16 @@ const markersSlice = createSlice({
     initialState: initialState,
     reducers: {
         createNewMarker: (state: MarkersState, action: PayloadAction<string>) => {
-            state.editable = {...initialState.editable};
+            state.editable = { ...initialState.editable };
             state.editable.state = EditingState.New;
             state.editable.name = action.payload;
         },
         editSavedMarker: (state, action: PayloadAction<number>) => {
-            const marker = selectMarkerById(state, action.payload);
+            const marker = selectMarkerById(state.saved, action.payload);
             if (!marker) {
                 return;
             }
-            state.editable = {...marker, state: EditingState.Saved};
+            state.editable = { ...marker, state: EditingState.Saved };
         },
         updateMarkerPosition: (state: MarkersState, action: PayloadAction<Point>) => {
             state.editable.position = action.payload;
@@ -60,11 +67,31 @@ const markersSlice = createSlice({
         setAreaColor: (state: MarkersState, action: PayloadAction<string>) => {
             state.editable.color = action.payload;
         },
-        setMarkerDescription: (state: MarkersState, action: PayloadAction<string>) =>{
+        setMarkerDescription: (state: MarkersState, action: PayloadAction<string>) => {
             state.editable.description = action.payload;
         },
         cancelEditionMode: (state: MarkersState) => {
-            state.editable = {...initialState.editable};
+            state.editable = { ...initialState.editable };
+            state.spotlight = { ...initialState.spotlight };
+        },
+
+        turnOnSpotlightHover: (state: MarkersState, action: PayloadAction<number>) => {
+            if (state.spotlight.state !== SpotlightStatus.Selected) {
+                state.spotlight.state = SpotlightStatus.Hovered;
+                state.spotlight.markerId = action.payload;
+            }
+        },
+        turnOffSpotlightBlur: (state: MarkersState) => {
+            if (state.spotlight.state !== SpotlightStatus.Selected) {
+                state.spotlight = { ...initialState.spotlight };
+            }
+        },
+        turnOnSpotlightSelect: (state: MarkersState, action: PayloadAction<number>) => {
+            state.spotlight.state = SpotlightStatus.Selected;
+            state.spotlight.markerId = action.payload;
+        },
+        turnOffSpotlightClose: (state: MarkersState) => {
+            state.spotlight = { ...initialState.spotlight };
         },
 
         addMarker: (state: MarkersState, action: PayloadAction<MarkerType>) => {
@@ -77,21 +104,34 @@ const markersSlice = createSlice({
             markersAdapter.removeOne(state.saved, action.payload);
         }
     },
-    extraReducers: (builder) => { builder
-        .addCase(saveEditingMarker.fulfilled, (state, action: PayloadAction<MarkerType>) => {
-            markersAdapter.setOne(state.saved, action.payload);
-            state.editable = {...initialState.editable};
-        })
+    extraReducers: (builder) => {
+        builder
+            .addCase(saveEditingMarker.fulfilled, (state, action: PayloadAction<MarkerType>) => {
+                markersAdapter.setOne(state.saved, action.payload);
+                state.editable = { ...initialState.editable };
+            })
 
-        .addCase(fetchProfileMarkers.fulfilled, (state, action: PayloadAction<MarkerType[]>) => {
-            state.editable = {...initialState.editable};
-            markersAdapter.setAll(state.saved, action.payload)
-        })
+            .addCase(fetchProfileMarkers.fulfilled, (state, action: PayloadAction<MarkerType[]>) => {
+                state.editable = { ...initialState.editable };
+                markersAdapter.setAll(state.saved, action.payload)
+            })
     }
 });
 
-export const selectMarkerById = (state: MarkersState, id: number) => markersAdapter.getSelectors().selectById(state.saved, id);
-export const selectAllMarkers = (state: MarkersState) => markersAdapter.getSelectors().selectAll(state.saved);
+export const selectSpotlightArea = (state: MarkersState) => {
+    if (state.spotlight.markerId) {
+        const marker = selectMarkerById(state.saved, state.spotlight.markerId);
+        if (marker) {
+            return {
+                coordinates: marker.bound,
+                color: marker.color
+            };
+        }
+    }
+    return undefined;
+}
+
+export const { selectById: selectMarkerById, selectAll: selectAllMarkers } = markersAdapter.getSelectors();
 
 export const selectEditableMarker = (state: MarkersState) => {
     if (state.editable.state === EditingState.Undefined) {
@@ -132,7 +172,7 @@ export const selectIsEditingMode = (state: MarkersState) => {
 
 export const markersReducer = markersSlice.reducer;
 
-export const { 
+export const {
     addMarker,
     addMarkers,
     createNewMarker,
@@ -140,5 +180,9 @@ export const {
     addAreaCoordinates,
     setAreaColor,
     editSavedMarker,
-    cancelEditionMode
+    cancelEditionMode,
+    turnOnSpotlightHover,
+    turnOffSpotlightBlur,
+    turnOnSpotlightSelect,
+    turnOffSpotlightClose
 } = markersSlice.actions;

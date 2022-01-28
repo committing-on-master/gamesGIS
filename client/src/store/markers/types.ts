@@ -5,6 +5,11 @@ export enum EditingState {
     New = 1,
     Saved = 2
 }
+export enum SpotlightStatus {
+    Undefined = 0,
+    Hovered = 1,
+    Selected = 2,
+}
 
 export type EditingMarkerType = Partial<MarkerType> & {
     state: EditingState;
@@ -18,4 +23,9 @@ export type MarkerType = {
     position: Point,
     color: string;
     bound: Point[];
+}
+
+export type SpotlightType = {
+    markerId?: number;
+    state: SpotlightStatus;
 }
