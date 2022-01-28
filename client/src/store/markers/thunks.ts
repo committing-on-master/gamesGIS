@@ -14,7 +14,7 @@ type ThunkArg = {
 export const saveEditingMarker = createAsyncThunk<MarkerType, ThunkArg, {state: RootState}>(
     "markers/saving",
     async (thunkArg, thunkApi) => {
-        const marker = thunkApi.getState().markers.editable;
+        const marker = {...thunkApi.getState().markers.editable};
         marker.name = thunkArg.name;
         marker.description = thunkArg.description;
         const profileName = thunkApi.getState().map.name;

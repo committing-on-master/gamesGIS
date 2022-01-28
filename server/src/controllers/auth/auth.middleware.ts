@@ -83,6 +83,7 @@ class AuthMiddleware extends CommonMiddleware {
 
         // проверка на отзыва refresh токена
         // TODO феерическая проблема с датками, закоменти и реши позже
+        this.logger.error("феерическая проблема с датками, закоменти и реши позже");
         if (savedRefreshToken.revoked) { // || ((savedRefreshToken.expiredDate < new Date()))) {
             throw new httpError.Unauthorized("refresh token was revoked or expired");
         }

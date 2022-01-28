@@ -27,7 +27,6 @@ function MapPage() {
 
     const dispatch = useAppDispatch();
     const mapParams = useAppSelector(state => mapSelectors.containerParams(state.map));
-    // const editable = useAppSelector(state => accountSelectors.UserId(state.account)) === mapParams.authorId;
     const isEditingNow = useAppSelector(state => selectIsEditingMode(state.markers));
 
 

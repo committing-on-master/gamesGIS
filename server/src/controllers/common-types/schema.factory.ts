@@ -81,7 +81,6 @@ class StaticSchemaFactory {
                 {exists: {errorMessage: "id body field is missing"}}),
 
             isEmpty: {negated: true, options: {ignore_whitespace: true}, errorMessage: "id body field is empty"},
-            trim: true,
             isNumeric: true,
         };
     }
@@ -95,7 +94,6 @@ class StaticSchemaFactory {
             in: ["body"],
             exists: {errorMessage: "refreshToken body field is missing"},
             isEmpty: {negated: true, options: {ignore_whitespace: true}, errorMessage: "refreshToken body field is empty"},
-            trim: true,
         };
     }
 
@@ -117,6 +115,7 @@ class StaticSchemaFactory {
 
             exists: {errorMessage: "profileName body field is missing"},
             isEmpty: {negated: true, options: {ignore_whitespace: true}, errorMessage: "profileName body field is empty"},
+            trim: true,
             isLength: {
                 options: {
                     min: 3,
@@ -156,6 +155,7 @@ class StaticSchemaFactory {
     public static createColorSchema(): ParamSchema {
         return {
             exists: {errorMessage: "color body field is missing"},
+            trim: true,
             matches: {
                 options: RegExp("#[a-zA-Z0-9]{6}"),
                 errorMessage: "colors available only in HEX format",
@@ -165,7 +165,6 @@ class StaticSchemaFactory {
 
     public static createNumericSchema(): ParamSchema {
         return {
-            trim: true,
             exists: {errorMessage: "field is missing"},
             isEmpty: {negated: true, options: {ignore_whitespace: true}, errorMessage: "field is empty"},
             isNumeric: {

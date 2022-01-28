@@ -13,16 +13,16 @@ const markersAdapter = createEntityAdapter<MarkerType>({
     selectId: (area) => area.id,
     sortComparer: (a, b) => {
         if (!a.position) {
-            return -1;
-        }
-        if (!b.position) {
             return 1;
         }
-        const yDelta = a.position.y - b.position.y;
+        if (!b.position) {
+            return -1;
+        }
+        const yDelta = b.position.x - a.position.x;
         if (yDelta !== 0) {
             return yDelta;
         }
-        return a.position.x - b.position.x;
+        return b.position.y - a.position.y;
     }
 });
 
