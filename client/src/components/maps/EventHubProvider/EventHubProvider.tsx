@@ -1,9 +1,11 @@
 import React from 'react';
-import { Observer } from '../../helpers/observer';
+import { PublisherSubscriber } from '../../../helpers/publisherSubscriber';
 
-type Payload = { x: number, y: number };
+type Events = {
+    "onMapClick": { x: number, y: number }
+}
 
-const EventHubContext = React.createContext<Observer<Payload> | undefined>(undefined);
+const EventHubContext = React.createContext<PublisherSubscriber<Events> | undefined>(undefined);
 
 interface EventHubProviderProps {
     children?: React.ReactNode;
@@ -14,7 +16,7 @@ interface EventHubProviderProps {
  * Используется для проброса событий из ветки компонентов leaflet-а в обычные react компоненты страницы
  */
 function EventHubProvider(props: EventHubProviderProps) {
-    const eventHub = new Observer<Payload>();
+    const eventHub = new PublisherSubscriber<Events>();
     return (
         <EventHubContext.Provider value={eventHub}>
             {props.children && props.children}

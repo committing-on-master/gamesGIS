@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "../../../../../store/hooks";
 import { turnOffSpotlightBlur, turnOffSpotlightClose, turnOnSpotlightHover, turnOnSpotlightSelect } from "../../../../../store/markers/slice";
 // import { removeSpotlightArea, setSpotlightArea } from "../../store/mapProfile/slice";
 import { PopupBody } from "../../../AreaPopup/PopupBody";
+import { useEventHub } from "../../../EventHubProvider";
 import { markerIcon } from "./markerIcon";
 
 interface MarkerProps {
@@ -17,6 +18,7 @@ interface MarkerProps {
 function AriaMarker(props: MarkerProps) {
 	const popupRef = useRef<LPopup>(null);
 	const dispatch = useAppDispatch();
+	const eventHub = useEventHub();
 
 	const handlePopupOpen = () => { props.id && dispatch(turnOnSpotlightSelect(props.id)) }
 	const handlePopupClose = () => { dispatch(turnOffSpotlightClose()) }

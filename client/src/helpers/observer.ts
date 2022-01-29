@@ -12,7 +12,6 @@ class Observer<T = any> {
     subscribe(sub: Subscriber<T>): Unsubscribe {
         this.subs.push(sub);
         return () => {
-            console.log("unsibscribed");
             this.subs = this.subs.filter((item) => item !== sub);
         };
     }

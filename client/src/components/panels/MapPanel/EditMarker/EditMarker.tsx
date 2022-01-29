@@ -55,7 +55,7 @@ function EditMarker() {
             }
         }
 
-        const unsubscribe = eventHub.subscribe(onMapClick);
+        const unsubscribe = eventHub.subscribe("onMapClick", onMapClick);
         return () => unsubscribe();
     }, [dispatch, eventHub, marker]);
 
