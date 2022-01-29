@@ -7,7 +7,6 @@ import {ServicesLayer} from "./../../services-layer/services.layer";
 import {CommonController} from "./../common.controller";
 import {TokenInjection} from "./../../infrastructure/token.injection";
 import {GetUserDto} from "./../../services-layer/users/models/get.user.dto";
-import {ResponseBody} from "../response.body";
 
 @injectable()
 class UsersController extends CommonController {
@@ -33,7 +32,7 @@ class UsersController extends CommonController {
      * */
     public async createUser(req: express.Request, res: express.Response) {
         await this.services.Users.createUser(req.body);
-        return res.status(201).send(ResponseBody.jsonOk("user registered"));
+        return res.status(201).json({message: "user registered"});
     }
 
     /**
