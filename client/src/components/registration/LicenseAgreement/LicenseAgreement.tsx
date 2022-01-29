@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AgreementText } from "./AgreementText";
+import { AgreementText } from "../AgreementText";
 
 interface LicenseAgreementProps {
     /**endpoint с которого будет загружено пользовательское соглашение */

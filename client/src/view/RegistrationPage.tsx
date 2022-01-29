@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { Inputs, RegistrationForm } from '../components/registration/RegistrationForm';
+import { Inputs, RegistrationForm } from '../components/registration/RegistrationForm/RegistrationForm';
 import { LicenseAgreement } from './../components/registration/LicenseAgreement';
 import { useAppDispatch } from '../store/hooks';
 import { loginUser } from '../store/account/thunks';

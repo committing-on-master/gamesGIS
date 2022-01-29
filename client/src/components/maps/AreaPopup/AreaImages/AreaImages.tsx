@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import SwiperCore, { FreeMode, Navigation, Thumbs } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react/swiper-react.js';
-import { ModalImage } from './ModalImage';
+import { ModalImage } from '../ModalImage';
+
 
 import "./AreaImages.scss";
 

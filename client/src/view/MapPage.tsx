@@ -8,12 +8,13 @@ import { WarningComponent } from "../components/common/WarningComponent";
 
 import { selectIsEditingMode } from "../store/markers/slice";
 import { mapSelectors } from "../store/mapProfile/state";
-import { Sidenav } from "../components/navbar/Sidenav";
+
 import { fetchMapProfile } from "../store/mapProfile/thunks";
 import { EventHubProvider } from "../components/maps/EventHubProvider";
 import { LeafletComponent } from "../components/maps/LeafletComponent";
 import { fetchProfileMarkers } from "../store/markers/thunks";
 import { MapPanel } from "../components/panels/MapPanel";
+import { SidePanel } from "../components/panels/SidePanel";
 
 type LoadingState = {
     status: "idle" | "loading" | "succeeded" | "failed";
@@ -38,16 +39,16 @@ function MapPage() {
             .unwrap()
             .then(() => {
                 dispatch(fetchProfileMarkers(profileName!))
-                .unwrap()
-                .then(() => {
-                    setLoadingState({ status: "succeeded", msg: "profile loaded" });
-                })
+                    .unwrap()
+                    .then(() => {
+                        setLoadingState({ status: "succeeded", msg: "profile loaded" });
+                    })
             })
             .catch(error => {
                 console.log(error);
                 setLoadingState({ status: "failed", msg: "profile loading failed" });
             })
-        
+
     }, [dispatch, navigate, profileName]);
 
     if (loadingState.status === "idle" || loadingState.status === "loading") {
@@ -69,12 +70,12 @@ function MapPage() {
     return (
         <EventHubProvider>
             <LeafletComponent />
-            <Sidenav
+            <SidePanel
                 visibility={true}
                 header="Markers"
             >
                 <MapPanel />
-            </Sidenav>
+            </SidePanel>
         </EventHubProvider>
     );
 }

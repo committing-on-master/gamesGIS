@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { UserElement } from "./account/UserElement";
+import { UserElement } from "./UserElement";
 import logo from "./../../img/logo_nav_64.png"
 import { useAppSelector } from "../../store/hooks";
 import { accountSelectors } from "../../store/account/state";

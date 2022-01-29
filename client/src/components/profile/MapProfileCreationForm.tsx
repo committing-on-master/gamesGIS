@@ -4,7 +4,7 @@ import { MapProfileDTO } from "../../api/dto/request/MapProfileDTO";
 import { ErrorDTO } from "../../api/dto/response/ErrorDTO";
 import { MapType } from "../../api/dto/types/MapType";
 import { RequestWrapper } from "../../api/JsonRequestWrapper";
-import { SchemaValidation } from "../schemas/schemaValidation";
+import { SchemaValidation } from "./schemaValidation";
 
 import "./MapProfileCreationForm.scss";
 

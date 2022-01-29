@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { RequestWrapper } from "./../../api/JsonRequestWrapper";
-import { AgreementDTO } from "../../api/dto/response/AgreementDTO";
-import { AwaitingComponent } from "../common/AwaitingComponent";
-import { WarningComponent } from "../common/WarningComponent";
+import { RequestWrapper } from "./../../../api/JsonRequestWrapper";
+import { AgreementDTO } from "./../../../api/dto/response/AgreementDTO";
+import { AwaitingComponent } from "./../../common/AwaitingComponent";
+import { WarningComponent } from "./../../common/WarningComponent";
 
 interface AgreementTextProps {
     endPoint: string;

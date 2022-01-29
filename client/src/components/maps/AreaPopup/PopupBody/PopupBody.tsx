@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { selectMarkerById } from "../../../store/markers/slice";
-import { useAppSelector } from "../../../store/hooks";
-import { AreaImages } from "./AreaImages";
+import { selectMarkerById } from "./../../../../store/markers/slice";
+import { useAppSelector } from "./../../../../store/hooks";
 
 import "./PopupBody.scss"
 
@@ -11,7 +10,8 @@ interface PopupBodyProps {
 
 function PopupBody(props: PopupBodyProps) {
     const marker = useAppSelector(state => selectMarkerById(state.markers.saved, props.markerId));
-    const [areaGalleryVisability, setAreaGalleryVisability] = useState(false);
+    // недопилил галерею
+    // const [areaGalleryVisability, setAreaGalleryVisability] = useState(false);
     if (!marker) {
         return null;
     }

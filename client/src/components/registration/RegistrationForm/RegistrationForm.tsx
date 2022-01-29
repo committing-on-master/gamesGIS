@@ -2,12 +2,12 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelope, faKey, faUser } from '@fortawesome/free-solid-svg-icons'
 
-import { SchemaValidation } from "../schemas/schemaValidation";
-import { RequestWrapper } from "../../api/JsonRequestWrapper";
-import { CreateUserDTO } from "../../api/dto/request/CreateUserDTO";
+import { SchemaValidation } from "./schemaValidation";
+import { RequestWrapper } from "../../../api/JsonRequestWrapper";
+import { CreateUserDTO } from "../../../api/dto/request/CreateUserDTO";
 import { useState } from "react";
-import { nameofPropChecker } from "../../api/nameofPropChecker";
-import { ErrorDTO } from "../../api/dto/response/ErrorDTO";
+import { nameofPropChecker } from "../../../api/nameofPropChecker";
+import { ErrorDTO } from "../../../api/dto/response/ErrorDTO";
 
 interface RegistrationFormProps {
     onRegistered?(userData: Inputs): void;

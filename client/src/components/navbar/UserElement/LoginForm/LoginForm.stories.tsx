@@ -1,7 +1,7 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import fetchMock from 'fetch-mock';
-import { ErrorDTO } from '../../../api/dto/response/ErrorDTO';
-import { JwtDTO } from '../../../api/dto/response/JwtDTO';
+import { ErrorDTO } from '../../../../api/dto/response/ErrorDTO';
+import { JwtDTO } from '../../../../api/dto/response/JwtDTO';
 
 import { LoginForm } from "./LoginForm";
 

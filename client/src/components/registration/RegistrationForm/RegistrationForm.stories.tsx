@@ -1,7 +1,7 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import fetchMock from 'fetch-mock';
 import { RegistrationForm } from './RegistrationForm';
-import { ErrorDTO } from '../../api/dto/response/ErrorDTO';
+import { ErrorDTO } from '../../../api/dto/response/ErrorDTO';
 
 export default {
     title: 'registration/RegistrationForm',

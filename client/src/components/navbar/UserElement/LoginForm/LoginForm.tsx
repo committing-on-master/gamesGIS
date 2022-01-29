@@ -2,13 +2,13 @@ import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelope, faKey } from '@fortawesome/free-solid-svg-icons'
-import { SchemaValidation } from "./../../schemas/schemaValidation";
+import { SchemaValidation } from "./schemaValidation";
 import { Link } from "react-router-dom";
-import { useAppDispatch } from "./../../../store/hooks";
-import { loginUser } from "./../../../store/account/thunks";
-import { ErrorDTO } from "../../../api/dto/response/ErrorDTO";
-import { nameofPropChecker } from "../../../api/nameofPropChecker";
-import { AuthDTO } from "../../../api/dto/request/AuthDTO";
+import { useAppDispatch } from "../../../../store/hooks";
+import { loginUser } from "../../../../store/account/thunks";
+import { ErrorDTO } from "../../../../api/dto/response/ErrorDTO";
+import { nameofPropChecker } from "../../../../api/nameofPropChecker";
+import { AuthDTO } from "../../../../api/dto/request/AuthDTO";
 import "./LoginForm.scss";
 
 type Inputs = {

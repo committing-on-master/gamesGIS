@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Route, Routes } from 'react-router-dom';
-import { Navbar } from './components/navbar/Navbar';
+import { Navbar } from './components/Navbar/Navbar';
 import { HomePage } from './view/HomePage';
 import { MapPage } from './view/MapPage';
 import { NoMatchPage } from './view/NoMatchPage';

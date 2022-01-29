@@ -1,15 +1,15 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 
-import { Sidenav } from "./Sidenav";
+import { SidePanel } from "./SidePanel";
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
-  title: 'Navbar/Sidenav',
-  component: Sidenav,
-} as ComponentMeta<typeof Sidenav>;
+  title: 'Navbar/SidePanel',
+  component: SidePanel,
+} as ComponentMeta<typeof SidePanel>;
 
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
-const Template: ComponentStory<typeof Sidenav> = (args) => <Sidenav {...args}/>;
+const Template: ComponentStory<typeof SidePanel> = (args) => <SidePanel {...args}/>;
 
 export const Primary = Template.bind({});
 Primary.args = {

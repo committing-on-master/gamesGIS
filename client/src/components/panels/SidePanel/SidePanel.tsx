@@ -1,15 +1,15 @@
 import { useState } from "react";
 import classNames from "classnames";
 
-import "./Sidenav.scss";
+import "./SidePanel.scss";
 
-interface SidenavProps {
+interface SidePanelProps {
     visibility: boolean;
     children?: React.ReactNode;
     header?: string;
 }
 
-function Sidenav(props: SidenavProps) {
+function SidePanel(props: SidePanelProps) {
     const [visibility, setVisibility] = useState(props.visibility);
 
     const navClass = classNames(
@@ -44,4 +44,4 @@ function Sidenav(props: SidenavProps) {
     )
 }
 
-export { Sidenav }
+export { SidePanel };

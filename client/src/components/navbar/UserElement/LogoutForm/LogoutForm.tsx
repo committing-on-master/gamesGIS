@@ -1,9 +1,9 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSignOutAlt, faUserCog } from '@fortawesome/free-solid-svg-icons'
-import { useAppDispatch } from '../../../store/hooks'
-import { logoutUser } from '../../../store/account/thunks';
+import { useAppDispatch } from '../../../../store/hooks'
+import { logoutUser } from '../../../../store/account/thunks';
 import "./LogoutForm.scss";
-import { Button } from '../../Button';
+import { Button } from '../../../Button';
 import { Link } from 'react-router-dom';
 
 interface LogoutProps {

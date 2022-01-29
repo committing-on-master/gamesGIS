@@ -4,7 +4,7 @@ import { Marker, Popup } from 'react-leaflet';
 import { Point } from '../../../../../../api/dto/types/Point';
 import { useAppDispatch } from '../../../../../../store/hooks';
 import { turnOffSpotlightBlur, turnOffSpotlightClose, turnOnSpotlightHover, turnOnSpotlightSelect } from '../../../../../../store/markers/slice';
-import { PopupBody } from '../../../../AreaPopup/PopupBody';
+import { PopupBody } from '../../../../areaPopup/PopupBody';
 import { useEventHub } from '../../../../EventHubProvider';
 import { markerIcon } from '../../markerIcon';
 
