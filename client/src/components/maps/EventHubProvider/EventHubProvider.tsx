@@ -2,7 +2,8 @@ import React from 'react';
 import { PublisherSubscriber } from '../../../helpers/publisherSubscriber';
 
 type Events = {
-    "onMapClick": { x: number, y: number }
+    "onMapClick": { x: number, y: number },
+    "onMarkerPanelClick": { markerId: number }
 }
 
 const EventHubContext = React.createContext<PublisherSubscriber<Events> | undefined>(undefined);

@@ -1,12 +1,12 @@
 import React from 'react';
 import { useAppSelector } from '../../../../../store/hooks';
 import { selectAllMarkers } from '../../../../../store/markers/slice';
-import { AriaMarker } from '../AreaMarker/AriaMarker';
+import { AreaMarkerReview } from './AreaMarkerReview';
 
 function ReviewMode() {
     const markers = useAppSelector(state => selectAllMarkers(state.markers.saved));
     const IconsElements = markers.map((value, index) => 
-        <AriaMarker
+        <AreaMarkerReview
             key={value.id}
             name={value.name}
             position={value.position}

@@ -1,14 +1,14 @@
 import React from 'react';
 import { useAppSelector } from '../../../../../store/hooks';
 import { selectEditingMarkerIconParams } from '../../../../../store/markers/slice';
-import { AriaMarker } from '../AreaMarker/AriaMarker';
+import { AreaMarkerEditable } from './AreaMarkerEditable';
 
 function EditableMode() {
     const marker = useAppSelector(state => selectEditingMarkerIconParams(state.markers));
     if (!marker) {
         return null;
     }
-    return <AriaMarker name={marker.name} position={marker.position} />
+    return <AreaMarkerEditable name={marker.name} position={marker.position} />
 }
 
 export { EditableMode };

@@ -26,7 +26,10 @@ class PublisherSubscriber<E extends Event> {
     }
 
     public publish: Publish<E> = (event, argument) => {
-        this.handlers[event].forEach(h => h(argument))
+        const map = this.handlers[event];
+        if (map) {
+            map.forEach(h => h(argument))
+        }
     }
 
     public subscribe: Subscribe<E> = (event, callback) => {
