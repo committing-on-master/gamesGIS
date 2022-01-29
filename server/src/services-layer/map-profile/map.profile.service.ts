@@ -148,6 +148,29 @@ class MapProfileService {
         return this.dataLayer.markerRepository.getMarkersWithAreasByProfileName(profileName);
     }
 
+    public async deleteMarker(markerId: number) {
+        const marker = await this.dataLayer.markerRepository.findMarkerById(markerId, ["area"]);
+        if (!marker) {
+            return;
+        }
+
+        const queryRunner = this.dataLayer.createQueryRunner();
+        try {
+            queryRunner.startTransaction();
+
+            await queryRunner.manager.remove(marker.area);
+            await queryRunner.manager.remove(marker);
+
+            await queryRunner.commitTransaction();
+            return;
+        } catch (err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
     private mapMarkerDtoToDao(marker: MarkerDto): MarkerDao {
         const newEntry = new MarkerDao();
         newEntry.name = marker.name;

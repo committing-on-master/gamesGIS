@@ -45,3 +45,15 @@ export const fetchProfileMarkers = createAsyncThunk(
         throw new Error(response.failure?.message);
     }
 );
+
+export const deleteProfileMarker = createAsyncThunk<number, number, {state: RootState}> (
+    "markers/deleting",
+    async (markerId: number, thunkApi) => {
+        const profileName = thunkApi.getState().map.name;
+        const response = await RequestWrapper.endPoint(`map-profile/${profileName}/markers/${markerId}`).withAuth().delete().send<{}, ErrorDTO>();
+        if (response.ok) {
+            return markerId;
+        }
+        throw new Error(response.failure?.message);
+    }
+)

@@ -14,12 +14,13 @@ interface ISend {
 
 interface IRequestMethods {
     get(): ISend;
+    delete(): ISend;
     post(body: BodyInit | object): ISend;
     put(body: BodyInit | object): ISend;
 }
 
 type Options = {
-    method?: "POST" | "GET" | "PUT";
+    method?: "POST" | "GET" | "PUT" | "DELETE";
     url: string;
     authToken: boolean;
     headers: Headers;
@@ -63,6 +64,10 @@ class RequestWrapper implements IRequestWrapper {
 
     public get(): ISend {
         this.opt.method = "GET";
+        return this;
+    }
+    public delete(): ISend {
+        this.opt.method = "DELETE";
         return this;
     }
     public post(body: BodyInit | object = {}): ISend {

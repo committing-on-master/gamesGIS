@@ -23,6 +23,7 @@ class MapProfileController extends CommonController {
         this.getMarkers = this.getMarkers.bind(this);
         this.createMarker = this.createMarker.bind(this);
         this.updateMarker = this.updateMarker.bind(this);
+        this.deleteMarker = this.deleteMarker.bind(this);
     }
     public async createProfile(req: express.Request, res: express.Response) {
         const userId = (res.locals.jwt as JwtPayload).userId;
@@ -87,6 +88,12 @@ class MapProfileController extends CommonController {
                 };
             }),
         };
+    }
+    public async deleteMarker(req: express.Request, res: express.Response) {
+        const markerId: number = req.body.markerId;
+
+        await this.services.MapProfiles.deleteMarker(markerId);
+        return res.status(200).json({message: "ok"});
     }
 }
 

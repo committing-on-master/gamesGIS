@@ -67,10 +67,13 @@ class MapProfileRoutes extends CommonRoutesConfig {
 
         route
             .route("/map-profile/:profileName/markers/:markerId")
-            .put(
+            .all(
                 this.authMiddleware.jwtTokenValidation(),
                 this.permissionMiddleware.permissionFlagRequired(PermissionFlag.APPROVED_USER),
                 asyncWrapper(this.mapProfileMiddleware.validateProfileAuthorship),
+            )
+            .delete(asyncWrapper(this.mapProfileController.deleteMarker))
+            .put(
                 asyncWrapper(this.mapProfileMiddleware.validateRequestSchema(checkSchema(markerDtoSchema))),
                 asyncWrapper(this.mapProfileController.updateMarker),
             );

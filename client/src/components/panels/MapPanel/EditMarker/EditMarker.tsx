@@ -2,12 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import { addAreaCoordinates, cancelEditionMode, selectEditableMarker, setAreaColor, updateMarkerPosition } from '../../../../store/markers/slice';
-import { saveEditingMarker } from '../../../../store/markers/thunks';
+import { deleteProfileMarker, saveEditingMarker } from '../../../../store/markers/thunks';
 import { useEventHub } from '../../../maps/EventHubProvider';
 import { EditSchemaValidation } from './SchemaValidation';
 import { CoordinatesList } from './CoordinatesList';
 
 import "./EditMarker.scss";
+import { EditingState } from '../../../../store/markers/types';
 
 type Inputs = {
     name: string;
@@ -75,6 +76,10 @@ function EditMarker() {
         eventArg.preventDefault();
         dispatch(cancelEditionMode());
     }
+    const onDelete = (eventArg: React.MouseEvent<HTMLButtonElement>) => {
+        eventArg.preventDefault();
+        marker.id && dispatch(deleteProfileMarker(marker.id));
+    }
 
     const positionText = marker.position ? `x: ${marker.position.x.toFixed(3)} y: ${marker.position.y.toFixed(3)}` : "";
     return (
@@ -112,6 +117,7 @@ function EditMarker() {
             <hr />
             <input type="submit" />
             <button onClick={onCancel}>Cancel</button>
+            {marker.state === EditingState.Saved ? <button onClick={onDelete}>Delete</button> : null}
         </form>
     );
 }
