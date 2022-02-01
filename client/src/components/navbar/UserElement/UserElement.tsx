@@ -22,19 +22,22 @@ interface UserProps {
 function UserElement(props: UserProps) {
     const [dropdownVisibility, setDropdownVisibility] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-    
+
     const dropDownCSS = classNames(
-        dropdownVisibility ? "dropdown-menu--is-active" : "dropdown-menu"
-    )    
+        "dropdown-menu",
+        {
+            "dropdown-menu--is-active": dropdownVisibility
+        }
+    )
 
     const handleDropdownSuccessfullyEvent = () => {
         setDropdownVisibility(false);
     }
-    
-    const dropDownContent: JSX.Element = (props.userName) 
-        ? <LogoutForm onSuccessfullyProcess={handleDropdownSuccessfullyEvent}/>
-        : <LoginForm onSuccessfullyLogin={handleDropdownSuccessfullyEvent} />
-        
+
+    const dropDownContent: JSX.Element = (props.userName)
+        ? <LogoutForm onLogout={handleDropdownSuccessfullyEvent} />
+        : <LoginForm onSuccessfullyLogin={handleDropdownSuccessfullyEvent} onRegistrationRedirect={handleDropdownSuccessfullyEvent} />
+
     function switchDropdownVisivility() {
         setDropdownVisibility(!dropdownVisibility);
     }
@@ -62,10 +65,8 @@ function UserElement(props: UserProps) {
     return (
         <div className="dropdown-container" >
             <UserName userName={props.userName} onClick={switchDropdownVisivility} />
-            <div className={dropDownCSS}>
-                <div ref={dropdownRef} className={`dropdown-content`}>
-                    {dropDownContent}
-                </div>
+            <div ref={dropdownRef} className={dropDownCSS}>
+                {dropDownContent}
             </div>
         </div>
     );

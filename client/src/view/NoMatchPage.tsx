@@ -1,7 +1,9 @@
+import "./NoMatchPage.scss";
+
 function NoMatchPage() {
     // TODO: перепилить егеря из сборки в ссылку на статику
     return (
-        <div className="content container is-widescreen has-text-centered">
+        <div className="page-404">
             <h1>404 Page</h1>
 
             <img

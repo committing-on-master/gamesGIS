@@ -15,21 +15,20 @@ export const Navbar = () => {
 
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation">
-      <a className="navbar-item" href="/">
-        <img src={logo} width="32" height="32" alt="logo" />
-      </a>
+        <div className="navbar__start">
+          <a className="navbar__icon" href="/">
+            <img src={logo} width="32" height="32" alt="logo" />
+          </a>
+          <Link className="navbar__item" to="/">Home</Link>
+          <Link className="navbar__item" to="about">About</Link>
 
-      <div className="navbar-start">
-        <Link className="navbar-item" to="/">Home</Link>
-        <Link className="navbar-item" to="about">About</Link>
+          {userName && <Link className="navbar__item" to="howto">How to</Link>}
+          {userName && <Link className="navbar__item" to="mymaps">My maps</Link>}
+        </div>
 
-        {userName && <Link className="navbar-item" to="howto">How to</Link>}
-        {userName && <Link className="navbar-item" to="mymaps">My maps</Link>}
-      </div>
-
-      <div className="navbar-end">
+        <div className="navbar__end">
           <UserElement userName={userName} />
-      </div>
-    </nav >
+        </div>
+    </nav>
   );
 }

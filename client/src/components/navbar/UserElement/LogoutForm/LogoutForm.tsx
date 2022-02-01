@@ -2,12 +2,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSignOutAlt, faUserCog } from '@fortawesome/free-solid-svg-icons'
 import { useAppDispatch } from '../../../../store/hooks'
 import { logoutUser } from '../../../../store/account/thunks';
-import "./LogoutForm.scss";
-import { Button } from '../../../Button';
 import { Link } from 'react-router-dom';
 
+import "./LogoutForm.scss";
+
 interface LogoutProps {
-    onSuccessfullyProcess?(): void;
+    onLogout?(): void;
 }
 
 function LogoutForm(props: LogoutProps) {
@@ -15,36 +15,21 @@ function LogoutForm(props: LogoutProps) {
 
     const handleLogout = () => {
         dispatch(logoutUser());
-        if (props.onSuccessfullyProcess) {
-            props.onSuccessfullyProcess();
+        if (props.onLogout) {
+            props.onLogout();
         }
     }
 
     return (
         <div className="logout-form">
             <Link to={"/profile"}>Profile</Link>
-            <hr/>
-            <span className="icon is-small">
-                <FontAwesomeIcon icon={faSignOutAlt} />
-            </span>
-            <Button size='small' label="Logout" onClick={handleLogout}/>
-            {/* <a href="#" className="dropdown-item">
-                <span className="icon is-small">
-                    <FontAwesomeIcon icon={faUserCog} />
+            <hr />
+            <button className="button button-danger" onClick={handleLogout}>
+                <span className="icon">
+                    <FontAwesomeIcon icon={faSignOutAlt} />
                 </span>
-                <span> Settings</span>
-            </a>
-
-            <div>
-                <button className="button is-link" onClick={handleLogout} >
-                    <span className="icon is-small">
-                        <FontAwesomeIcon icon={faSignOutAlt} />
-                    </span>
-                    <span>
-                        Logout
-                    </span>
-                </button>
-            </div> */}
+                Logout
+            </button>
         </div>
     )
 }
