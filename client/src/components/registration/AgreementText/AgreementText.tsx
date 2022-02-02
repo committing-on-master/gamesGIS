@@ -4,6 +4,8 @@ import { AgreementDTO } from "./../../../api/dto/response/AgreementDTO";
 import { AwaitingComponent } from "./../../common/AwaitingComponent";
 import { WarningComponent } from "./../../common/WarningComponent";
 
+import "./AgreementText.scss";
+
 interface AgreementTextProps {
     endPoint: string;
     onTextLoaded(): void;
@@ -21,9 +23,9 @@ function AgreementText(props: AgreementTextProps) {
             .then(response => {
                 if (response.ok && response.success) {
                     setComponentStatus("loaded");
+                    console.log(response.success?.payload?.agreementText);
                     setText(response.success?.payload?.agreementText);
                     props.onTextLoaded();
-                    return Promise.resolve();
                 } else {
                     switch (response.code) {
                         case 404:
@@ -53,25 +55,26 @@ function AgreementText(props: AgreementTextProps) {
     switch (componentStatus) {
         case "loading":
             content =
-                <AwaitingComponent>
+                <AwaitingComponent size="large">
                     <p>{text}</p>
                 </AwaitingComponent>
             break;
         case "loaded":
-            content = <div className="content">{text}</div>;
+            content = <div className="agreement-text">{text}</div>;
             break;
         default:
             content =
-                <WarningComponent>
+                <WarningComponent size="large">
                     <p>{text}</p>
                 </WarningComponent>
             break;
     }
 
     return (
-        <section className="modal-card-body">
+        <>
             {content}
-        </section>);
+        </>
+    );
 }
 
 export { AgreementText }

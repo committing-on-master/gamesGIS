@@ -9,6 +9,8 @@ import { useState } from "react";
 import { nameofPropChecker } from "../../../api/nameofPropChecker";
 import { ErrorDTO } from "../../../api/dto/response/ErrorDTO";
 
+import "./RegistrationForm.scss";
+
 interface RegistrationFormProps {
     onRegistered?(userData: Inputs): void;
     endPoint: string;
@@ -36,7 +38,7 @@ function RegistrationForm(props: RegistrationFormProps) {
 
         RequestWrapper.endPoint(props.endPoint).post(requestBody).send<null, ErrorDTO>()
             .then(res => {
-                if (res.ok) {                    
+                if (res.ok) {
                     if (props.onRegistered) {
                         props.onRegistered(data);
                     }
@@ -78,69 +80,61 @@ function RegistrationForm(props: RegistrationFormProps) {
     }
 
     return (
-        <div className="p-3">
+        <form className="registration-form" onSubmit={handleSubmit(onSubmit)}>
 
-            <form onSubmit={handleSubmit(onSubmit)}>
-
-                <div className="field">
-                    <label className="label">Email</label>
-                    <div className="control has-icons-left">
-                        <input className="input" type="email" placeholder="User email ..." {...register("userEmail", SchemaValidation.Email)} />
-                        <span className="icon is-small is-left">
-                            <FontAwesomeIcon icon={faEnvelope} />
-                        </span>
-                    </div>
-                    {errors.userEmail && <p className="help is-danger">{errors.userEmail.message}</p>}
+            <div className="form-input-block">
+                <label >Email</label>
+                <div className="control">
+                    <span className="icon">
+                        <FontAwesomeIcon icon={faEnvelope} />
+                    </span>
+                    <input className="input" type="email" placeholder="User email ..." {...register("userEmail", SchemaValidation.Email)} />
                 </div>
+                {errors.userEmail && <p className="error">{errors.userEmail.message}</p>}
+            </div>
 
-                <div className="field">
-                    <label className="label">Name</label>
-                    <div className="control has-icons-left">
-                        <input className="input" type="text" placeholder="User name ..." {...register("userName", SchemaValidation.Name)} />
-                        <span className="icon is-small is-left">
-                            <FontAwesomeIcon icon={faUser} />
-                        </span>
-                    </div>
-                    {errors.userName && <p className="help is-danger">{errors.userName.message}</p>}
+            <div className="form-input-block">
+                <label className="label">Name</label>
+                <div className="control">
+                    <span className="icon is-small is-left">
+                        <FontAwesomeIcon icon={faUser} />
+                    </span>
+                    <input className="input" type="text" placeholder="User name ..." {...register("userName", SchemaValidation.Name)} />
                 </div>
+                {errors.userName && <p className="error">{errors.userName.message}</p>}
+            </div>
 
-                <div className="field">
-                    <label className="label">Password</label>
-                    <div className="control has-icons-left">
-                        <input className="input" type="password" placeholder="User password ..." {...register("userPassword", SchemaValidation.Password)} />
-                        <span className="icon is-small is-left">
-                            <FontAwesomeIcon icon={faKey} />
-                        </span>
-                    </div>
-                    {errors.userPassword && <p className="help is-danger">{errors.userPassword.message}</p>}
+            <div className="form-input-block">
+                <label className="label">Password</label>
+                <div className="control">
+                    <span className="icon is-small is-left">
+                        <FontAwesomeIcon icon={faKey} />
+                    </span>
+                    <input className="input" type="password" placeholder="User password ..." {...register("userPassword", SchemaValidation.Password)} />
                 </div>
+                {errors.userPassword && <p className="error">{errors.userPassword.message}</p>}
+            </div>
 
-                <div className="field">
-                    <label className="label">Confirm Password</label>
-                    <div className="control has-icons-left">
-                        <input className="input" type="password" placeholder="User password ..."
-                            {...register("userPasswordConfirm", {
-                                validate: fieldValue => {
-                                    return fieldValue === watch().userPassword || "Passwords not matching";
-                                }
-                            })} />
-                        <span className="icon is-small is-left">
-                            <FontAwesomeIcon icon={faKey} />
-                        </span>
-                    </div>
-                    {errors.userPasswordConfirm && <p className="help is-danger">{errors.userPasswordConfirm.message}</p>}
+            <div className="form-input-block">
+                <label className="label">Confirm Password</label>
+                <div className="control">
+                    <span className="icon is-small is-left">
+                        <FontAwesomeIcon icon={faKey} />
+                    </span>
+                    <input className="input" type="password" placeholder="User password ..."
+                        {...register("userPasswordConfirm", {
+                            validate: fieldValue => {
+                                return fieldValue === watch().userPassword || "Passwords not matching";
+                            }
+                        })} />
                 </div>
-                <div className="field is-grouped">
-                    <div className="control">
-                        <button type="submit" className="button is-success">Registration</button>
-                    </div>
-                    <div className="control">
-                        {unexpectedError.length !==0 && <p className="help is-danger">{unexpectedError}</p>}
-                    </div>
-                </div>
-
-            </form>
-        </div>
+                {errors.userPasswordConfirm && <p className="error">{errors.userPasswordConfirm.message}</p>}
+            </div>
+            <div className="form-controls">
+                <button type="submit" className="button button--primary">Registration</button>
+                {unexpectedError.length !== 0 && <p className="error">{unexpectedError}</p>}
+            </div>
+        </form>
     )
 }
 

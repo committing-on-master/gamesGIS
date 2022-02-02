@@ -6,7 +6,7 @@ import httpErrors from "http-errors";
 import {ServicesLayer} from "./../../services-layer/services.layer";
 import {TokenInjection} from "./../../infrastructure/token.injection";
 import {CommonController} from "./../common.controller";
-import {GetAgreementDto} from "./../../services-layer/agreements/models/get.agreement.dto";
+import {AgreementDto} from "../../services-layer/agreements/models/agreement.dto";
 
 @injectable()
 class AgreementsController extends CommonController {
@@ -24,11 +24,11 @@ class AgreementsController extends CommonController {
         if (!agreement) {
             throw new httpErrors.NotFound("user license not found");
         }
-        const result: GetAgreementDto = {
+        const agreementDto: AgreementDto = {
             version: agreement.version,
             agreementText: agreement.agreementBody,
         };
-        return res.status(200).json({message: `Agreement version: ${result.version}`, payload: result.agreementText});
+        return res.status(200).json({message: "loaded", payload: agreementDto});
     }
 }
 

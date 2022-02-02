@@ -3,8 +3,12 @@ import { Inputs, RegistrationForm } from '../components/registration/Registratio
 import { LicenseAgreement } from './../components/registration/LicenseAgreement';
 import { useAppDispatch } from '../store/hooks';
 import { loginUser } from '../store/account/thunks';
+import { useState } from 'react';
+
+import "./RegistrationPage.scss";
 
 function RegistrationPage() {
+    const [confirmation, setConfirmation] = useState(true);
     const dispatch = useAppDispatch();
     const routerNav = useNavigate();
 
@@ -20,15 +24,13 @@ function RegistrationPage() {
     }
 
     return (
-        <article className="container is-max-desktop message is-info">
-            <LicenseAgreement endPoint="agreement" onCancel={handleCancel} />
-            <div className="message-header">
-                <p>Registration form</p>
-            </div>
+        <div className="registration-container">
+            { confirmation && <LicenseAgreement endPoint="agreement" onCancel={handleCancel} onConfirm={() => setConfirmation(false)} /> }
+            <h2>Registration form</h2>
             <div className="message-body">
                 <RegistrationForm endPoint="users" onRegistered={handleRegistration}/>
             </div>
-        </article>
+        </div>
     )
 }
 

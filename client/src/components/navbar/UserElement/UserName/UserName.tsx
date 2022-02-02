@@ -11,7 +11,7 @@ export interface IUserProps {
 
 const UserName = (props: IUserProps) => {
     return (
-        <button className="button button-primary user-name-container" onClick={props.onClick}>
+        <button className="button button--primary user-name-container" onClick={props.onClick}>
             <span className="icon">
                 <FontAwesomeIcon icon={faUser} />
             </span>

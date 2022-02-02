@@ -9,18 +9,25 @@ interface WarningComponentProps {
     children?: React.ReactNode;
 }
 
-export function WarningComponent({size = "medium", ...props}: WarningComponentProps) {
-    const cssClass = classNames(
+export function WarningComponent({ size = "medium", ...props }: WarningComponentProps) {
+    const componentCss = classNames(
+        "component-warning",
+        {
+            "component-warning--inline": size === "small"
+        }
+    );
+    const iconCss = classNames(
         "fas-warn",
         {
             "fa-xs": size === "small",
+            "fas-warn-inline": size === "small",
             "fa-1x": size === "medium",
             "fa-5x": size === "large",
         }
     );
     return (
-        <div>
-            <FontAwesomeIcon className={cssClass} icon={faExclamationTriangle} />
+        <div className={componentCss}>
+            <FontAwesomeIcon className={iconCss} icon={faExclamationTriangle} />
             {props.children ?? props.children}
         </div>
     );

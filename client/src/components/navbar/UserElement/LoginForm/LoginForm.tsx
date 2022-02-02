@@ -8,8 +8,9 @@ import { loginUser } from "../../../../store/account/thunks";
 import { ErrorDTO } from "../../../../api/dto/response/ErrorDTO";
 import { nameofPropChecker } from "../../../../api/nameofPropChecker";
 import { AuthDTO } from "../../../../api/dto/request/AuthDTO";
-import "./LoginForm.scss";
 import { LinkButton } from "../../../common/LinkButton";
+
+import "./LoginForm.scss";
 
 type Inputs = {
     userPassword: string,
@@ -78,7 +79,7 @@ function LoginForm(props: LoginFormProps) {
                         </span>
                         <input className="input" type="email" placeholder="User email ..." {...register("userEmail", SchemaValidation.Email)} />
                     </div>
-                    {errors.userEmail && <p className="help is-danger">{errors.userEmail.message}</p>}
+                    {errors.userEmail && <p className="error">{errors.userEmail.message}</p>}
                 </div>
 
                 <div className="form-input-block">
@@ -89,11 +90,11 @@ function LoginForm(props: LoginFormProps) {
                         </span>
                         <input className="input" type="password" placeholder="User password ..." {...register("userPassword", SchemaValidation.Password)} />
                     </div>
-                    {errors.userPassword && <p className="help is-danger">{errors.userPassword.message}</p>}
+                    {errors.userPassword && <p className="error">{errors.userPassword.message}</p>}
                 </div>
 
                 <div className="form-controls">
-                    <button type="submit" className="button button-primary">Login</button>
+                    <button type="submit" className="button button--primary">Login</button>
                     <LinkButton className="button" onClick={props.onRegistrationRedirect} to="registration">Registration</LinkButton>
                 </div>
             </form>

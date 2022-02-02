@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { AgreementText } from "../AgreementText";
 
+import "./LicenseAgreement.scss";
+
 interface LicenseAgreementProps {
     /**endpoint с которого будет загружено пользовательское соглашение */
     endPoint: string;
@@ -12,30 +14,22 @@ interface LicenseAgreementProps {
 
 function LicenseAgreement(props: LicenseAgreementProps) {
     const [agreementTextLoading, setAgreementTextLoading] = useState(true);
-    const [modalVisibility, setModalVisibility] = useState(true);
 
     function onAgreementTestLoaded() {
         setAgreementTextLoading(false);
     }
 
-    function handleConfirm() {
-        setModalVisibility(false);
-    }
-    
-    const modalClass = modalVisibility? "modal is-active" : "modal";
-
     return (
-        <div className={modalClass}>
-            <div className="modal-background"></div>
-            <div className="modal-card">
-                <header className="modal-card-head">
-                    <p className="modal-card-title">License agreement</p>
-                    <button className="delete" aria-label="close" onClick={props.onCancel}></button>
+        <div className="license-shadow">
+            <div className="license">
+                <header className="license-header">
+                    <h2>License agreement</h2>
+                    <button className="license-close button button--danger" aria-label="close" onClick={props.onCancel}>×</button>
                 </header>
-                <AgreementText endPoint={props.endPoint} onTextLoaded={onAgreementTestLoaded}/>
-                <footer className="modal-card-foot">
-                    <button className="button is-success" disabled={agreementTextLoading} onClick={handleConfirm}>Agree</button>
-                    <button className="button" onClick={props.onCancel}>Cancel</button>
+                <AgreementText endPoint={props.endPoint} onTextLoaded={onAgreementTestLoaded} />
+                <footer className="license-footer">
+                    <button className="button button--primary" disabled={agreementTextLoading} onClick={props.onConfirm}>Agree</button>
+                    <button className="button button--danger" onClick={props.onCancel}>Cancel</button>
                 </footer>
             </div>
         </div>

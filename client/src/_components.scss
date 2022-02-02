@@ -12,15 +12,20 @@
     cursor: pointer;
     
     background-color: $button-color;
+
     &:hover {
         border: $button-border-thin solid black;
     }
 
-    &-primary {
+    &:disabled {
+        cursor: not-allowed;
+    }
+
+    &--primary {
         background-color: $button-color-primary;
     }
 
-    &-danger {
+    &--danger {
         background-color: $button-color-danger;
     }
 }
@@ -41,6 +46,7 @@ span.icon {
     border: $input-border-thin solid transparent;
     height: 2em;
     font-size: 0.9rem;
+    background-color: $input-background-color;
     // align-items: center;
     // border: ;
     // box-shadow: none;

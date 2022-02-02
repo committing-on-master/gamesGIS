@@ -9,19 +9,27 @@ interface AwaitingComponentProps {
     children?: React.ReactNode;
 }
 
-export function AwaitingComponent(props: AwaitingComponentProps) {
-    const cssClass = classNames(
+export function AwaitingComponent({ size = "medium", ...props }: AwaitingComponentProps) {
+    const componentCss = classNames(
+        "component-awaiting",
+        {
+            "component-awaiting--inline": size === "small"
+        }
+    );
+
+    const iconCss = classNames(
         "fas-await",
         "fa-pulse",
         {
-            "fa-xs": props.size === "small",
-            "fa-1x": props.size === "medium",
-            "fa-5x": props.size === "large",
+            "fa-xs": size === "small",
+            "fas-await--inline": size === "small",
+            "fa-1x": size === "medium",
+            "fa-5x": size === "large",
         }
     );
     return (
-        <div>
-            <FontAwesomeIcon className={cssClass} icon={faSpinner} />
+        <div className={componentCss}>
+            <FontAwesomeIcon className={iconCss} icon={faSpinner} />
             {props.children ?? props.children}
         </div>
     );

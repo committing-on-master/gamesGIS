@@ -7,7 +7,7 @@ export default {
     title: 'registration/AgreementText',
     component: AgreementText,
     decorators: [(Story) =>
-        <div className="modal-card">
+        <div>
             <Story />
         </div>]
 } as ComponentMeta<typeof AgreementText>;

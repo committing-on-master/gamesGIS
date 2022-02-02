@@ -19,7 +19,7 @@ SuccessLoad.play = () => {
     fetchMock
         .restore()
         .get(
-            "http://localhost:3000/SuccessLoad",
+            "http://localhost:3000/api/SuccessLoad",
             {
                 status: 200,
                 headers: { "Content-Type": "application/json" },
@@ -41,7 +41,7 @@ SuccessLoad4sDelay.play = () => {
     fetchMock
         .restore()
         .get(
-            "http://localhost:3000/SuccessLoad4sDelay",
+            "http://localhost:3000/api/SuccessLoad4sDelay",
             {
                 status: 200,
                 headers: { "Content-Type": "application/json" },
