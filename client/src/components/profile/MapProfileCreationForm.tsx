@@ -7,6 +7,51 @@ import { RequestWrapper } from "../../api/JsonRequestWrapper";
 import { SchemaValidation } from "./schemaValidation";
 
 import "./MapProfileCreationForm.scss";
+import { AreaChoicer, ChoicerAreaType } from "./AreaChoicer/AreaChoicer";
+
+const previewUrl = (name: string) => `${process.env.PUBLIC_URL ?? "localhost:3001"}/img/maps/${name}.png`;
+const areas: ChoicerAreaType[] = [
+    {
+        map: MapType.Woods,
+        name: "Woods",
+        url: previewUrl("Woods")
+    },
+    {
+        map: MapType.Factory,
+        name: "Factory",
+        url: previewUrl("Factory")
+    },
+    {
+        map: MapType.Customs,
+        name: "Customs",
+        url: previewUrl("Customs")
+    },
+    {
+        map: MapType.Interchange,
+        name: "Interchange",
+        url: previewUrl("Interchange")
+    },
+    {
+        map: MapType.Labs,
+        name: "Labs",
+        url: previewUrl("Labs")
+    },
+    {
+        map: MapType.Shoreline,
+        name: "Shoreline",
+        url: previewUrl("Shoreline")
+    },
+    {
+        map: MapType.Reserve,
+        name: "Reserve",
+        url: previewUrl("Reserve")
+    },
+    {
+        map: MapType.Lighthouse,
+        name: "Lighthouse",
+        url: previewUrl("Lighthouse")
+    },
+]
 
 type CreatingMapProfile = {
     profileName: string;
@@ -18,7 +63,7 @@ interface ProfileCreationProps {
 }
 
 function MapProfileCreationForm(props: ProfileCreationProps) {
-    const { register, handleSubmit, setError, reset, formState: { errors }, watch } = useForm<CreatingMapProfile>();
+    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<CreatingMapProfile>();
     const [backendError, setBackendError] = useState<string | undefined>(undefined);
 
     const onSubmit: SubmitHandler<CreatingMapProfile> = (data) => {
@@ -44,28 +89,21 @@ function MapProfileCreationForm(props: ProfileCreationProps) {
             });
     }
 
-    const RadioGroup: JSX.Element[] = [];
-    for (let index = 0; index < Object.keys(MapType).length / 2; ++index) {
-        RadioGroup.push(<input type="radio" value={index} {...register("map")}/>);
-        RadioGroup.push(<label>{MapType[index]}</label>);
-    }    
-
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
-            <div>
+        <form className="profile-creation-form" onSubmit={handleSubmit(onSubmit)}>
+            <div className="form-input-block">
                 <label>Name</label>
-                <input type="text" placeholder="profile name ..." {...register("profileName", SchemaValidation.ProfileName)} />
-                {errors.profileName && <p>{errors.profileName.message}</p>}
+                <input className="input" type="text" placeholder="profile name ..." {...register("profileName", SchemaValidation.ProfileName)} />
+                {errors.profileName && <p className="error">{errors.profileName.message}</p>}
             </div>
 
-            <div>
+            <div className="form-input-block">
                 <label>Map</label>
-                <br/>
-
-                {RadioGroup}
-                {errors.profileName && <p>{errors.profileName.message}</p>}
+                <input type="number" hidden={true} {...register("map", SchemaValidation.Map)} />
+                <AreaChoicer areas={areas} onChoiseChanged={(map) => {setValue("map", map)}} />
+                {errors.map && <p className="error">{errors.map.message}</p>}
             </div>
-            <button>Create</button>
+            <button className="button button--primary">Create</button>
             {backendError && <p>{backendError}</p>}
         </form>
     )

@@ -59,14 +59,14 @@
     "supports es6-module"
   ],
   "devDependencies": {
-    "@storybook/addon-actions": "^6.4.14",
-    "@storybook/addon-essentials": "^6.4.14",
-    "@storybook/addon-links": "^6.4.14",
-    "@storybook/builder-webpack5": "^6.4.14",
-    "@storybook/manager-webpack5": "^6.4.14",
-    "@storybook/node-logger": "^6.4.14",
+    "@storybook/addon-actions": "^6.4.17",
+    "@storybook/addon-essentials": "^6.4.17",
+    "@storybook/addon-links": "^6.4.17",
+    "@storybook/builder-webpack5": "^6.4.17",
+    "@storybook/manager-webpack5": "^6.4.17",
+    "@storybook/node-logger": "^6.4.17",
     "@storybook/preset-create-react-app": "^4.0.0",
-    "@storybook/react": "^6.4.14",
+    "@storybook/react": "^6.4.17",
     "fetch-mock": "^9.11.0",
     "lorem-ipsum": "^2.0.4",
     "webpack": "^5.67.0"

@@ -2,6 +2,7 @@ import { ComponentStory, ComponentMeta } from '@storybook/react';
 import fetchMock from 'fetch-mock';
 import { RegistrationForm } from './RegistrationForm';
 import { ErrorDTO } from '../../../api/dto/response/ErrorDTO';
+import { loremIpsum } from "lorem-ipsum";
 
 export default {
     title: 'registration/RegistrationForm',
@@ -72,7 +73,7 @@ FailureNetworkError.play = () => {
         .post(
             "http://localhost:3000/users/NetworkError",
             {
-                throws: new Error("DNS blah-blah something")
+                throws: new Error(loremIpsum({count: 1, format: 'plain', units: 'paragraphs' }))
             },
             {
                 delay: 250
