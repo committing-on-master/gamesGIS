@@ -20,6 +20,12 @@
             "server": true, // добавлено в workspace как backend директория
             "coverage": true,
 			"static data": true
-        }
+        },
+		"search.exclude": {
+			"**/node_modules": true,
+			"**/bower_components": true,
+			"**/*.code-search": true,
+			"**/package-lock.json": true,
+		}
 	}
 }

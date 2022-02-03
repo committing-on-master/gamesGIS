@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { MapProfileDTO } from "../../api/dto/request/MapProfileDTO";
-import { ErrorDTO } from "../../api/dto/response/ErrorDTO";
-import { MapType } from "../../api/dto/types/MapType";
-import { RequestWrapper } from "../../api/JsonRequestWrapper";
+import { MapProfileDTO } from "./../../../api/dto/request/MapProfileDTO";
+import { ErrorDTO } from "./../../../api/dto/response/ErrorDTO";
+import { MapType } from "./../../../api/dto/types/MapType";
+import { RequestWrapper } from "./../../../api/JsonRequestWrapper";
 import { SchemaValidation } from "./schemaValidation";
 
 import "./MapProfileCreationForm.scss";
-import { AreaChoicer, ChoicerAreaType } from "./AreaChoicer/AreaChoicer";
+import { AreaChoicer, ChoicerAreaType } from "./../AreaChoicer";
 
 const previewUrl = (name: string) => `${process.env.PUBLIC_URL ?? "localhost:3001"}/img/maps/${name}.png`;
 const areas: ChoicerAreaType[] = [
@@ -63,14 +63,15 @@ interface ProfileCreationProps {
 }
 
 function MapProfileCreationForm(props: ProfileCreationProps) {
-    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<CreatingMapProfile>();
+    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<CreatingMapProfile>({defaultValues: {map: MapType.Woods}});
     const [backendError, setBackendError] = useState<string | undefined>(undefined);
 
     const onSubmit: SubmitHandler<CreatingMapProfile> = (data) => {
         const body: MapProfileDTO = {
+            profileName: data.profileName,
             map: data.map
         }
-        RequestWrapper.endPoint(`map-profile/${data.profileName}`).withAuth().post(body).send<null, ErrorDTO>()
+        RequestWrapper.endPoint("map-profiles").withAuth().post(body).send<null, ErrorDTO>()
             .then(res => {
                 if (res.ok) {
                     if (props.onCreated) {
@@ -104,7 +105,7 @@ function MapProfileCreationForm(props: ProfileCreationProps) {
                 {errors.map && <p className="error">{errors.map.message}</p>}
             </div>
             <button className="button button--primary">Create</button>
-            {backendError && <p>{backendError}</p>}
+            {backendError && <p className="error">{backendError}</p>}
         </form>
     )
 }

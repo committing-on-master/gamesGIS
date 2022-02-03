@@ -1,1 +1,1 @@
-export { AreaChoicer } from "./AreaChoicer";
+export { AreaChoicer, type ChoicerAreaType } from "./AreaChoicer";

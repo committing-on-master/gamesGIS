@@ -1,12 +1,12 @@
 form.profile-creation-form {
+    p.error{
+        color: red;margin-top: 0;
+        font-size: .9rem;
+    }
     div.form-input-block {
         input[type=text] {
             display: block;
             width: 100%;
-        }
-        p.error{
-            color: red;margin-top: 0;
-            font-size: .9rem;
         }
     }
     button {

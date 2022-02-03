@@ -17,7 +17,8 @@ class MapProfileMiddleware extends CommonMiddleware {
         super(logger, "MapProfileMiddleware");
         this.services = services;
 
-        this.validateProfileAuthorship = this.validateProfileAuthorship.bind(this);
+        this.validateProfileNameAuthorship = this.validateProfileNameAuthorship.bind(this);
+        this.validateProfileIdAuthorship = this.validateProfileIdAuthorship.bind(this);
     }
 
     /**
@@ -27,15 +28,33 @@ class MapProfileMiddleware extends CommonMiddleware {
      * @param {express.NextFunction} next
      * @return {void}
      * */
-    public async validateProfileAuthorship(
+    public async validateProfileNameAuthorship(
         req: express.Request,
         res: express.Response,
         next: express.NextFunction,
     ) {
         const profileName: string = req.body.profileName;
-        const userId = await this.services.MapProfiles.getProfileAuthorId(profileName);
+        const userId = await this.services.MapProfiles.getAuthorIdByProfileName(profileName);
         if (!userId) {
             throw new httpErrors[404](`Profile with name "${profileName}" not found`);
+        }
+
+        const jwtToken = res.locals.jwt as JwtPayload;
+        if (userId === jwtToken.userId) {
+            return next();
+        }
+        throw new httpErrors.Forbidden("You do not have permission to edit this map profile");
+    }
+
+    public async validateProfileIdAuthorship(
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction,
+    ) {
+        const profileId: number = req.body.profileId;
+        const userId = await this.services.MapProfiles.getAuthorIdByProfileId(profileId);
+        if (!userId) {
+            throw new httpErrors[404](`Profile with id "${profileId}" not found`);
         }
 
         const jwtToken = res.locals.jwt as JwtPayload;

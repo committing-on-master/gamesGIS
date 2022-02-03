@@ -39,11 +39,8 @@ class MapProfileRoutes extends CommonRoutesConfig {
 
     protected configureRoute(route: Router): Router {
         route
-            .param("profileName", this.mapProfileMiddleware.extractParamToBody);
-
-        route
-            .route("/map-profile/:profileName")
-            .get(asyncWrapper(this.mapProfileController.getProfile))
+            .route("/map-profiles")
+            .get(asyncWrapper(this.mapProfileController.getProfiles))
             .post(
                 this.authMiddleware.jwtTokenValidation(),
                 this.permissionMiddleware.permissionFlagRequired(PermissionFlag.APPROVED_USER),
@@ -52,25 +49,37 @@ class MapProfileRoutes extends CommonRoutesConfig {
             );
 
         route
-            .route("/map-profile/:profileName/markers")
+            .param("profileId", this.mapProfileMiddleware.extractParamToBody);
+        route
+            .route("/map-profiles/:profileId")
+            .all(
+                this.authMiddleware.jwtTokenValidation(),
+                asyncWrapper(this.mapProfileMiddleware.validateProfileIdAuthorship),
+            )
+            .put(asyncWrapper(this.mapProfileController.updateMapProfile))
+            .delete(asyncWrapper(this.mapProfileController.deleteMapProfile));
+
+        route
+            .param("profileName", this.mapProfileMiddleware.extractParamToBody);
+        route
+            .route("/map-profiles/:profileName/markers")
             .get(asyncWrapper(this.mapProfileController.getMarkers))
             .post(
                 this.authMiddleware.jwtTokenValidation(),
                 this.permissionMiddleware.permissionFlagRequired(PermissionFlag.APPROVED_USER),
-                asyncWrapper(this.mapProfileMiddleware.validateProfileAuthorship),
+                asyncWrapper(this.mapProfileMiddleware.validateProfileNameAuthorship),
                 asyncWrapper(this.mapProfileMiddleware.validateRequestSchema(checkSchema(markerDtoSchema))),
                 asyncWrapper(this.mapProfileController.createMarker),
             );
 
         route
             .param("markerId", this.mapProfileMiddleware.extractParamToBody);
-
         route
-            .route("/map-profile/:profileName/markers/:markerId")
+            .route("/map-profiles/:profileName/markers/:markerId")
             .all(
                 this.authMiddleware.jwtTokenValidation(),
                 this.permissionMiddleware.permissionFlagRequired(PermissionFlag.APPROVED_USER),
-                asyncWrapper(this.mapProfileMiddleware.validateProfileAuthorship),
+                asyncWrapper(this.mapProfileMiddleware.validateProfileNameAuthorship),
             )
             .delete(asyncWrapper(this.mapProfileController.deleteMarker))
             .put(

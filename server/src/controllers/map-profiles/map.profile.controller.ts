@@ -24,6 +24,7 @@ class MapProfileController extends CommonController {
         this.createMarker = this.createMarker.bind(this);
         this.updateMarker = this.updateMarker.bind(this);
         this.deleteMarker = this.deleteMarker.bind(this);
+        this.getProfiles = this.getProfiles.bind(this);
     }
     public async createProfile(req: express.Request, res: express.Response) {
         const userId = (res.locals.jwt as JwtPayload).userId;
@@ -71,6 +72,13 @@ class MapProfileController extends CommonController {
         return res.status(200).json({message: "ok", payload: response});
     }
 
+    public async deleteMapProfile(req: express.Request, res: express.Response) {
+        throw new Error("Method deleteMapProfile not implemented.");
+    }
+    public async updateMapProfile(req: express.Request, res: express.Response) {
+        throw new Error("Method updateMapProfile not implemented.");
+    }
+
     private mapMarker(marker: MarkerDao): MarkerDto {
         return {
             id: marker.id,
@@ -89,11 +97,34 @@ class MapProfileController extends CommonController {
             }),
         };
     }
+
     public async deleteMarker(req: express.Request, res: express.Response) {
         const markerId: number = req.body.markerId;
 
         await this.services.MapProfiles.deleteMarker(markerId);
         return res.status(200).json({message: "ok"});
+    }
+
+    public async getProfiles(req: express.Request, res: express.Response) {
+        const nameQuery = req.query.name;
+        if (nameQuery && typeof nameQuery === "string") {
+            const result = await this.services.MapProfiles.getProfile(nameQuery);
+            if (!result) {
+                throw new httpErrors.NotFound(`map profile with name: ${nameQuery} not found`);
+            }
+            return res.status(200).json({message: "ok", payload: result});
+        }
+
+        const userId = req.query.userId;
+        if (userId && typeof userId === "string") {
+            const parsedId = parseInt(userId, 10);
+            if (Number.isInteger(parsedId)) {
+                const result = await this.services.MapProfiles.getProfilesByUserId(parseInt(userId, 10));
+                return res.status(200).json({message: "ok", payload: result});
+            }
+            throw new httpErrors.BadRequest(`userId parameter: ${userId} is not a integer`);
+        }
+        throw new httpErrors.NotAcceptable("getting all maps profiles is not currently allowed");
     }
 }
 

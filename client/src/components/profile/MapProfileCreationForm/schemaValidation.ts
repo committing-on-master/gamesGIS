@@ -1,5 +1,5 @@
 import { RegisterOptions } from "react-hook-form";
-import { MapType } from "../../api/dto/types/MapType";
+import { MapType } from "./../../../api/dto/types/MapType";
 
 class SchemaValidation {
     static get ProfileName(): RegisterOptions {

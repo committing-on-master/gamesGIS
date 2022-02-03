@@ -20,11 +20,10 @@ interface ProfileArg {
     maxZoom: number
 }
 
-// export const loginUser = createAsyncThunk<result back to initial, Action inside store>() {
 export const fetchMapProfile = createAsyncThunk<ProfileArg, string>(
     "mapProfile/fetching",
     async (profileName: string, thunkApi) => {
-        return RequestWrapper.endPoint(`/map-profile/${profileName}`).get().send<ProfileMapDTO, ErrorResponse>()
+        return RequestWrapper.endPoint(`/map-profiles?name=${profileName}`).get().send<ProfileMapDTO, ErrorResponse>()
             .then(res => {
                 if (res.ok && res.success) {
                     const resultBody = res.success.payload;

@@ -21,9 +21,9 @@ export const saveEditingMarker = createAsyncThunk<MarkerType, ThunkArg, {state: 
         
         let response: Result<MarkerDTO, ErrorDTO>;
         if (marker.state === EditingState.New) {
-            response = await RequestWrapper.endPoint(`map-profile/${profileName}/markers`).withAuth().post(marker).send<MarkerDTO, ErrorDTO>();
+            response = await RequestWrapper.endPoint(`map-profiles/${profileName}/markers`).withAuth().post(marker).send<MarkerDTO, ErrorDTO>();
         } else {
-            response = await RequestWrapper.endPoint(`map-profile/${profileName}/markers/${marker.id}`).withAuth().put(marker).send<MarkerDTO, ErrorDTO>();
+            response = await RequestWrapper.endPoint(`map-profiles/${profileName}/markers/${marker.id}`).withAuth().put(marker).send<MarkerDTO, ErrorDTO>();
         }
         
         if (response.ok && response.success) {
@@ -37,7 +37,7 @@ export const saveEditingMarker = createAsyncThunk<MarkerType, ThunkArg, {state: 
 export const fetchProfileMarkers = createAsyncThunk(
     "markers/fetching",
     async (profileName: string, thunkApi) => {
-        const response = await RequestWrapper.endPoint(`map-profile/${profileName}/markers`).get().send<MarkersDTO, ErrorDTO>();
+        const response = await RequestWrapper.endPoint(`map-profiles/${profileName}/markers`).get().send<MarkersDTO, ErrorDTO>();
         if (response.ok && response.success) {
             const payload: MarkerType[] = response.success.payload
             return payload;
@@ -50,7 +50,7 @@ export const deleteProfileMarker = createAsyncThunk<number, number, {state: Root
     "markers/deleting",
     async (markerId: number, thunkApi) => {
         const profileName = thunkApi.getState().map.name;
-        const response = await RequestWrapper.endPoint(`map-profile/${profileName}/markers/${markerId}`).withAuth().delete().send<{}, ErrorDTO>();
+        const response = await RequestWrapper.endPoint(`map-profiles/${profileName}/markers/${markerId}`).withAuth().delete().send<{}, ErrorDTO>();
         if (response.ok) {
             return markerId;
         }

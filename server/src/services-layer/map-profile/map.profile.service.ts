@@ -86,7 +86,7 @@ class MapProfileService {
         return this.dataLayer.mapProfileRepository.isProfileExist(profileName);
     };
 
-    public async getProfileAuthorId(profileName: string): Promise<number | undefined> {
+    public async getAuthorIdByProfileName(profileName: string): Promise<number | undefined> {
         return this.dataLayer.mapProfileRepository.getAuthorIdByProfileName(profileName);
     }
 
@@ -148,6 +148,10 @@ class MapProfileService {
         return this.dataLayer.markerRepository.getMarkersWithAreasByProfileName(profileName);
     }
 
+    public async getAuthorIdByProfileId(profileId: number) {
+        return this.dataLayer.mapProfileRepository.getAuthorIdByProfileId(profileId);
+    }
+
     public async deleteMarker(markerId: number) {
         const marker = await this.dataLayer.markerRepository.findMarkerById(markerId, ["area"]);
         if (!marker) {
@@ -169,6 +173,10 @@ class MapProfileService {
         } finally {
             await queryRunner.release();
         }
+    }
+
+    public async getProfilesByUserId(userId: number) {
+        return this.dataLayer.mapProfileRepository.getProfilesByUserId(userId);
     }
 
     private mapMarkerDtoToDao(marker: MarkerDto): MarkerDao {
