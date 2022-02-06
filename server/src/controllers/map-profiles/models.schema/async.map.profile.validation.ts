@@ -1,7 +1,7 @@
 import {body, ValidationChain} from "express-validator";
 import {nameofPropChecker} from "./../../../infrastructure/name.of.prop.checker";
 import {MapProfileService} from "./../../../services-layer/map-profile/map.profile.service";
-import {MapProfileDto} from "./../../../services-layer/map-profile/models/map.profile.dto";
+import {MapProfileDto} from "../../../dto/request/map.profile.dto";
 
 /**
  * Проверка имени на предмет доступности (не занятости)

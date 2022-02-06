@@ -6,7 +6,7 @@ import httpErrors from "http-errors";
 import {ServicesLayer} from "./../../services-layer/services.layer";
 import {TokenInjection} from "./../../infrastructure/token.injection";
 import {CommonController} from "./../common.controller";
-import {AgreementDto} from "../../services-layer/agreements/models/agreement.dto";
+import {AgreementDto} from "../../dto/response/agreement.dto";
 
 @injectable()
 class AgreementsController extends CommonController {

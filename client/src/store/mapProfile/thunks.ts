@@ -4,6 +4,7 @@ import { ProfileMapDTO } from "../../api/dto/response/MapProfileDTO";
 import { MapType } from "../../api/dto/types/MapType";
 import { Point } from "../../api/dto/types/Point";
 import { RequestWrapper } from "../../api/JsonRequestWrapper";
+import { resetMarkers } from "../markers/slice";
 
 interface ProfileArg {
     id: number;
@@ -23,7 +24,7 @@ interface ProfileArg {
 export const fetchMapProfile = createAsyncThunk<ProfileArg, string>(
     "mapProfile/fetching",
     async (profileName: string, thunkApi) => {
-        return RequestWrapper.endPoint(`/map-profiles?name=${profileName}`).get().send<ProfileMapDTO, ErrorResponse>()
+        return RequestWrapper.endPoint(`map-profiles?name=${profileName}`).get().send<ProfileMapDTO, ErrorResponse>()
             .then(res => {
                 if (res.ok && res.success) {
                     const resultBody = res.success.payload;

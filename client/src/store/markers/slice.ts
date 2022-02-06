@@ -42,6 +42,12 @@ const markersSlice = createSlice({
     name: 'markers',
     initialState: initialState,
     reducers: {
+        resetMarkers: (state) => {
+            markersAdapter.removeAll(state.saved);
+            state.editable = {...initialState.editable};
+            state.saved = {...initialState.saved};
+            state.spotlight = {...initialState.spotlight};
+        },
         createNewMarker: (state: MarkersState, action: PayloadAction<string>) => {
             state.editable = { ...initialState.editable };
             state.editable.state = EditingState.New;
@@ -189,5 +195,6 @@ export const {
     turnOnSpotlightHover,
     turnOffSpotlightBlur,
     turnOnSpotlightSelect,
-    turnOffSpotlightClose
+    turnOffSpotlightClose,
+    resetMarkers
 } = markersSlice.actions;

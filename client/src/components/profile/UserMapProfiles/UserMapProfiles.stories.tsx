@@ -1,6 +1,6 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import fetchMock from 'fetch-mock';
-import { MapProfileType } from '../../../api/dto/response/ProfilesDTO';
+import { MapProfileReviewType } from '../../../api/dto/response/ProfilesDTO';
 import { MapType } from '../../../api/dto/types/MapType';
 import { UserMapProfiles } from "./UserMapProfiles";
 
@@ -14,7 +14,7 @@ const Template: ComponentStory<typeof UserMapProfiles> = (args) => <UserMapProfi
 export const Primary = Template.bind({});
 Primary.args = { userId: 32 };
 Primary.play = () => {
-  const data: MapProfileType[] = [
+  const data: MapProfileReviewType[] = [
     {
       id: 1,
       map: MapType.Woods,
@@ -41,7 +41,7 @@ Primary.play = () => {
   fetchMock
       .restore()
       .get(
-          "http://localhost:3000/api/map-profiles?userId=32",
+          "http://localhost:3000/api/map-profiles/review?userId=32",
           {
               status: 200,
               headers: { "Content-Type": "application/json" },
@@ -51,7 +51,7 @@ Primary.play = () => {
               })
           },
           {
-              delay: 4000
+              delay: 100
           }
       )
 }

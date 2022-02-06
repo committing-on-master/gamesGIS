@@ -7,8 +7,9 @@ import {TokenInjection} from "./../../infrastructure/token.injection";
 import {ServicesLayer} from "./../../services-layer/services.layer";
 import {CommonController} from "../common.controller";
 import {JwtPayload} from "../common-types/jwt.payload";
-import {MarkerDto} from "./../../services-layer/map-profile/models/marker.dto";
+import {MarkerDto} from "../../dto/response/marker.dto";
 import {MarkerDao} from "src/data-layer/models/marker.dao";
+import {MapProfileReviewDTO} from "src/dto/response/map.profile.review.dto";
 
 @singleton()
 class MapProfileController extends CommonController {
@@ -25,6 +26,8 @@ class MapProfileController extends CommonController {
         this.updateMarker = this.updateMarker.bind(this);
         this.deleteMarker = this.deleteMarker.bind(this);
         this.getProfiles = this.getProfiles.bind(this);
+        this.getReviewProfiles = this.getReviewProfiles.bind(this);
+        this.deleteMapProfile = this.deleteMapProfile.bind(this);
     }
     public async createProfile(req: express.Request, res: express.Response) {
         const userId = (res.locals.jwt as JwtPayload).userId;
@@ -73,7 +76,9 @@ class MapProfileController extends CommonController {
     }
 
     public async deleteMapProfile(req: express.Request, res: express.Response) {
-        throw new Error("Method deleteMapProfile not implemented.");
+        const profileId: number = req.body.profileId;
+        await this.services.MapProfiles.deleteProfile(profileId);
+        return res.status(200).json({message: "resource deleted successfully"});
     }
     public async updateMapProfile(req: express.Request, res: express.Response) {
         throw new Error("Method updateMapProfile not implemented.");
@@ -114,13 +119,25 @@ class MapProfileController extends CommonController {
             }
             return res.status(200).json({message: "ok", payload: result});
         }
+        throw new httpErrors.NotAcceptable("getting all maps profiles is not currently allowed");
+    }
 
+    public async getReviewProfiles(req: express.Request, res: express.Response) {
         const userId = req.query.userId;
         if (userId && typeof userId === "string") {
             const parsedId = parseInt(userId, 10);
             if (Number.isInteger(parsedId)) {
-                const result = await this.services.MapProfiles.getProfilesByUserId(parseInt(userId, 10));
-                return res.status(200).json({message: "ok", payload: result});
+                const mapProfiles = await this.services.MapProfiles.getProfilesByUserId(parseInt(userId, 10));
+                const response: MapProfileReviewDTO[] = mapProfiles.map((value) => {
+                    return {
+                        id: value.id,
+                        map: value.map.mapType,
+                        creationDate: value.creationDate,
+                        name: value.name,
+                        markersCount: value.markers ? value.markers.length : 0,
+                    };
+                });
+                return res.status(200).json({message: "ok", payload: response});
             }
             throw new httpErrors.BadRequest(`userId parameter: ${userId} is not a integer`);
         }

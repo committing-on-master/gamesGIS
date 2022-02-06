@@ -3,11 +3,11 @@ import winston from "winston";
 import {inject, singleton} from "tsyringe";
 import httpErrors from "http-errors";
 
-import {MapProfileDto} from "./models/map.profile.dto";
+import {MapProfileDto} from "../../dto/request/map.profile.dto";
 import {TokenInjection} from "./../../infrastructure/token.injection";
 import {MapProfileDao} from "./../../data-layer/models/map.profile.dao";
-import {Point, Profile} from "./models/profile";
-import {MarkerDto} from "./models/marker.dto";
+import {Point, Profile} from "../../dto/response/profile";
+import {MarkerDto} from "../../dto/response/marker.dto";
 import {MarkerDao} from "./../../data-layer/models/marker.dao";
 import {CoordinatesDao} from "./../../data-layer/models/coordinates.dao";
 
@@ -175,8 +175,43 @@ class MapProfileService {
         }
     }
 
+    public async deleteProfile(profileId: number) {
+        const profile = await this.dataLayer.mapProfileRepository.findProfileById(profileId, ["markers"]);
+        if (!profile) {
+            return;
+        }
+
+        let coordinatesPromises: Promise<CoordinatesDao[]>[] = [];
+        if (profile.markers) {
+            coordinatesPromises = profile.markers?.map((value) => this.dataLayer.coordinatesRepository.getCoordinatesByMarkerId(value.id));
+        }
+        const coordinates = (await Promise.all(coordinatesPromises))
+            .reduce((previous, current) => {
+                previous.push(...current);
+                return previous;
+            });
+
+        const queryRunner = this.dataLayer.createQueryRunner();
+        try {
+            queryRunner.startTransaction();
+
+            if (profile.markers) {
+                await queryRunner.manager.remove(coordinates);
+                await queryRunner.manager.remove(profile.markers);
+            }
+            await queryRunner.manager.remove(profile);
+            await queryRunner.commitTransaction();
+            return;
+        } catch (err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
     public async getProfilesByUserId(userId: number) {
-        return this.dataLayer.mapProfileRepository.getProfilesByUserId(userId);
+        return this.dataLayer.mapProfileRepository.getProfilesByUserId(userId, ["map", "markers"]);
     }
 
     private mapMarkerDtoToDao(marker: MarkerDto): MarkerDao {

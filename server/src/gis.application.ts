@@ -82,7 +82,7 @@ class GisApplication {
     }
 
     private async dbInitialization(connectionName: string) {
-        const winstonOrm = new WinstonAdaptor(this.logger, ["warn", "error"]);
+        const winstonOrm = new WinstonAdaptor(this.logger, ["warn", "error", "query"]);
         // Берем конфигу из ormconfig файла, и подменяем логгер на уже созданный единый логгер приложения
         this.dbConnection = await getConnectionOptions(connectionName)
             .then((connectionOpt) => {

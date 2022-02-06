@@ -66,4 +66,4 @@ const mapSlice = createSlice({
 
 export const mapReducer = mapSlice.reducer;
 
-export const { } = mapSlice.actions
+// export const { } = mapSlice.actions

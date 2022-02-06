@@ -49,6 +49,9 @@ class MapProfileRoutes extends CommonRoutesConfig {
             );
 
         route
+            .get("/map-profiles/review", asyncWrapper(this.mapProfileController.getReviewProfiles));
+
+        route
             .param("profileId", this.mapProfileMiddleware.extractParamToBody);
         route
             .route("/map-profiles/:profileId")

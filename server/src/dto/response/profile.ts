@@ -1,4 +1,4 @@
-import {MapType} from "./map.type";
+import {MapType} from "../../services-layer/map-profile/models/map.type";
 
 export type Point = {
     x: number,

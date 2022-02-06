@@ -9,10 +9,8 @@ class MarkerRepository extends AbstractRepository<MarkerDao> {
     public async getMarkersWithAreasByProfileName(profileName: string) {
         return this.repository.createQueryBuilder()
             .select("MarkerDao")
-            .leftJoin("MarkerDao.profile", "profile")
-            .where("profile.name = :name", {name: profileName})
-            .leftJoinAndSelect("MarkerDao.area", "area")
-            .where("area.marker.id = MarkerDao.id")
+            .innerJoin("MarkerDao.profile", "profile", "profile.name = :name", {name: profileName})
+            .innerJoinAndSelect("MarkerDao.area", "area", "area.marker.id = MarkerDao.id")
             .getMany();
     }
 

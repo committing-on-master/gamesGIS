@@ -2,8 +2,8 @@ import {inject, injectable} from "tsyringe";
 import winston from "winston";
 import argon2 from "argon2";
 
-import {CreateUserDto} from "./models/create.user.dto";
-import {PatchUserDto} from "./models/patch.user.dto";
+import {CreateUserDto} from "../../dto/request/create.user.dto";
+import {PatchUserDto} from "../../dto/request/patch.user.dto";
 import {DataLayer} from "../../data-layer/data.layer";
 import {UsersDAO} from "../../data-layer/models/users.dao";
 import {TokenInjection} from "../../infrastructure/token.injection";

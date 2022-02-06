@@ -6,7 +6,7 @@ import httpError from "http-errors";
 import {ServicesLayer} from "./../../services-layer/services.layer";
 import {CommonController} from "./../common.controller";
 import {TokenInjection} from "./../../infrastructure/token.injection";
-import {GetUserDto} from "./../../services-layer/users/models/get.user.dto";
+import {GetUserDto} from "../../dto/response/get.user.dto";
 
 @injectable()
 class UsersController extends CommonController {

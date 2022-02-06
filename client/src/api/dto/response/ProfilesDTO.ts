@@ -1,7 +1,7 @@
 import { SuccessResponse } from "../SuccessResponse";
 import { MapType } from "../types/MapType";
 
-export type MapProfileType = {
+export type MapProfileReviewType = {
     id: number;
     name: string;
     map: MapType;
@@ -9,4 +9,4 @@ export type MapProfileType = {
     markersCount: number;
 }
 
-export interface ProfilesDTO extends SuccessResponse<MapProfileType[]> { };
+export interface MapProfilesReviewDTO extends SuccessResponse<MapProfileReviewType[]> { };
