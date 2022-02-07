@@ -91,22 +91,22 @@ function MapProfileCreationForm(props: ProfileCreationProps) {
     }
 
     return (
-        <form className="profile-creation-form" onSubmit={handleSubmit(onSubmit)}>
-            <div className="form-input-block">
-                <label>Name</label>
-                <input className="input" type="text" placeholder="profile name ..." {...register("profileName", SchemaValidation.ProfileName)} />
-                {errors.profileName && <p className="error">{errors.profileName.message}</p>}
-            </div>
+            <form className="profile-creation-form" onSubmit={handleSubmit(onSubmit)}>
+                <div className="form-input-block">
+                    <label>Name</label>
+                    <input className="input" type="text" placeholder="profile name ..." {...register("profileName", SchemaValidation.ProfileName)} />
+                    {errors.profileName && <p className="error">{errors.profileName.message}</p>}
+                </div>
 
-            <div className="form-input-block">
-                <label>Map</label>
-                <input type="number" hidden={true} {...register("map", SchemaValidation.Map)} />
-                <AreaChoicer areas={areas} onChoiseChanged={(map) => {setValue("map", map)}} />
-                {errors.map && <p className="error">{errors.map.message}</p>}
-            </div>
-            <button className="button button--primary">Create</button>
-            {backendError && <p className="error">{backendError}</p>}
-        </form>
+                <div className="form-input-block">
+                    <label>Map</label>
+                    <input type="number" hidden={true} {...register("map", SchemaValidation.Map)} />
+                    <AreaChoicer areas={areas} onChoiseChanged={(map) => {setValue("map", map)}} />
+                    {errors.map && <p className="error">{errors.map.message}</p>}
+                </div>
+                <button className="button button--primary">Create</button>
+                {backendError && <p className="error">{backendError}</p>}
+            </form>
     )
 }
 

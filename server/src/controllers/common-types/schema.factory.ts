@@ -128,6 +128,7 @@ class StaticSchemaFactory {
 
     public static createMarkerNameSchema(): ParamSchema {
         return {
+            in: ["body"],
             exists: {errorMessage: "name body field is missing"},
             isEmpty: {negated: true, options: {ignore_whitespace: true}, errorMessage: "name body field is empty"},
             trim: true,
@@ -143,11 +144,10 @@ class StaticSchemaFactory {
             in: ["body"],
 
             optional: true,
-            isEmpty: {negated: true, options: {ignore_whitespace: true}, errorMessage: "name body field is empty"},
             trim: true,
             isLength: {
-                options: {min: 1, max: length},
-                errorMessage: `marker name should not be greater than ${length} symbols, not shorter than 1 symbols`,
+                options: {min: 0, max: length},
+                errorMessage: `marker description should not be greater than ${length} symbols`,
             },
         };
     }

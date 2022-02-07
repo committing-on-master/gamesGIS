@@ -1,3 +1,6 @@
+$common-corner-radius: 0.5em;
+$common-border-thin: 2px;
+
 // buttons
 $button-color: rgb(211, 211, 211);
 $button-color-primary: rgb(77, 190, 255);
@@ -11,9 +14,13 @@ $input-corner-radius: 0.2em;
 $input-border-thin: 2px;
 $input-background-color: rgb(228, 249, 253);
 
+// table
+$table-header-color:#92e7ff;
+$table-tr-odd-color: rgb(228, 249, 253);
+
+
+
+
 $primary-color: #282c34;
-$secondary-color: #61dafb;
-
 $background-color: #ffffff;
-
 $body-content-max-width: 1200px;

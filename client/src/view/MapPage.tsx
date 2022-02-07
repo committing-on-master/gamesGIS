@@ -68,15 +68,17 @@ function MapPage() {
     }
 
     return (
+        <div className="leaflet-container">
         <EventHubProvider>
             <LeafletComponent />
             <SidePanel
                 visibility={true}
                 header="Markers"
-            >
+                >
                 <MapPanel />
             </SidePanel>
         </EventHubProvider>
+        </div>
     );
 }
 

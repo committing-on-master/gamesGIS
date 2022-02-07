@@ -181,21 +181,21 @@ class MapProfileService {
             return;
         }
 
-        let coordinatesPromises: Promise<CoordinatesDao[]>[] = [];
-        if (profile.markers) {
-            coordinatesPromises = profile.markers?.map((value) => this.dataLayer.coordinatesRepository.getCoordinatesByMarkerId(value.id));
+        let coordinates: CoordinatesDao[] = [];
+        if (profile.markers && profile.markers.length !== 0) {
+            const coordinatesPromises = profile.markers?.map((value) => this.dataLayer.coordinatesRepository.getCoordinatesByMarkerId(value.id));
+            coordinates = (await Promise.all(coordinatesPromises))
+                .reduce((previous, current) => {
+                    previous.push(...current);
+                    return previous;
+                });
         }
-        const coordinates = (await Promise.all(coordinatesPromises))
-            .reduce((previous, current) => {
-                previous.push(...current);
-                return previous;
-            });
 
         const queryRunner = this.dataLayer.createQueryRunner();
         try {
             queryRunner.startTransaction();
 
-            if (profile.markers) {
+            if (profile.markers && profile.markers.length !== 0) {
                 await queryRunner.manager.remove(coordinates);
                 await queryRunner.manager.remove(profile.markers);
             }

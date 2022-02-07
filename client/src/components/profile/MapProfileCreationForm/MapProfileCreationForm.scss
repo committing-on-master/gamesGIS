@@ -1,4 +1,10 @@
+@import "./../../../_variables.scss";
+
 form.profile-creation-form {
+    border-radius: $common-corner-radius;
+    border: $common-border-thin solid #1f1f1f;
+    padding: 1em;
+
     p.error{
         color: red;margin-top: 0;
         font-size: .9rem;

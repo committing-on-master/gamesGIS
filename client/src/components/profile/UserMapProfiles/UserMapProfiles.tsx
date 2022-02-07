@@ -8,7 +8,7 @@ import { ErrorDTO } from '../../../api/dto/response/ErrorDTO';
 import "./UserMapProfiles.scss";
 import { MapType } from '../../../api/dto/types/MapType';
 import { ColumnsType, RenderExpandIconProps } from 'rc-table/lib/interface';
-import { LinkButton } from '../../common/LinkButton';
+import { ProfileActions } from './ProfileActions';
 
 type RowType = MapProfileReviewType & { key: React.Key };
 
@@ -72,13 +72,28 @@ function UserMapProfiles(props: UserMapProfilesProps) {
     }
 
     return (
-        <div className="users-map-profiles">
+        <div className='saved-profiles'>
+            <h3>Saved profiles</h3>
             <Table
+                className={'profiles-table'}
+                rowClassName={"profiles-table-row"}
+                rowKey={record => record.id}
                 columns={columns}
                 data={filtered}
+                // scroll={{
+                //     y: 250
+                // }}
                 expandable={{
                     expandRowByClick: true,
-                    expandedRowRender: record => <ProfileActions record={record} onDeletionClick={handleDeleteEvent} />,
+                    expandedRowRender: record => 
+                            <ProfileActions 
+                                record={record}
+                                onDeletionClick={handleDeleteEvent}
+                            />,
+                    onExpand: (expanded, record) => {
+
+                    },
+                    expandedRowClassName: () => "profiles-table-expanded-row",
                     expandIcon: CustomExpandIcon,
                 }}
             />
@@ -86,43 +101,18 @@ function UserMapProfiles(props: UserMapProfilesProps) {
     );
 }
 
-interface ProfileActionsProps {
-    record: MapProfileReviewType;
-    onDeletionClick(profileId: number): void;
-}
-
-function ProfileActions(props: ProfileActionsProps) {
-    return (
-        <div>
-            <LinkButton className="button" to={`/map/${props.record.name}`}>Open map</LinkButton>
-            <button
-                className='button button--danger'
-                onClick={() => props.onDeletionClick(props.record.id)}
-            >
-                Delete
-            </button>
-        </div>
-    );
-}
-
 function CustomExpandIcon(props: RenderExpandIconProps<MapProfileReviewType>) {
-    let text;
-    if (props.expanded) {
-        text = '&#8679; collapse';
-    } else {
-        text = '&#8681; expand';
-    }
+    const text = props.expanded ? '⇧' : '⇩';
 
     return (
-        <a
+        <span
             className="expand-row-icon"
-            // onClick={e => {
-            //   props.onExpand(props.record, e);
-            // }}
-            // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{ __html: text }}
-            style={{ color: 'blue', cursor: 'pointer' }}
-        />
+            onClick={e => {
+              props.onExpand(props.record, e);
+            }}
+        >
+            {text}
+        </span>
     );
 }
 
@@ -131,8 +121,9 @@ function useFilterHook(mapProfiles: MapProfileReviewType[]): [MapProfileReviewTy
     const [mapFilter, setMapFilter] = useState(MapType.Undefined);
 
     const NameInput = <input
+        className="name-filter"
         type={"text"}
-        placeholder={"Name"}
+        placeholder={"Name filter"}
         value={nameFilter}
         onChange={(e) => {
             setNameFilter(e.target.value)
@@ -140,9 +131,13 @@ function useFilterHook(mapProfiles: MapProfileReviewType[]): [MapProfileReviewTy
     />
 
     const SelectFilter =
-        <select value={mapFilter} onChange={(e) => {
-            setMapFilter(Number(e.target.value));
-        }}>
+        <select
+            className="map-filter"
+            value={mapFilter}
+            onChange={(e) => {
+                setMapFilter(Number(e.target.value));
+            }
+        }>
             {Object.keys(MapType)
                 .filter((value) => Number.isNaN(Number(value)))
                 .map((key, index) => (
