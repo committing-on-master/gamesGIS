@@ -25,6 +25,10 @@ function SidePanel(props: SidePanelProps) {
         "arrowContainer",
         {"arrowContainer--right": visibility}
     )
+    const nabBodyClass = classNames(
+        "navbody",
+        {"navbody--visible" : visibility}
+    );
 
     const handleOnCLick = () => {
         setVisibility(!visibility);
@@ -37,7 +41,7 @@ function SidePanel(props: SidePanelProps) {
             <div className={arrowContainerClass}>
                 <span className={arrowClass} onClick={handleOnCLick}></span>
             </div>
-            <div className="navbody">
+            <div className={nabBodyClass}>
                 {props.children ?? props.children}
             </div>            
         </nav>

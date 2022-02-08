@@ -17,8 +17,12 @@ function MarkerList(props: MarkerListProps) {
     const [filter, setFilter] = useState("");
 
     return (
-        <div>
-            <input type="text" onChange={(eventArg) => setFilter(eventArg.target.value)} />
+        <div className='marker-list'>
+            <input type="text" 
+                className='input markers-filter'
+                placeholder='Markers filter...'
+                onChange={(eventArg) => setFilter(eventArg.target.value)} 
+            />
             {props.editable ? <CreationMarker onCreate={props.onCreationClick} /> : null}
             <List editable={props.editable} filter={filter} onEditClick={props.onEditionClick} />
         </div>

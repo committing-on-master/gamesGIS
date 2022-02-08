@@ -1,8 +1,9 @@
 import classNames from 'classnames';
 import React from 'react';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
-import "./EditSpanComponent.scss";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+import "./EditSpanComponent.scss";
 
 interface EditSpanComponentProps {
     id: number;
@@ -11,8 +12,14 @@ interface EditSpanComponentProps {
 }
 
 function EditSpanComponent({ id, onClick, size = "small" }: EditSpanComponentProps) {
-    const cssClass = classNames(
-        "",
+    const componentCss = classNames(
+        "component-edit",
+        {
+            "component-edit--inline": size === "small"
+        }
+    );
+    const iconCss = classNames(
+        "fa-edit",
         {
             "fa-xs": size === "small",
             "fa-1x": size === "medium",
@@ -20,8 +27,11 @@ function EditSpanComponent({ id, onClick, size = "small" }: EditSpanComponentPro
         }
     );
     return (
-        <span onClick={() => onClick(id)}>
-            <FontAwesomeIcon className={cssClass} icon={faEdit} />
+        <span 
+            className={componentCss}
+            onClick={() => onClick(id)}
+        >
+            <FontAwesomeIcon className={iconCss} icon={faEdit} />
         </span>
     );
 }

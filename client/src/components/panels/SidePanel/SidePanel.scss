@@ -1,3 +1,5 @@
+@import "./../../../_variables.scss";
+
 .sidenav {
     height: 100%;
     width: 0;
@@ -6,18 +8,30 @@
     top: 0;
     right: 0;
     background-color: rgb(153, 153, 153);
-    overflow-x: visible;
+    // overflow: visible;
     transition: 0.5s;
 
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
     &--active {
-        width: 300px;
+        width: 350px;
     }
 
     h2 {
         text-align: center;
+        width: 90%;
+
+        background-color: $background-secondary;
+        border-radius: $button-corner-radius;
+        border: $common-border-thin solid rgb(73, 73, 73);
     }
 
     .arrowContainer{
+        align-self: flex-start;
+
         position: relative;
         top: 0px;
         right: 35px;
@@ -53,5 +67,19 @@
 
     .navbody {
         margin: 8px;
+        display: none;
+        width: 0%;
+        overflow: hidden;
+
+        height: 100%;
+
+        background-color: $background-secondary;
+        border-radius: $button-corner-radius;
+        border: $common-border-thin solid rgb(73, 73, 73);
+
+        &--visible {
+            display: block;
+            width: 90%;
+        }
     }
 }

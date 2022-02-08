@@ -1,5 +1,6 @@
 import React, { FocusEventHandler, useState } from 'react';
 import classNames from "classnames";
+
 import "./CreationMarker.scss";
 
 interface CreationMarkerProps {
@@ -8,10 +9,16 @@ interface CreationMarkerProps {
 
 function CreationMarker({ onCreate }: CreationMarkerProps) {
     const [slimMode, setSlimMode] = useState(true);
-    if (slimMode) {
-        return <SlimMode onClick={() => setSlimMode(false)}/>
-    }
-    return <CreationMode onCreate={onCreate} onCancel={() => setSlimMode(true)}/>;
+    let body: JSX.Element = 
+        slimMode ?
+            <SlimMode onClick={() => setSlimMode(false)}/>
+        :
+            <CreationMode onCreate={onCreate} onCancel={() => setSlimMode(true)}/>
+    return (
+        <div className='create-marker'>
+            {body}
+        </div>
+    );
 }
 
 interface CreationModeProps {
@@ -37,22 +44,24 @@ function CreationMode({onCreate, onCancel}: CreationModeProps) {
             onCreate(name)
     }
     return (
-        <form className="commentForm" onSubmit={handleSubmit} onBlur={handleBlur}>
+        <form onSubmit={handleSubmit} onBlur={handleBlur}>
             <input
                 type="text"
+                className='input'
+                placeholder='Markers name...'
                 autoFocus={true}
                 value={name}
                 onChange={(eventArg) => setName(eventArg.target.value)}
                 onKeyDown={handleKeyPress}
             />
-            <button type='submit'>Add</button>
+            <button className='button button--primary' type='submit'>Add</button>
         </form>
     );
 }
 
 function SlimMode({onClick}: {onClick(): void}) {
     return (
-        <button
+        <button className='button'
             onClick={() => onClick()}
         >
             Add new marker
