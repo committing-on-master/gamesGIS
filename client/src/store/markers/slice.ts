@@ -70,6 +70,9 @@ const markersSlice = createSlice({
                 state.editable.bound = [action.payload];
             }
         },
+        removeAreaCoordinates: (state: MarkersState) => {
+            state.editable.bound = [];
+        },
         setAreaColor: (state: MarkersState, action: PayloadAction<string>) => {
             state.editable.color = action.payload;
         },
@@ -196,5 +199,6 @@ export const {
     turnOffSpotlightBlur,
     turnOnSpotlightSelect,
     turnOffSpotlightClose,
-    resetMarkers
+    resetMarkers,
+    removeAreaCoordinates
 } = markersSlice.actions;

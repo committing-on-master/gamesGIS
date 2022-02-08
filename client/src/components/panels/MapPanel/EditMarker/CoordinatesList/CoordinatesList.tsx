@@ -17,7 +17,7 @@ function CoordinatesList() {
         })
     }
 
-    return <ul>{listBody}</ul>;
+    return <ul className='coordinate-list'>{listBody}</ul>;
 }
 
 export { CoordinatesList };
