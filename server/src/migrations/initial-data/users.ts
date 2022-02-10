@@ -1,5 +1,5 @@
-import {UsersDAO} from "../../src/data-layer/models/users.dao";
-import {PermissionFlag} from "../../src/services-layer/users/models/permission.flag";
+import {UsersDAO} from "../../data-layer/models/users.dao";
+import {PermissionFlag} from "../../services-layer/users/models/permission.flag";
 
 const userAdmin = new UsersDAO();
 userAdmin.email = "tarkov@gachi.com";

@@ -1,4 +1,4 @@
-import {AgreementsDAO} from "../../src/data-layer/models/agreements.dao";
+import {AgreementsDAO} from "../../data-layer/models/agreements.dao";
 
 const agreement = new AgreementsDAO();
 agreement.version = 1;

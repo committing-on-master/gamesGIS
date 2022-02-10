@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import winston from "winston";
 
-import {GisApplication} from "./src/gis.application";
+import {GisApplication} from "./gis.application";
 
 const loggerOptions: winston.LoggerOptions = {
     level: "info",

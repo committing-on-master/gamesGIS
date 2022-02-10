@@ -5,19 +5,19 @@ import express from "express";
 import supertestServ from "supertest";
 import {expect} from "chai";
 
-import {Brick} from "./../../helpers/brick";
-import {TestDataBuilder} from "./../../helpers/test.data.builder";
+import {Brick} from "../../helpers/brick";
+import {TestDataBuilder} from "../../helpers/test.data.builder";
 
-import {UsersRoutes} from "./../../../src/controllers/users/users.routes.config";
-import {UsersMiddleware} from "./../../../src/controllers/users/users.middleware";
-import {UsersController} from "./../../../src/controllers/users/users.controller";
-import {PermissionMiddleware} from "./../../../src/controllers/permission.middleware";
-import {ServicesLayer} from "./../../../src/services-layer/services.layer";
-import {UsersService} from "./../../../src/services-layer/users/users.service";
-import {CryptoHelper} from "./../../helpers/crypto.helper";
-import {UsersDAO} from "./../../../src/data-layer/models/users.dao";
-import {AuthMiddleware} from "./../../../src/controllers/auth/auth.middleware";
-import {PermissionFlag} from "./../../../src/services-layer/users/models/permission.flag";
+import {UsersRoutes} from "../../../controllers/users/users.routes.config";
+import {UsersMiddleware} from "../../../controllers/users/users.middleware";
+import {UsersController} from "../../../controllers/users/users.controller";
+import {PermissionMiddleware} from "../../../controllers/permission.middleware";
+import {ServicesLayer} from "../../../services-layer/services.layer";
+import {UsersService} from "../../../services-layer/users/users.service";
+import {CryptoHelper} from "../../helpers/crypto.helper";
+import {UsersDAO} from "../../../data-layer/models/users.dao";
+import {AuthMiddleware} from "../../../controllers/auth/auth.middleware";
+import {PermissionFlag} from "../../../services-layer/users/models/permission.flag";
 
 class TestData {
     logger = new Brick(mock<winston.Logger>());

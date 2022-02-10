@@ -1,4 +1,4 @@
-import {MarkerDao} from "./../../src/data-layer/models/marker.dao";
+import {MarkerDao} from "../../data-layer/models/marker.dao";
 
 
 const markersDummy: Omit<MarkerDao, "id" | "gallery" | "area" | "creationDate" | "profile">[] =

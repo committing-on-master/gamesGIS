@@ -5,17 +5,17 @@ import supertestServ from "supertest";
 import winston from "winston";
 import {anyString, mock, verify, when} from "ts-mockito";
 
-import {CryptoHelper} from "./../../helpers/crypto.helper";
-import {TestDataBuilder} from "./../../helpers/test.data.builder";
+import {CryptoHelper} from "../../helpers/crypto.helper";
+import {TestDataBuilder} from "../../helpers/test.data.builder";
 import {Brick} from "../../helpers/brick";
 
-import {AuthController} from "../../../src/controllers/auth/auth.controller";
-import {AuthMiddleware} from "../../../src/controllers/auth/auth.middleware";
-import {AuthRoutes} from "../../../src/controllers/auth/auth.routes.config";
-import {ServicesLayer} from "../../../src/services-layer/services.layer";
-import {UsersService} from "../../../src/services-layer/users/users.service";
-import {UsersDAO} from "../../../src/data-layer/models/users.dao";
-import {RefreshTokensDao} from "../../../src/data-layer/models/refresh.tokens.dao";
+import {AuthController} from "../../../controllers/auth/auth.controller";
+import {AuthMiddleware} from "../../../controllers/auth/auth.middleware";
+import {AuthRoutes} from "../../../controllers/auth/auth.routes.config";
+import {ServicesLayer} from "../../../services-layer/services.layer";
+import {UsersService} from "../../../services-layer/users/users.service";
+import {UsersDAO} from "../../../data-layer/models/users.dao";
+import {RefreshTokensDao} from "../../../data-layer/models/refresh.tokens.dao";
 
 /** Данные используемые в тестах */
 class TestData {

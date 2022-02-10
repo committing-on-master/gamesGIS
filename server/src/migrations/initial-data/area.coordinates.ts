@@ -1,5 +1,5 @@
 
-import {CoordinatesDao} from "./../../src/data-layer/models/coordinates.dao";
+import {CoordinatesDao} from "../../data-layer/models/coordinates.dao";
 
 // Мини скрипт по форматированию кучи координат из бд
 // const data =

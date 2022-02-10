@@ -1,16 +1,16 @@
-import {UsersDAO} from "./../src/data-layer/models/users.dao";
+import {UsersDAO} from "../data-layer/models/users.dao";
 import {getRepository, MigrationInterface, QueryRunner} from "typeorm";
 import {userAdmin} from "./initial-data/users";
-import {MapDao} from "./../src/data-layer/models/map.dao";
+import {MapDao} from "../data-layer/models/map.dao";
 import {maps} from "./initial-data/maps";
 import {mapProfile} from "./initial-data/map.profile";
-import {MapProfileDao} from "./../src/data-layer/models/map.profile.dao";
-import {AgreementsDAO} from "./../src/data-layer/models/agreements.dao";
+import {MapProfileDao} from "../data-layer/models/map.profile.dao";
+import {AgreementsDAO} from "../data-layer/models/agreements.dao";
 import {agreement} from "./initial-data/agreement";
-import {MarkerDao} from "./../src/data-layer/models/marker.dao";
+import {MarkerDao} from "../data-layer/models/marker.dao";
 import {markers} from "./initial-data/markers";
 import {areas} from "./initial-data/area.coordinates";
-import {CoordinatesDao} from "./../src/data-layer/models/coordinates.dao";
+import {CoordinatesDao} from "../data-layer/models/coordinates.dao";
 
 
 export class InitialSeed1642159380709 implements MigrationInterface {

@@ -18,20 +18,7 @@
                 "ts-node/register"
             ],
             "args": [
-                "${workspaceFolder}/index.ts"
-            ],
-            "console": "integratedTerminal"
-        },
-        {
-            "type": "pwa-node",
-            "request": "launch",
-            "name": "Launch Program",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}\\dist\\index.js",
-            "outFiles": [
-                "${workspaceFolder}/**/*.js"
+                "${workspaceFolder}/src/index.ts"
             ],
             "console": "integratedTerminal"
         },
@@ -59,21 +46,5 @@
                 "<node_internals>/**"
             ],
         }
-        // {
-        //     "name": "Debug mocha",
-        //     "type": "node",
-        //     "request": "launch",
-        //     "program": "/Users/rgilling/.nvm/versions/node/v7.2.1/bin/_mocha",
-        //     "stopOnEntry": false,
-        //     "args": ["--no-timeouts", "dist/**/*.spec.js"],
-        //     "cwd": "${workspaceFolder}",
-        //     "runtimeExecutable": null,
-        //     "sourceMaps": true,
-        //     "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-        //     "env": {
-        //       "NODE_ENV": "test",
-        //       "quiet": "false"
-        //     }
-        //   },
     ]
 }
