@@ -30,12 +30,12 @@ class GisApplication {
     private startingDate?: Date;
     private dbConnection?: Connection;
 
-    constructor(logger: winston.Logger, port: number, host?: string) {
+    constructor(logger: winston.Logger, host: string, port: number) {
         this.logger = logger;
         logger.info("Starting GameGis application");
 
         this.port = port;
-        this.host = host ?? "localhost";
+        this.host = host;
         this.routes = [];
 
         this.programErrorHandler = this.programErrorHandler.bind(this);
@@ -113,7 +113,6 @@ class GisApplication {
             throw new Error("Nullref, router variable is undefined");
         }
 
-        // TODO: разобраться с путями, слишком много относительных путей
         router.use(express.static(__dirname + "./../spa"));
         router.get("*", (request: express.Request, response: express.Response) => {
             response.sendFile(path.resolve(__dirname, "./../spa/index.html"));
@@ -126,7 +125,6 @@ class GisApplication {
         if (!router) {
             throw new Error("Nullref, router variable is undefined");
         }
-        // TODO: разобраться с путями, слишком много относительных путей
         router.use(express.static(__dirname + "./../maps"));
         return router;
     }
@@ -177,5 +175,4 @@ class GisApplication {
     }
 }
 
-// export default new GisApplication();
 export {GisApplication};

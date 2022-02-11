@@ -1,7 +1,7 @@
-import dotenv from "dotenv";
 import winston from "winston";
 
 import {GisApplication} from "./gis.application";
+import {EnvironmentWrapper} from "./infrastructure/environment.wrapper";
 
 const loggerOptions: winston.LoggerOptions = {
     level: "info",
@@ -20,21 +20,17 @@ const loggerOptions: winston.LoggerOptions = {
 
 const logger: winston.Logger = winston.createLogger(loggerOptions);
 
-// Загрузили конфигу в глобальную переменную process
-const dotenvResult = dotenv.config( {path: "./config/.env"} );
-if (dotenvResult.error) {
-    throw dotenvResult.error;
-}
+const settings = new EnvironmentWrapper();
 
-const port = Number.parseInt(process.env.PORT ?? "3000");
-const jwtSecret = process.env.JWT_SECRET || "My!@!Se3cr8tH4sh3";
-const jwtExpiration = (process.env.JWT_EXPIRATION && parseInt(process.env.JWT_EXPIRATION)) || 300;
-const refreshTokenExpiration = (process.env.REFRESH_TOKEN_EXPIRATION && parseInt(process.env.REFRESH_TOKEN_EXPIRATION)) || 10;
-
-const gisApp = new GisApplication(logger, port);
+const gisApp = new GisApplication(logger, settings.Host, settings.Port);
 gisApp
     // .setUp("in-memory", jwtSecret, jwtExpiration, refreshTokenExpiration)
-    .setUp("develop", jwtSecret, jwtExpiration, refreshTokenExpiration)
+    .setUp(
+        settings.ConnectionString,
+        settings.JwtSecret,
+        settings.JwtExpiration,
+        settings.JwtRefreshExpiration,
+    )
     .then(() => {
         gisApp.start();
     });

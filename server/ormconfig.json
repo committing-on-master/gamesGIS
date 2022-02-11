@@ -1,29 +1,29 @@
 [
     {
-        "name": "in-memory",
-        "type": "sqlite",
-        "database": ":memory:",
-        "synchronize": true,
-        "entities": [
-            "\\dist\\src\\data-layer\\models\\*.dao.js"
-        ],
-        "logging": ["query", "error", "info", "log"],
-        "migrations": ["\\dist\\migrations\\*.js"],
-        "cli": {
-            "migrationsDir": "\\dist\\migrations"
-        }
-    },
-    {
-        "name": "develop",
+        "name": "JS",
         "type": "sqlite",
         "database": "database/test.db",
         "synchronize": true,
         "entities": [
-            "./src/data-layer/models/*.dao.ts",
             "./dist/data-layer/models/*.dao.js"
         ],
         "logging": ["query", "error", "info", "log"],
-        "migrations": ["./migrations/*.ts"],
+        "migrations": [
+            "./dist/migrations/*.js"
+        ]
+    },
+    {
+        "name": "TS",
+        "type": "sqlite",
+        "database": "database/test.db",
+        "synchronize": true,
+        "entities": [
+            "./src/data-layer/models/*.dao.ts"
+        ],
+        "logging": ["query", "error", "info", "log"],
+        "migrations": [
+            "./src/migrations/*.ts"
+        ],
         "cli": {
             "migrationsDir": ".src/migrations"
         }
