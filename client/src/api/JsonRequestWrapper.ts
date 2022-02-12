@@ -3,6 +3,7 @@ import { RequestOptions } from "./RequestOptions";
 import { Result } from "./iResult ";
 import { JwtToken } from "./jwtToken";
 import { ErrorResponse } from "./dto/ErrorResponse";
+import { EndPoints } from "./endPoints";
 
 interface IRequestWrapper extends IRequestMethods {
     withAuth(): IRequestWrapper
@@ -50,11 +51,7 @@ class RequestWrapper implements IRequestWrapper {
     
     
     private static getUrl(endPoint: string) {
-        const api = process.env.REACT_APP_API_URL;
-        if (!api) {
-            throw new Error("REACT_APP_API_URL variable is undefined");
-        }
-        return `http://${api}/${endPoint}`;
+        return `http://${EndPoints.Api}/${endPoint}`;
     }
 
     withAuth(): IRequestWrapper {

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import SwiperCore, { FreeMode, Navigation, Thumbs } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react/swiper-react.js';
+import { EndPoints } from '../../../../api/endPoints';
 import { ModalImage } from '../ModalImage';
 
 
@@ -17,15 +18,9 @@ function AreaImages(props: AreaImagesProps) {
     const [previewId, setPreviewId] = useState<number>(props.areaPhotosIds[0]);
     const [fullVisability, setFullVisability] = useState(false);
 
-    const imgEndpoint = process.env.REACT_APP_AREA_IMAGES;
-    if (!imgEndpoint) {
-        console.log("REACT_APP_AREA_IMAGES not defined");
-        return null;
-    }
-
-    const fullUrl = (id: number) => `http://${imgEndpoint}/${id}/full`;
-    const miniUrl = (id: number) => `http://${imgEndpoint}/${id}/mini`;
-    const prevUrl = (id: number) => `http://${imgEndpoint}/${id}/prev`;
+    const fullUrl = (id: number) => `http://${EndPoints.Gallery}/${id}/full`;
+    const miniUrl = (id: number) => `http://${EndPoints.Gallery}/${id}/mini`;
+    const prevUrl = (id: number) => `http://${EndPoints.Gallery}/${id}/prev`;
 
     const handleFullviewClose = () => { setFullVisability(false); }
 

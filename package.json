@@ -8,8 +8,8 @@
     "build": "npm run build-client && npm run copy-spa-to-server && npm run build-server",
     "start-server": "cd server && npm run start",
     "build-client": "cd client && npm run build",
-    "build-server": "pushd server && npm run build",
-    "copy-spa-to-server": "copyfiles -u 2 -V ./client/build/**/*.* server/dist/spa"
+    "build-server": "pushd server && npm run build-release",
+    "copy-spa-to-server": "copyfiles -u 2 -V ./client/build/**/*.* ./server/spa"
   },
   "repository": {
     "type": "git",

@@ -8,8 +8,9 @@ import { SchemaValidation } from "./schemaValidation";
 
 import "./MapProfileCreationForm.scss";
 import { AreaChoicer, ChoicerAreaType } from "./../AreaChoicer";
+import { EndPoints } from "../../../api/endPoints";
 
-const previewUrl = (name: string) => `${process.env.PUBLIC_URL ?? "localhost:3001"}/img/maps/${name}.png`;
+const previewUrl = (name: string) => `http://${EndPoints.Host}/img/maps/${name}.png`;
 const areas: ChoicerAreaType[] = [
     {
         map: MapType.Woods,

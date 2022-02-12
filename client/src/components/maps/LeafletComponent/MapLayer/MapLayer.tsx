@@ -1,5 +1,6 @@
 import React from 'react';
 import { TileLayer, useMapEvent } from 'react-leaflet';
+import { EndPoints } from '../../../../api/endPoints';
 import { useAppSelector } from '../../../../store/hooks';
 import { mapSelectors } from '../../../../store/mapProfile/state';
 import { useEventHub } from '../../EventHubProvider';
@@ -12,10 +13,7 @@ function MapLayer() {
     })
     const eventHub = useEventHub();
 
-    const mapHost = process.env.REACT_APP_TILES_URL || "localhost:3000/map"
-    const mapUrl = `http://${mapHost}/${mapParams.map}/${mapLayer}/{z}/tile_{x}_{y}.png`;
-    // const mapUrl = `http://develop.constantine.keenetic.name/maps/${props.mapName}/${props.mapLayer}/{z}/tile_{x}_{y}.png`;
-
+    const mapUrl = `http://${EndPoints.Tiles}/${mapParams.map}/${mapLayer}/{z}/tile_{x}_{y}.png`;
 
     const leftBottom = mapParams.bounds[0];
     const rightTop = mapParams.bounds[1];

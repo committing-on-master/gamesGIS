@@ -1,3 +1,4 @@
+import { EndPoints } from "../api/endPoints";
 import "./NoMatchPage.scss";
 
 function NoMatchPage() {
@@ -7,7 +8,7 @@ function NoMatchPage() {
             <h1>404 Page</h1>
 
             <img
-                src={process.env.PUBLIC_URL + "/img/Jaeger.jpg"}
+                src={`http://${EndPoints.Host}/img/Jaeger.jpg`}
                 width="526" height="526" alt="logo" />
 
             <h2>Stashes not found. Jeager is a dick!</h2>

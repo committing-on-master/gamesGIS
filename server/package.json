@@ -5,7 +5,7 @@
   "type": "commonjs",
   "scripts": {
     "build": "tsc",
-    "JS": "npm run build && cross-env CONNECTION_STRING=JS node ./dist/index.js",
+    "JS": "npm run build && node ./dist/index.js",
     "TS": "cross-env CONNECTION_STRING=TS ts-node ./src/index.ts",
     "test": "npm run build && mocha",
     "eslint:fix": "eslint ./src/** --ext ts --fix",

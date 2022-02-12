@@ -1,4 +1,5 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { EndPoints } from '../../../api/endPoints';
 
 import { AreaChoicer, ChoicerAreaType } from "./AreaChoicer";
 
@@ -12,7 +13,7 @@ export default {
 
 const Template: ComponentStory<typeof AreaChoicer> = (args) => <AreaChoicer {...args}/>;
 
-const previewUrl = (name: string) => `${process.env.PUBLIC_URL ?? "localhost:6006"}/img/maps/${name}.png`;
+const previewUrl = (name: string) => `${process.env.PUBLIC_URL}/img/maps/${name}.png`;
 const areas: ChoicerAreaType[] = [
     {
         map: 0,
