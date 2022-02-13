@@ -5,7 +5,7 @@ import path from "path";
 import * as http from "http";
 
 import express from "express";
-import cors from "cors";
+import cors, {CorsOptions} from "cors";
 import * as expressWinston from "express-winston";
 import winston from "winston";
 import {WinstonAdaptor} from "typeorm-logger-adaptor/logger/winston";
@@ -18,37 +18,40 @@ import {Connection, createConnection, getConnectionOptions} from "typeorm";
 import {AuthRoutes} from "./controllers/auth/auth.routes.config";
 import {AgreementsRoutes} from "./controllers/agreements/agreements.routes.config";
 import {MapProfileRoutes} from "./controllers/map-profiles/map.profile.routes.config";
+import {EnvironmentWrapper} from "./infrastructure/environment.wrapper";
 
 class GisApplication {
     readonly port: number;
     readonly host: string;
     readonly logger: winston.Logger;
     readonly routes: Array<CommonRoutesConfig>;
+    readonly settings: EnvironmentWrapper;
 
     private app?: express.Application;
     server?: http.Server;
     private startingDate?: Date;
     private dbConnection?: Connection;
 
-    constructor(logger: winston.Logger, host: string, port: number) {
+    constructor(logger: winston.Logger, settings: EnvironmentWrapper) {
         this.logger = logger;
         logger.info("Starting GameGis application");
 
-        this.port = port;
-        this.host = host;
+        this.settings = settings;
+        this.port = settings.Port;
+        this.host = settings.Host;
         this.routes = [];
 
         this.programErrorHandler = this.programErrorHandler.bind(this);
     }
 
     /* eslint-disable new-cap */
-    public async setUp(connectionName: string, jwtSecret: string, jwtExpiration:number, refreshTokenExpiration: number) {
+    public async setUp() {
         container.register<winston.Logger>(TokenInjection.LOGGER, {useValue: this.logger});
-        container.register(TokenInjection.JWT_SECRET, {useValue: jwtSecret});
-        container.register(TokenInjection.JWT_EXPIRATION, {useValue: jwtExpiration});
-        container.register(TokenInjection.REFRESH_TOKEN_EXPIRATION, {useValue: refreshTokenExpiration});
+        container.register(TokenInjection.JWT_SECRET, {useValue: this.settings.JwtSecret});
+        container.register(TokenInjection.JWT_EXPIRATION, {useValue: this.settings.JwtExpiration});
+        container.register(TokenInjection.REFRESH_TOKEN_EXPIRATION, {useValue: this.settings.JwtRefreshExpiration});
 
-        await this.dbInitialization(connectionName);
+        await this.dbInitialization(this.settings.ConnectionString);
 
         let expressApp = express();
         expressApp = this.addExpressLoggingMiddleware(expressApp, this.logger);
@@ -129,12 +132,21 @@ class GisApplication {
         return router;
     }
 
+    private corsOptions(): CorsOptions {
+        if (this.settings.Runtime === "DEVELOP") {
+            return {};
+        }
+        return {
+            origin: this.settings.CorsOrigins,
+        };
+    }
+
     private createApiRoutes(router: express.Router): express.Router {
         if (!router) {
             throw new Error("Router is empty.");
         }
+        router.use(cors(this.corsOptions()));
         router.use(express.json());
-        router.use(cors());
 
         this.routes.push(
             container.resolve(UsersRoutes),

@@ -22,15 +22,9 @@ const logger: winston.Logger = winston.createLogger(loggerOptions);
 
 const settings = new EnvironmentWrapper();
 
-const gisApp = new GisApplication(logger, settings.Host, settings.Port);
+const gisApp = new GisApplication(logger, settings);
 gisApp
-    // .setUp("in-memory", jwtSecret, jwtExpiration, refreshTokenExpiration)
-    .setUp(
-        settings.ConnectionString,
-        settings.JwtSecret,
-        settings.JwtExpiration,
-        settings.JwtRefreshExpiration,
-    )
+    .setUp()
     .then(() => {
         gisApp.start();
     });

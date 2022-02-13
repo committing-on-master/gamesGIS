@@ -30,6 +30,14 @@ class EndPoints {
         }
         throw new Error("Environment variable REACT_APP_AREA_IMAGES is not set");
     }
+
+    public static get Protocol(): string {
+        const protocol = process.env.REACT_APP_PROTOCOL;
+        if (protocol && protocol !== "") {
+            return protocol;
+        }
+        throw new Error("Environment variable REACT_APP_PROTOCOL is not set");
+    }
 }
 
 export { EndPoints }

@@ -10,6 +10,8 @@ class EnvironmentWrapper {
 
     private connectionString?: string;
 
+    private corsOrigins?: string[];
+
     constructor() {
         const dotenvResult = dotenv.config();
         if (dotenvResult.error) {
@@ -43,46 +45,66 @@ class EnvironmentWrapper {
         return parsed;
     }
 
+    private readStrArray(key: string): string[] {
+        const readed = this.readStrValue(key);
+        const result = JSON.parse(readed);
+        if (Array.isArray(result)) {
+            return result;
+        }
+        throw new Error(`[EnvironmentWrapper] Parsing failed. Expecting Json array format for key: "${key}"`);
+    }
+
     public get Port(): number {
         if (!this.port) {
-            this.port = this.readIntValue("PORT");
+            this.port = this.readIntValue("G_PORT");
         }
         return this.port;
     }
 
     public get Host(): string {
         if (!this.host) {
-            this.host = this.readStrValue("HOST");
+            this.host = this.readStrValue("G_HOST");
         }
         return this.host;
     }
 
     public get JwtSecret(): string {
         if (!this.jwtSecret) {
-            this.jwtSecret = this.readStrValue("JWT_SECRET");
+            this.jwtSecret = this.readStrValue("G_JWT_SECRET");
         }
         return this.jwtSecret;
     }
 
     public get JwtExpiration(): number {
         if (!this.jwtExpiration) {
-            this.jwtExpiration = this.readIntValue("JWT_EXPIRATION");
+            this.jwtExpiration = this.readIntValue("G_JWT_EXPIRATION");
         }
         return this.jwtExpiration;
     }
 
     public get JwtRefreshExpiration(): number {
         if (!this.jwtRefreshTokenExpiration) {
-            this.jwtRefreshTokenExpiration = this.readIntValue("REFRESH_TOKEN_EXPIRATION");
+            this.jwtRefreshTokenExpiration = this.readIntValue("G_REFRESH_TOKEN_EXPIRATION");
         }
         return this.jwtRefreshTokenExpiration;
     }
 
     public get ConnectionString(): string {
         if (!this.connectionString) {
-            this.connectionString = this.readStrValue("CONNECTION_STRING");
+            this.connectionString = this.readStrValue("G_CONNECTION_STRING");
         }
         return this.connectionString;
+    }
+
+    public get CorsOrigins(): string[] {
+        if (!this.corsOrigins) {
+            this.corsOrigins = this.readStrArray("G_ORIGIN");
+        }
+        return this.corsOrigins;
+    }
+
+    public get Runtime(): string | undefined {
+        return process.env.NODE_ENV;
     }
 }
 

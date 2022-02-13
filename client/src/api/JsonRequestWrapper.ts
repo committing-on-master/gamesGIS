@@ -51,7 +51,7 @@ class RequestWrapper implements IRequestWrapper {
     
     
     private static getUrl(endPoint: string) {
-        return `http://${EndPoints.Api}/${endPoint}`;
+        return `${EndPoints.Protocol}://${EndPoints.Api}/${endPoint}`;
     }
 
     withAuth(): IRequestWrapper {

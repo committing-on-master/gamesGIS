@@ -18,9 +18,9 @@ function AreaImages(props: AreaImagesProps) {
     const [previewId, setPreviewId] = useState<number>(props.areaPhotosIds[0]);
     const [fullVisability, setFullVisability] = useState(false);
 
-    const fullUrl = (id: number) => `http://${EndPoints.Gallery}/${id}/full`;
-    const miniUrl = (id: number) => `http://${EndPoints.Gallery}/${id}/mini`;
-    const prevUrl = (id: number) => `http://${EndPoints.Gallery}/${id}/prev`;
+    const fullUrl = (id: number) => `${EndPoints.Protocol}://${EndPoints.Gallery}/${id}/full`;
+    const miniUrl = (id: number) => `${EndPoints.Protocol}://${EndPoints.Gallery}/${id}/mini`;
+    const prevUrl = (id: number) => `${EndPoints.Protocol}://${EndPoints.Gallery}/${id}/prev`;
 
     const handleFullviewClose = () => { setFullVisability(false); }
 

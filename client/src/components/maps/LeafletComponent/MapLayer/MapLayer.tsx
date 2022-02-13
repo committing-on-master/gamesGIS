@@ -13,7 +13,7 @@ function MapLayer() {
     })
     const eventHub = useEventHub();
 
-    const mapUrl = `http://${EndPoints.Tiles}/${mapParams.map}/${mapLayer}/{z}/tile_{x}_{y}.png`;
+    const mapUrl = `${EndPoints.Protocol}://${EndPoints.Tiles}/${mapParams.map}/${mapLayer}/{z}/tile_{x}_{y}.png`;
 
     const leftBottom = mapParams.bounds[0];
     const rightTop = mapParams.bounds[1];

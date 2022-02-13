@@ -20,6 +20,9 @@
             "args": [
                 "${workspaceFolder}/src/index.ts"
             ],
+            "env": {
+                "G_CONNECTION_STRING": "TS"
+            },
             "console": "integratedTerminal"
         },
         {
