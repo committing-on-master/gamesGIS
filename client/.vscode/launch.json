@@ -6,17 +6,19 @@
     "configurations": [
         {
             "name": "Launch Chrome against localhost",
-            "type": "chrome", 
+            "type": "pwa-chrome", 
             "request": "launch",
             "url": "http://localhost:3001",
             "webRoot": "${workspaceFolder}/src",
             "sourceMapPathOverrides": {
                 "webpack:///src/*": "${webRoot}/*"
             },
+            "userDataDir": "${workspaceFolder}/.vscode/vscode-profile",
             "runtimeArgs": [
                 // "--disable-web-security",
-                "--incognito",
-                "--remote-debugging-port=9222"
+                // "--incognito",
+                // "--profile-directory=Profile 2",
+                "--remote-debugging-port=9222",
             ]
         }
     ]

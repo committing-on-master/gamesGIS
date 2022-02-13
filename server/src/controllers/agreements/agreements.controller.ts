@@ -1,12 +1,12 @@
 import {inject, injectable} from "tsyringe";
 import winston from "winston";
 import express from "express";
+import httpErrors from "http-errors";
 
 import {ServicesLayer} from "./../../services-layer/services.layer";
 import {TokenInjection} from "./../../infrastructure/token.injection";
 import {CommonController} from "./../common.controller";
-import {GetAgreementDto} from "./../../services-layer/agreements/models/get.agreement.dto";
-import {ResponseBody} from "../response.body";
+import {AgreementDto} from "../../dto/response/agreement.dto";
 
 @injectable()
 class AgreementsController extends CommonController {
@@ -20,20 +20,15 @@ class AgreementsController extends CommonController {
     }
 
     public async getUserAgreement(req: express.Request, res: express.Response) {
-        try {
-            const agreement = await this.services.Agreements.getLastAgreement();
-            if (!agreement) {
-                return res.status(404).send(ResponseBody.jsonEmpty());
-            }
-            const result: GetAgreementDto = {
-                version: agreement.version,
-                agreementText: agreement.agreementBody,
-            };
-            return res.status(200).send(ResponseBody.jsonOk(`Agreement version: ${result.version}`, result));
-        } catch (error) {
-            this.logger.error(`${this.name}.getUserAgreement`, error);
-            return res.status(500).send(ResponseBody.jsonEmpty());
+        const agreement = await this.services.Agreements.getLastAgreement();
+        if (!agreement) {
+            throw new httpErrors.NotFound("user license not found");
         }
+        const agreementDto: AgreementDto = {
+            version: agreement.version,
+            agreementText: agreement.agreementBody,
+        };
+        return res.status(200).json({message: "loaded", payload: agreementDto});
     }
 }
 

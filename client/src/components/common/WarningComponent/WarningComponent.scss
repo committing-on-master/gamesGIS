@@ -1,0 +1,20 @@
+@import "@fortawesome/fontawesome-svg-core/styles.css";
+
+div.component-warning {
+    text-align: center;
+
+    .fas-warn {
+        color: rgb(41, 41, 41);
+    }
+
+    &--inline {
+        text-align: start;
+        
+        .fas-warn-inline {
+            margin-right: 5px;
+        }
+        > p {
+            display: inline-block;
+        }
+    }
+}

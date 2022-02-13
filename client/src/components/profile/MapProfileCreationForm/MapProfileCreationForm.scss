@@ -1,0 +1,22 @@
+@import "./../../../_variables.scss";
+
+form.profile-creation-form {
+    border-radius: $common-corner-radius;
+    border: $common-border-thin solid #1f1f1f;
+    padding: 1em;
+    width: 25.5em;
+
+    p.error{
+        color: red;margin-top: 0;
+        font-size: .9rem;
+    }
+    div.form-input-block {
+        input[type=text] {
+            display: block;
+            width: 100%;
+        }
+    }
+    button {
+        font-size: 1.2rem;
+    }
+}

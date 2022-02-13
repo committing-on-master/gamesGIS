@@ -6,7 +6,13 @@ module.exports = {
   "addons": [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
-    "@storybook/preset-create-react-app",
-    // "storybook-addon-pseudo-states"
-  ]
+    "@storybook/preset-create-react-app"
+  ],
+  "staticDir": [
+    "./../public"
+  ],
+  "framework": "@storybook/react",
+  "core": {
+    "builder": "webpack5"
+  }
 }

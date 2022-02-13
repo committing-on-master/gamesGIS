@@ -69,14 +69,18 @@ class StaticSchemaFactory {
 
     /**
      * Схема валидации поля - id
+     * @param {boolean} [optional = false] опциональность поля, true для случаев когда наличие поля пустым допускается
      * @return {ParamSchema} схема валидации "express-validator"-а
      */
-    public static createIdSchema(): ParamSchema {
+    public static createIdSchema(optional: boolean = false): ParamSchema {
         return {
             in: ["body"],
-            exists: {errorMessage: "id body field is missing"},
+
+            ...(optional ?
+                {optional: true} :
+                {exists: {errorMessage: "id body field is missing"}}),
+
             isEmpty: {negated: true, options: {ignore_whitespace: true}, errorMessage: "id body field is empty"},
-            trim: true,
             isNumeric: true,
         };
     }
@@ -90,7 +94,82 @@ class StaticSchemaFactory {
             in: ["body"],
             exists: {errorMessage: "refreshToken body field is missing"},
             isEmpty: {negated: true, options: {ignore_whitespace: true}, errorMessage: "refreshToken body field is empty"},
+        };
+    }
+
+    public static createMapSchema(): ParamSchema {
+        return {
+            in: ["body"],
+
+            exists: {errorMessage: "map body field is missing"},
+            isNumeric: {
+                negated: true,
+                options: {no_symbols: true},
+                errorMessage: "map body field numeric only"},
+        };
+    }
+
+    public static createProfileNameSchema(): ParamSchema {
+        return {
+            in: ["body"],
+
+            exists: {errorMessage: "profileName body field is missing"},
+            isEmpty: {negated: true, options: {ignore_whitespace: true}, errorMessage: "profileName body field is empty"},
             trim: true,
+            isLength: {
+                options: {
+                    min: 3,
+                    max: 255,
+                },
+                errorMessage: "profileName should not be greater than 255 symbols or shorter than 3 symbols",
+            },
+        };
+    }
+
+    public static createMarkerNameSchema(): ParamSchema {
+        return {
+            in: ["body"],
+            exists: {errorMessage: "name body field is missing"},
+            isEmpty: {negated: true, options: {ignore_whitespace: true}, errorMessage: "name body field is empty"},
+            trim: true,
+            isLength: {
+                options: {min: 1, max: 30},
+                errorMessage: "marker name should not be greater than 30 symbols, not shorter than 1 symbols",
+            },
+        };
+    }
+
+    public static createMarkerDescriptionSchema(length: number): ParamSchema {
+        return {
+            in: ["body"],
+
+            optional: true,
+            trim: true,
+            isLength: {
+                options: {min: 0, max: length},
+                errorMessage: `marker description should not be greater than ${length} symbols`,
+            },
+        };
+    }
+
+    public static createColorSchema(): ParamSchema {
+        return {
+            exists: {errorMessage: "color body field is missing"},
+            trim: true,
+            matches: {
+                options: RegExp("#[a-zA-Z0-9]{6}"),
+                errorMessage: "colors available only in HEX format",
+            },
+        };
+    }
+
+    public static createNumericSchema(): ParamSchema {
+        return {
+            exists: {errorMessage: "field is missing"},
+            isEmpty: {negated: true, options: {ignore_whitespace: true}, errorMessage: "field is empty"},
+            isNumeric: {
+                errorMessage: "numeric format expected",
+            },
         };
     }
 }

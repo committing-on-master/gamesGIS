@@ -1,7 +1,7 @@
-import express from "express";
+import express, {NextFunction} from "express";
 import winston from "winston";
 import {ValidationChain, validationResult} from "express-validator";
-import {ResponseBody} from "./response.body";
+import httpError, {HttpError} from "http-errors";
 
 abstract class CommonMiddleware {
     protected readonly logger: winston.Logger;
@@ -11,6 +11,7 @@ abstract class CommonMiddleware {
         this.logger = logger;
         this.name = name;
         this.logger.info(`Creating middleware for: ${name}`);
+        this.handleOperationalErrors = this.handleOperationalErrors.bind(this);
     }
 
     /**
@@ -26,25 +27,42 @@ abstract class CommonMiddleware {
             validationChain.push(validation);
         }
 
-        const scopedLogger = this.logger;
-        const methodName = `[${this?.name}.validateRequestSchema]`;
-
         return async function(req: express.Request,
             res: express.Response,
             next: express.NextFunction) {
-            try {
-                await Promise.all(validationChain.map((validation) => validation.run(req)));
+            await Promise.all(validationChain.map((validation) => validation.run(req)));
 
-                const errors = validationResult(req);
-                if (errors.isEmpty()) {
-                    return next();
-                }
-                res.status(400).json(ResponseBody.jsonError("async validation error", errors.array()));
-            } catch (error) {
-                scopedLogger.error(methodName, error);
-                return next(error);
+            const errors = validationResult(req);
+            if (errors.isEmpty()) {
+                return next();
             }
+            throw httpError(400, "async validation error", {errors: errors.array()});
         };
+    }
+
+    public extractParamToBody(
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction,
+        value: string,
+        paramName: string,
+    ) {
+        if (value) {
+            req.body[paramName] = value;
+        }
+        next();
+    }
+
+    public handleOperationalErrors(error: Error, req: express.Request, res: express.Response, next: NextFunction) {
+        if (!httpError.isHttpError(error) || error.status === 500) {
+            next(error);
+        }
+        const operationalError = error as HttpError;
+        this.logger.warn(`[${this.name}] Operational Error: ${operationalError.message}`, operationalError);
+        res
+            .header("Content-Type", "application/json")
+            .status(operationalError.statusCode)
+            .send(JSON.stringify(operationalError));
     }
 }
 

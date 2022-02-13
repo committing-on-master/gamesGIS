@@ -1,5 +1,7 @@
 /* eslint-disable new-cap */
-import {Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn} from "typeorm";
+import {Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm";
+import {GalleryDao} from "./gallery.dao";
+import {MapProfileDao} from "./map.profile.dao";
 import {RefreshTokensDao} from "./refresh.tokens.dao";
 
 /**
@@ -31,6 +33,12 @@ class UsersDAO {
 
     @OneToOne(() => RefreshTokensDao)
         refreshToken?: RefreshTokensDao;
+
+    @OneToMany(() => MapProfileDao, (profile) => profile.user)
+        profiles!: MapProfileDao[];
+
+    @OneToMany(() => GalleryDao, (gallery) => gallery.user)
+        gallery!: GalleryDao[];
 }
 
 export {UsersDAO};

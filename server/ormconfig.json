@@ -1,0 +1,31 @@
+[
+    {
+        "name": "JS",
+        "type": "sqlite",
+        "database": "database/test.db",
+        "synchronize": true,
+        "entities": [
+            "./dist/data-layer/models/*.dao.js"
+        ],
+        "logging": ["query", "error", "info", "log"],
+        "migrations": [
+            "./dist/migrations/*.js"
+        ]
+    },
+    {
+        "name": "TS",
+        "type": "sqlite",
+        "database": "database/test.db",
+        "synchronize": true,
+        "entities": [
+            "./src/data-layer/models/*.dao.ts"
+        ],
+        "logging": ["query", "error", "info", "log"],
+        "migrations": [
+            "./src/migrations/*.ts"
+        ],
+        "cli": {
+            "migrationsDir": ".src/migrations"
+        }
+    }
+]

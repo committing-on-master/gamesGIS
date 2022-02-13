@@ -5,7 +5,7 @@ import path from "path";
 import * as http from "http";
 
 import express from "express";
-import cors from "cors";
+import cors, {CorsOptions} from "cors";
 import * as expressWinston from "express-winston";
 import winston from "winston";
 import {WinstonAdaptor} from "typeorm-logger-adaptor/logger/winston";
@@ -17,52 +17,75 @@ import {TokenInjection} from "./infrastructure/token.injection";
 import {Connection, createConnection, getConnectionOptions} from "typeorm";
 import {AuthRoutes} from "./controllers/auth/auth.routes.config";
 import {AgreementsRoutes} from "./controllers/agreements/agreements.routes.config";
+import {MapProfileRoutes} from "./controllers/map-profiles/map.profile.routes.config";
+import {EnvironmentWrapper} from "./infrastructure/environment.wrapper";
 
 class GisApplication {
     readonly port: number;
     readonly host: string;
     readonly logger: winston.Logger;
     readonly routes: Array<CommonRoutesConfig>;
+    readonly settings: EnvironmentWrapper;
 
     private app?: express.Application;
     server?: http.Server;
     private startingDate?: Date;
     private dbConnection?: Connection;
 
-    constructor(logger: winston.Logger, port: number, host?: string) {
+    constructor(logger: winston.Logger, settings: EnvironmentWrapper) {
         this.logger = logger;
         logger.info("Starting GameGis application");
 
-        this.port = port;
-        this.host = host ?? "localhost";
+        this.settings = settings;
+        this.port = settings.Port;
+        this.host = settings.Host;
         this.routes = [];
+
+        this.programErrorHandler = this.programErrorHandler.bind(this);
     }
 
     /* eslint-disable new-cap */
-    public async setUp(connectionName: string, jwtSecret: string, jwtExpiration:number, refreshTokenExpiration: number) {
+    public async setUp() {
         container.register<winston.Logger>(TokenInjection.LOGGER, {useValue: this.logger});
-        container.register(TokenInjection.JWT_SECRET, {useValue: jwtSecret});
-        container.register(TokenInjection.JWT_EXPIRATION, {useValue: jwtExpiration});
-        container.register(TokenInjection.REFRESH_TOKEN_EXPIRATION, {useValue: refreshTokenExpiration});
+        container.register(TokenInjection.JWT_SECRET, {useValue: this.settings.JwtSecret});
+        container.register(TokenInjection.JWT_EXPIRATION, {useValue: this.settings.JwtExpiration});
+        container.register(TokenInjection.REFRESH_TOKEN_EXPIRATION, {useValue: this.settings.JwtRefreshExpiration});
 
-        await this.dbInitialization(connectionName);
+        await this.dbInitialization(this.settings.ConnectionString);
 
         let expressApp = express();
         expressApp = this.addExpressLoggingMiddleware(expressApp, this.logger);
 
         const apiRouter = this.createApiRoutes(express.Router());
-        const staticRouter = this.serveStaticFiles(express.Router());
+        const spaRouter = this.serveSPA(express.Router());
+        const mapsRouter = this.serveMaps(express.Router());
 
         expressApp.use("/api", apiRouter);
-        expressApp.use(staticRouter);
+        expressApp.use("/maps", mapsRouter);
+        expressApp.use(spaRouter);
+
+        expressApp.use(this.programErrorHandler);
 
         this.app = expressApp;
         this.server = http.createServer(expressApp);
         return this;
     }
 
+    // eslint-disable-next-line valid-jsdoc
+    /**
+     * Обработчик верхнего уровня Express.js-а
+     * @param {Error} error объект с ошибкой
+     * @param {express.Request} req запрос, который привел к ошибке
+     * @param {express.Response} res объект ответа
+     */
+    private programErrorHandler(error: Error, req: express.Request, res: express.Response, next: express.NextFunction) {
+        this.logger.error(error);
+        // TODO: для ВАХ эффекта, можно в зависимости от типа ошибки, перезапускать сервер
+        res.status(500).header("Content-Type", "application/json").send({});
+    }
+
     private async dbInitialization(connectionName: string) {
-        const winstonOrm = new WinstonAdaptor(this.logger, "all");
+        const winstonOrm = new WinstonAdaptor(this.logger, ["warn", "error", "query"]);
         // Берем конфигу из ormconfig файла, и подменяем логгер на уже созданный единый логгер приложения
         this.dbConnection = await getConnectionOptions(connectionName)
             .then((connectionOpt) => {
@@ -88,12 +111,11 @@ class GisApplication {
         return app;
     }
 
-    private serveStaticFiles(router: express.Router): express.Router {
+    private serveSPA(router: express.Router): express.Router {
         if (!router) {
             throw new Error("Nullref, router variable is undefined");
         }
 
-        // TODO: разобраться с путями, слишком много относительных путей
         router.use(express.static(__dirname + "./../spa"));
         router.get("*", (request: express.Request, response: express.Response) => {
             response.sendFile(path.resolve(__dirname, "./../spa/index.html"));
@@ -102,24 +124,41 @@ class GisApplication {
         return router;
     }
 
+    private serveMaps(router: express.Router): express.Router {
+        if (!router) {
+            throw new Error("Nullref, router variable is undefined");
+        }
+        router.use(express.static(__dirname + "./../maps"));
+        return router;
+    }
+
+    private corsOptions(): CorsOptions {
+        if (this.settings.Runtime === "DEVELOP") {
+            return {};
+        }
+        return {
+            origin: this.settings.CorsOrigins,
+        };
+    }
+
     private createApiRoutes(router: express.Router): express.Router {
         if (!router) {
-            throw new Error("Express is not created.");
+            throw new Error("Router is empty.");
         }
+        router.use(cors(this.corsOptions()));
         router.use(express.json());
-        // TODO: вот это вот не точно, но скорее всего придется для SPA и прочей статики отдельный express.js поднимать, поэтому оставим пока так
-
-        router.use(cors());
 
         this.routes.push(
             container.resolve(UsersRoutes),
             container.resolve(AuthRoutes),
             container.resolve(AgreementsRoutes),
+            container.resolve(MapProfileRoutes),
         );
 
         this.routes.forEach((route) => {
             route.registerRoutes(router);
         });
+
         return router;
     }
 
@@ -148,5 +187,4 @@ class GisApplication {
     }
 }
 
-// export default new GisApplication();
 export {GisApplication};

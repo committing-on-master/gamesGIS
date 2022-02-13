@@ -1,0 +1,12 @@
+div.my-maps-page {
+    display: inline-flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: stretch;
+    .profile-creation {
+        width: 35%;
+    }
+    .saved-profiles {
+        width: 60%;
+    }
+}

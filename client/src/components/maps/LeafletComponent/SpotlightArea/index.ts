@@ -1,0 +1,1 @@
+export { SpotlightArea } from "./SpotlightArea";

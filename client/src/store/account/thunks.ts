@@ -22,7 +22,7 @@ export const loginUser = createAsyncThunk<UserData, LoginThunkArg>(
             password: data.userPassword
         }
         try {
-            const res = await RequestWrapper.post<JwtDTO, ErrorDTO>("auth", body);
+            const res = await RequestWrapper.endPoint("auth").post(body).send<JwtDTO, ErrorDTO>();
             if (res.ok && res.success?.payload) {
                 const result = res.success.payload;
                 RequestWrapper.JwtToken.Access = result.accessToken;
@@ -67,8 +67,6 @@ export const startUp = createAsyncThunk(
 
 function saveLoginData(data: UserData | undefined) {
     if (data) {
-        console.log("saving user data");
-        console.log(data);
         localStorage.setItem("userName", data.userName);
         localStorage.setItem("userId", data.userId.toString());
         return;
@@ -85,8 +83,6 @@ function loadLoginData(): UserData | undefined {
             userId: parseInt(id, 10),
             userName: name
         }
-        console.log("loaded user data");
-        console.log(result);
         return result;
     }
     return undefined;

@@ -1,0 +1,8 @@
+1 - Woods
+2 - Factory
+3 - Customs
+4 - Interchange
+5 - Labs
+6 - Shoreline
+7 - Reserve
+8 - Lighthouse

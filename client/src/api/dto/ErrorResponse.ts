@@ -1,4 +1,4 @@
 export interface ErrorResponse<DTO=null> {
-    msg?: string;
+    message?: string;
     errors?: DTO;
 }

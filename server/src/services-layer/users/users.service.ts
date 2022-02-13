@@ -2,8 +2,8 @@ import {inject, injectable} from "tsyringe";
 import winston from "winston";
 import argon2 from "argon2";
 
-import {CreateUserDto} from "./models/create.user.dto";
-import {PatchUserDto} from "./models/patch.user.dto";
+import {CreateUserDto} from "../../dto/request/create.user.dto";
+import {PatchUserDto} from "../../dto/request/patch.user.dto";
 import {DataLayer} from "../../data-layer/data.layer";
 import {UsersDAO} from "../../data-layer/models/users.dao";
 import {TokenInjection} from "../../infrastructure/token.injection";
@@ -39,22 +39,23 @@ class UsersService {
         userDb.email = resource.email;
         userDb.name = resource.name;
         userDb.passwordHash = await argon2.hash(resource.password);
+        userDb.permissionFlag = PermissionFlag.APPROVED_USER;
 
         const result = await this.dataLayer.usersRepository.addUser(userDb);
         return result.id;
     }
 
 
-    public async isEmailAvailable(email: string): Promise<boolean> {
-        return !await this.dataLayer.usersRepository.isEmailAlreadyExist(email);
+    public async isEmailAlreadyExist(email: string): Promise<boolean> {
+        return this.dataLayer.usersRepository.isEmailAlreadyExist(email);
     }
 
-    public async isNameAvailable(name: string): Promise<boolean> {
-        return !await this.dataLayer.usersRepository.isNameAlreadyExist(name);
+    public async isNameAlreadyExist(name: string): Promise<boolean> {
+        return this.dataLayer.usersRepository.isNameAlreadyExist(name);
     }
 
     public async isUserExist(userId: number): Promise<boolean> {
-        return await this.dataLayer.usersRepository.isUserExist(userId);
+        return this.dataLayer.usersRepository.isUserExist(userId);
     }
 
     /**
@@ -114,15 +115,19 @@ class UsersService {
     }
 
     public async getRefreshTokenByUserId(userId: number): Promise<RefreshTokensDao | undefined> {
-        return await this.dataLayer.refreshTokensRepository.findTokenByUserId(userId);
+        return this.dataLayer.refreshTokensRepository.findTokenByUserId(userId);
+    }
+
+    public async getRefreshToken(token: string): Promise<RefreshTokensDao | undefined> {
+        return this.dataLayer.refreshTokensRepository.getRefreshToken(token, true);
     }
 
     public async getUserByEmail(email: string) {
-        return await this.dataLayer.usersRepository.getUserByEmail(email);
+        return this.dataLayer.usersRepository.getUserByEmail(email);
     }
 
     public async getUserById(userId: number) {
-        return await this.dataLayer.usersRepository.findUserById(userId);
+        return this.dataLayer.usersRepository.findUserById(userId);
     }
 
     private getRefreshTokenExpirationDate(): Date {
@@ -132,10 +137,6 @@ class UsersService {
 
     async deleteById(userId: number) {
         return this.dataLayer.usersRepository.removeUserById(userId);
-    }
-
-    async list(limit: number, page: number) {
-        return await this.dataLayer.usersRepository.getUsers();
     }
 }
 

@@ -10,7 +10,7 @@ class UsersRepository extends AbstractRepository<UsersDAO> {
      * @return {Promise<UsersDAO>} сохраненная сущность, с присвоенным идентификатором
      */
     public async addUser(user: UsersDAO): Promise<UsersDAO> {
-        return await this.repository.save(user);
+        return this.repository.save(user);
     }
 
     public async isEmailAlreadyExist(checkingEmail: string): Promise<boolean> {
@@ -29,7 +29,7 @@ class UsersRepository extends AbstractRepository<UsersDAO> {
     }
 
     public async findUserByEmail(usersEmail: string): Promise<UsersDAO | undefined> {
-        return await this.repository.findOne({where: {email: usersEmail}});
+        return this.repository.findOne({where: {email: usersEmail}});
     }
 
     public async updateUser(userId: number, user: Partial<UsersDAO>): Promise<void> {
@@ -37,7 +37,7 @@ class UsersRepository extends AbstractRepository<UsersDAO> {
     }
 
     public async findUserById(userId: number) {
-        return await this.repository.findOne(userId);
+        return this.repository.findOne(userId);
     }
 
     public async removeUserById(userId: number) {
@@ -45,14 +45,7 @@ class UsersRepository extends AbstractRepository<UsersDAO> {
     }
 
     public async getUserByEmail(email: string) {
-        return await this.repository.findOne({email: email});
-    }
-
-
-    public async getUsers() {
-        // TODO: выпили эту хуйню после теста
-        const result = await this.repository.find();
-        return result;
+        return this.repository.findOne({email: email});
     }
 }
 

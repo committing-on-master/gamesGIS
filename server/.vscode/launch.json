@@ -4,18 +4,26 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
         {
-            "type": "pwa-node",
+            "name": "Launch via ts-node",
             "request": "launch",
-            "name": "Launch Program",
+            "type": "node",
+            "runtimeExecutable": "node",
             "skipFiles": [
-                "<node_internals>/**"
+                "<node_internals>/**",
+                "node_modules/**"
             ],
-            "program": "${workspaceFolder}\\dist\\index.js",
-            "outFiles": [
-                "${workspaceFolder}/**/*.js"
-            ]
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register"
+            ],
+            "args": [
+                "${workspaceFolder}/src/index.ts"
+            ],
+            "env": {
+                "G_CONNECTION_STRING": "TS"
+            },
+            "console": "integratedTerminal"
         },
         {
             "name": "Mocha Tests",
@@ -41,23 +49,5 @@
                 "<node_internals>/**"
             ],
         }
-        // {
-        //     "name": "Debug mocha",
-        //     "type": "node",
-        //     "request": "launch",
-        //     "program": "/Users/rgilling/.nvm/versions/node/v7.2.1/bin/_mocha",
-        //     "stopOnEntry": false,
-        //     "args": ["--no-timeouts", "dist/**/*.spec.js"],
-        //     "cwd": "${workspaceFolder}",
-        //     "runtimeExecutable": null,
-        //     "sourceMaps": true,
-        //     "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-        //     "env": {
-        //       "NODE_ENV": "test",
-        //       "quiet": "false"
-        //     }
-        //   },
-
-
     ]
 }

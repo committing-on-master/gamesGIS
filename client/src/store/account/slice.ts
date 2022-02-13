@@ -37,5 +37,5 @@ const accountSlice = createSlice({
     }
 });
 
-export default accountSlice.reducer;
+export const accountReducer = accountSlice.reducer;
 // export const { logoutUser } = accountSlice.actions;
