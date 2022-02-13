@@ -10,7 +10,7 @@ function MyMapsPage() {
     const navigate = useNavigate();
     const userId = useAppSelector(state => accountSelectors.UserId(state.account));
     const handleProfileCreation = (name: string) => {
-        navigate(`map/${name}/editing`);
+        navigate(`../map/${name}`);
     }
     if (!userId) {
         navigate("404");

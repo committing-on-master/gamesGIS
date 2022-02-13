@@ -22,7 +22,6 @@ export const Navbar = () => {
           <Link className="navbar__item" to="/">Home</Link>
           <Link className="navbar__item" to="about">About</Link>
 
-          {userName && <Link className="navbar__item" to="howto">How to</Link>}
           {userName && <Link className="navbar__item" to="mymaps">My maps</Link>}
         </div>
 

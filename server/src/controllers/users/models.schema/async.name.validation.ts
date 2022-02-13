@@ -12,8 +12,8 @@ function asyncNameValidation(userService: UsersService, optional: boolean = fals
     return body("name")
         .optional(optional)
         .custom(async (value /* , { req, location, path } */) =>
-            service.isNameAvailable(value)
-                .then((available) => (available) ? Promise.resolve() : Promise.reject(new Error("This name already in use"))),
+            service.isNameAlreadyExist(value)
+                .then((exist) => (exist) ? Promise.reject(new Error("This name already in use")) : Promise.resolve()),
         );
 }
 

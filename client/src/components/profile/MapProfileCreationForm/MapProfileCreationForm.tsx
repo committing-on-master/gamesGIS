@@ -9,6 +9,7 @@ import { SchemaValidation } from "./schemaValidation";
 import "./MapProfileCreationForm.scss";
 import { AreaChoicer, ChoicerAreaType } from "./../AreaChoicer";
 import { EndPoints } from "../../../api/endPoints";
+import { nameofPropChecker } from "../../../api/nameofPropChecker";
 
 const previewUrl = (name: string) => `${EndPoints.Protocol}://${EndPoints.Host}/img/maps/${name}.png`;
 const areas: ChoicerAreaType[] = [
@@ -64,7 +65,7 @@ interface ProfileCreationProps {
 }
 
 function MapProfileCreationForm(props: ProfileCreationProps) {
-    const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<CreatingMapProfile>({defaultValues: {map: MapType.Woods}});
+    const { register, handleSubmit, setError, reset, setValue, formState: { errors } } = useForm<CreatingMapProfile>({defaultValues: {map: MapType.Woods}});
     const [backendError, setBackendError] = useState<string | undefined>(undefined);
 
     const onSubmit: SubmitHandler<CreatingMapProfile> = (data) => {
@@ -79,6 +80,21 @@ function MapProfileCreationForm(props: ProfileCreationProps) {
                         props.onCreated(data.profileName);
                     }
                     reset();
+                    return Promise.resolve();
+                }
+                if (res.failure?.errors !== undefined  && res.failure?.errors?.length !== 0) {
+                    res.failure.errors.forEach((error) => {
+                        switch (error.param) {
+                            case nameofPropChecker<MapProfileDTO>("profileName"):
+                                setError("profileName", { message: error.msg }, { shouldFocus: true });                                                                                
+                                break;
+                            case nameofPropChecker<MapProfileDTO>("map"):
+                                setError("map", { message: error.msg });
+                                break;
+                            default:
+                                throw new Error(res.failure?.message);
+                        }
+                    })
                     return Promise.resolve();
                 }
                 setBackendError(res.failure?.message);

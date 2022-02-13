@@ -43,7 +43,6 @@ class UsersRoutes extends CommonRoutesConfig {
     protected configureRoute(router: express.Router): express.Router {
         router
             .route("/users")
-            .get(this.usersController.listUsers)
             .post(
                 asyncWrapper(this.usersMiddleware.validateRequestSchema(checkSchema(createUserDtoSchema))),
                 asyncWrapper(this.usersMiddleware.validateRequestSchema(asyncEmailValidation(this.usersService))),

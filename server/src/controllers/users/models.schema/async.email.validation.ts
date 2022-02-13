@@ -12,8 +12,8 @@ function asyncEmailValidation(userService: UsersService, optional: boolean = fal
     return body("email")
         .optional(optional)
         .custom(async (value /* , { req, location, path } */) =>
-            service.isEmailAvailable(value)
-                .then((available) => (available) ? Promise.resolve() : Promise.reject(new Error("This email already in use"))),
+            service.isEmailAlreadyExist(value)
+                .then((exist) => (exist) ? Promise.reject(new Error("This email already in use")) : Promise.resolve()),
         );
 }
 

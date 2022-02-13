@@ -19,7 +19,7 @@ function RegistrationPage() {
         dispatch(loginUser({userEmail: data.userEmail, userPassword: data.userPassword}))
             .unwrap()
             .then(() => {
-                routerNav("howto");
+                routerNav("../mymaps");
             });
     }
 

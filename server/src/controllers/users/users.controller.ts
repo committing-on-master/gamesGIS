@@ -17,7 +17,6 @@ class UsersController extends CommonController {
         this.services = services;
 
         // методы уходят в endpoint-ы экспресса, биндим this
-        this.listUsers = this.listUsers.bind(this);
         this.createUser = this.createUser.bind(this);
         this.patchUser = this.patchUser.bind(this);
         this.getUser = this.getUser.bind(this);
@@ -70,12 +69,6 @@ class UsersController extends CommonController {
         const newPermission: number = res.locals.permissionFlag;
         await this.services.Users.updateUserPermission(targetUser, newPermission);
         return res.status(200).send({msg: "user permission successfully changed"});
-    }
-
-    // TODO: удолить после тестов
-    async listUsers(req: express.Request, res: express.Response) {
-        const users = await this.services.Users.list(100, 0);
-        res.status(200).send(users);
     }
 }
 

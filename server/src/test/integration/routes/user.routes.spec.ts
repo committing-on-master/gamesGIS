@@ -152,8 +152,8 @@ describe("User Routes", function() {
         before(function() {
             manualResetTestInstances();
             builder
-                .addStep((data) => data.userService.addMock((service) => when(service.isEmailAvailable(userEmail)).thenResolve(true))
-                    .addMock((service) => when(service.isNameAvailable(userName)).thenResolve(true)))
+                .addStep((data) => data.userService.addMock((service) => when(service.isEmailAlreadyExist(userEmail)).thenResolve(false))
+                    .addMock((service) => when(service.isNameAlreadyExist(userName)).thenResolve(false)))
                 .TestedInstance.registerRoutes(expressApp);
         });
 
@@ -219,8 +219,8 @@ describe("User Routes", function() {
                 .addStep((data) => data.usersStub.addMock((user) => when(user.id).thenReturn(userId)))
                 .addStep((data) => data.userService.addMock((service) => when(service.isUserExist(userId)).thenResolve(true))
                     .addMock((service) => when(service.getUserById(userId)).thenResolve(data.usersStub.Instance))
-                    .addMock((service) => when(service.isNameAvailable(newUserName)).thenResolve(true))
-                    .addMock((service) => when(service.isEmailAvailable(newUserEmail)).thenResolve(true)))
+                    .addMock((service) => when(service.isNameAlreadyExist(newUserName)).thenResolve(false))
+                    .addMock((service) => when(service.isEmailAlreadyExist(newUserEmail)).thenResolve(false)))
                 .TestedInstance.registerRoutes(expressApp);
         });
 
