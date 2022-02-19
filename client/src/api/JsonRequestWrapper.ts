@@ -50,7 +50,7 @@ class RequestWrapper implements IRequestWrapper {
     }
     
     
-    private static getUrl(endPoint: string) {
+    public static getUrl(endPoint: string) {
         return `${EndPoints.Protocol}://${EndPoints.Api}/${endPoint}`;
     }
 

@@ -13,7 +13,6 @@ function App() {
   return (
     <div className="App">
       <Routes>
-
         <Route path="/map/:profileName" element={<MapPage />} />
         <Route path="/" element={<MainTemplate />}>
           <Route path="/" element={<HomePage />} />

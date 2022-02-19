@@ -1,1 +1,0 @@
-export { AgreementText } from "./AgreementText";
