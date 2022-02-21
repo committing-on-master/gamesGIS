@@ -2,6 +2,9 @@ import "./../src/App.scss";
 import { BrowserRouter } from "react-router-dom";
 import { store } from "./../src/store/store";
 import { Provider } from "react-redux";
+import { initialize, mswDecorator } from 'msw-storybook-addon';
+
+initialize();
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
@@ -19,6 +22,7 @@ export const parameters = {
 };
 
 export const decorators = [
+  mswDecorator,
   (Story) => (
     <BrowserRouter>
       <Story />

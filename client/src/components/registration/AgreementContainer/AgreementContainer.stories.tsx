@@ -5,8 +5,7 @@ import { AgreementContainer } from './AgreementContainer';
 import { RequestWrapper } from '../../../api/JsonRequestWrapper';
 import { AgreementDTO } from '../../../api/dto/response/AgreementDTO';
 import { loremIpsum } from 'lorem-ipsum';
-import fetchMock from 'fetch-mock';
-import { ErrorDTO } from '../../../api/dto/response/ErrorDTO';
+import { rest } from 'msw';
 
 export default {
     title: 'Agreement/License/3.Container',
@@ -18,83 +17,62 @@ const Template: ComponentStory<typeof AgreementContainer> = (props) => <Agreemen
 
 export const Primary = Template.bind({});
 Primary.storyName = 'Primary 1,5 sec delay';
-Primary.play = () => {
-    const response: AgreementDTO = {
-        message: 'ok',
-        payload: {
-            version: 1,
-            agreementText: loremIpsum({ count: 5, format: 'plain', suffix: "\r\n", units: 'paragraphs' })
-        }
+Primary.parameters = {
+    msw: {
+        handlers: [
+            rest.get(
+                RequestWrapper.getUrl('agreement'),
+                (req, res, ctx) => {
+                    const response: AgreementDTO = {
+                        message: 'ok',
+                        payload: {
+                            version: 1,
+                            agreementText: loremIpsum({ count: 5, format: 'plain', suffix: "\r\n", units: 'paragraphs' })
+                        }
+                    }
+                    return res(
+                        ctx.delay(1500),
+                        ctx.status(200),
+                        ctx.json(response)
+                    );
+                }
+            )
+        ]
     }
-    fetchMock
-        .restore()
-        .get(
-            RequestWrapper.getUrl('agreement'),
-            {
-                status: 200,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(response)
-            },
-            {
-                delay: 1500
-            }
-        )
-}
-
-export const LongLoading = Template.bind({});
-LongLoading.storyName = '1 hour spinner';
-LongLoading.play = () => {
-    const response: AgreementDTO = {
-        message: 'ok',
-        payload: {
-            version: 1,
-            agreementText: loremIpsum({ count: 5, format: 'plain', suffix: "\r\n", units: 'paragraphs' })
-        }
-    }
-    fetchMock
-        .restore()
-        .get(
-            RequestWrapper.getUrl('agreement'),
-            {
-                status: 200,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(response)
-            },
-            {
-                delay: 60 * 60 * 1000
-            }
-        )
 }
 
 export const Second = Template.bind({});
 Second.storyName = '404 error';
-Second.play = () => {
-    fetchMock
-        .restore()
-        .get(
-            RequestWrapper.getUrl('agreement'),
-            {
-                status: 404,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({})
-            },
-        )
+Second.parameters = {
+    msw: {
+        handlers: [
+            rest.get(
+                RequestWrapper.getUrl('agreement'),
+                (req, res, ctx) => {
+                    return res(
+                        ctx.status(404, 'Agreement not found'),
+                        ctx.json({})
+                    );
+                }
+            )
+        ]
+    }
 }
 
 export const Third = Template.bind({});
 Third.storyName = '500 error';
-Third.play = () => {
-    const response: ErrorDTO = {
-        message: "500 internal error"
+Third.parameters = {
+    msw: {
+        handlers: [
+            rest.get(
+                RequestWrapper.getUrl('agreement'),
+                (req, res, ctx) => {
+                    return res(
+                        ctx.status(500, 'something broke'),
+                        ctx.json({})
+                    );
+                }
+            )
+        ]
     }
-    fetchMock
-        .restore()
-        .get(
-            RequestWrapper.getUrl('agreement'),
-            {
-                status: 500,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(response)
-            },
-        )
 }

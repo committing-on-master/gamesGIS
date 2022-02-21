@@ -6,7 +6,7 @@ import { SchemaValidation } from "./schemaValidation";
 import { useAppDispatch } from "../../../../store/hooks";
 import { loginUser } from "../../../../store/account/thunks";
 import { ErrorDTO } from "../../../../api/dto/response/ErrorDTO";
-import { nameofPropChecker } from "../../../../api/nameofPropChecker";
+import { nameofPropChecker } from "../../../../generics/nameofPropChecker";
 import { AuthDTO } from "../../../../api/dto/request/AuthDTO";
 import { LinkButton } from "../../../common/LinkButton";
 

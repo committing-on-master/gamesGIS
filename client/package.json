@@ -37,7 +37,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "storybook": "start-storybook -p 6006 -s public",
+    "storybook": "start-storybook -p 3001 -s public",
     "build-storybook": "build-storybook -s public"
   },
   "eslintConfig": {
@@ -70,6 +70,11 @@
     "@storybook/react": "^6.4.19",
     "fetch-mock": "^9.11.0",
     "lorem-ipsum": "^2.0.4",
+    "msw": "^0.36.8",
+    "msw-storybook-addon": "^1.6.0",
     "webpack": "^5.67.0"
+  },
+  "msw": {
+    "workerDirectory": "public"
   }
 }
