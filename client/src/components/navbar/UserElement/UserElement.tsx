@@ -10,13 +10,7 @@ interface UserProps {
      * Отображаемое имя пользователя
      * undefined - отображается строкой Login
      */
-    userName?: string;
-    /**
-     * Выравнивание выпадайки по краю
-     * undefined | left - по левому краю
-     * right - по правому краю
-     */
-    // dropdownAlignDirection?: "right" | "left";
+    userName?: string;    
 }
 
 function UserElement(props: UserProps) {
