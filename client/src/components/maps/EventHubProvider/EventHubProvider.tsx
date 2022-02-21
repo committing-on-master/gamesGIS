@@ -1,5 +1,5 @@
 import React from 'react';
-import { PublisherSubscriber } from '../../../helpers/publisherSubscriber';
+import { PublisherSubscriber } from '../../../generics/publisherSubscriber';
 
 type Events = {
     "onMapClick": { x: number, y: number },

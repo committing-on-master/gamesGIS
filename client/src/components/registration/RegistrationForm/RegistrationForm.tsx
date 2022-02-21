@@ -6,7 +6,7 @@ import { SchemaValidation } from "./schemaValidation";
 import { RequestWrapper } from "../../../api/JsonRequestWrapper";
 import { CreateUserDTO } from "../../../api/dto/request/CreateUserDTO";
 import { useState } from "react";
-import { nameofPropChecker } from "../../../api/nameofPropChecker";
+import { nameofPropChecker } from "../../../generics/nameofPropChecker";
 import { ErrorDTO } from "../../../api/dto/response/ErrorDTO";
 
 import "./RegistrationForm.scss";

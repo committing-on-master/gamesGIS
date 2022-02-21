@@ -9,7 +9,7 @@ import { SchemaValidation } from "./schemaValidation";
 import "./MapProfileCreationForm.scss";
 import { AreaChoicer, ChoicerAreaType } from "./../AreaChoicer";
 import { EndPoints } from "../../../api/endPoints";
-import { nameofPropChecker } from "../../../api/nameofPropChecker";
+import { nameofPropChecker } from "../../../generics/nameofPropChecker";
 
 const previewUrl = (name: string) => `${EndPoints.Protocol}://${EndPoints.Host}/img/maps/${name}.png`;
 const areas: ChoicerAreaType[] = [

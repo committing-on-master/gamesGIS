@@ -1,5 +1,4 @@
-import React, { FocusEventHandler, useState } from 'react';
-import classNames from "classnames";
+import React, { useState } from 'react';
 
 import "./CreationMarker.scss";
 
