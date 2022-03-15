@@ -2,8 +2,6 @@ import { useState } from "react";
 import { selectMarkerById } from "./../../../../store/markers/slice";
 import { useAppSelector } from "./../../../../store/hooks";
 
-import "./PopupBody.scss"
-
 interface PopupBodyProps {
 	markerId: number;
 }

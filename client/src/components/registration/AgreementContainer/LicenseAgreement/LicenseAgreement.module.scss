@@ -1,0 +1,113 @@
+@use './../../../../sass/components';
+@use './../../../../sass/variables'as var;
+
+.shadow {
+    overflow: hidden;
+    display: block;
+    position: fixed;
+    z-index: 100;
+    padding-top: 5%;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.licenseContainer {
+    background-color: rgb(218, 218, 218);
+    border-radius: 5px;
+    max-width: $body-content-max-width;
+    margin: auto;
+
+    height: 80%;
+
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+
+.button {
+    @extend %button;
+
+    &Agree {
+        font-size: 1.2rem;
+        background-color: var.$button-color-primary;
+    }
+
+    &Disagree {
+        font-size: 1.2rem;
+        background-color: var.$button-color-danger;
+    }
+
+    &Close {
+        background-color: var.$button-color-danger;
+        width: 2.5em;
+        height: 2.5em;
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+}
+
+.header {
+    text-align: center;
+    position: relative;
+    flex-shrink: 0;
+    // height: 2.5em;
+
+    h2 {
+        font-size: 2em;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+.footer {
+    display: flex;
+    justify-content: space-around;
+    // height: 3em;
+    flex-shrink: 0;
+
+    padding: 1em 0;
+}
+
+.body {
+    margin: auto;
+    background-color: #fff;
+    width: 90%;
+    border-radius: 5px;
+    padding: 1em;
+    // height: 70%;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+div.license-shadow {
+
+
+    div.license {
+
+
+
+        header.license-header {
+
+
+            // border: 1px solid black;
+            button.license-close {}
+        }
+
+        div.license-body {}
+
+        footer.license-footer {
+
+
+            .button {
+                font-size: 1.2rem;
+                width: 15%;
+                max-width: 200px;
+            }
+        }
+    }
+}

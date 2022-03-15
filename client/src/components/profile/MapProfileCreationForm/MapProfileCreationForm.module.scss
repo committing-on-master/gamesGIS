@@ -1,0 +1,29 @@
+@use './../../../sass/variables' as var;
+@use './../../../sass/components';
+@use './../../../sass/functions' as func;
+
+.form {
+    border-radius: var.$common-corner-radius;
+    border: var.$common-border-thin solid #1f1f1f;
+    padding: 1em;
+    width: func.toEm(385);
+    // width: 25.5em;
+}
+
+.button {
+    @extend %button;
+    font-size: 1.2rem;
+    background-color: var.$button-color-primary;
+}
+
+.input {
+    @extend %input;
+    display: block;
+    width: 100%;
+}
+
+.error{
+    color: red;
+    margin-top: 0;
+    font-size: .9rem;
+}

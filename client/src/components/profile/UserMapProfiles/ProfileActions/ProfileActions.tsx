@@ -2,7 +2,7 @@ import React from 'react';
 import { MapProfileReviewType } from '../../../../api/dto/response/ProfilesDTO';
 import { LinkButton } from '../../../common/LinkButton';
 
-import "./ProfileActions.scss";
+import styles from './ProfileActions.module.scss';
 
 interface ProfileActionsProps {
     record: MapProfileReviewType;
@@ -10,10 +10,10 @@ interface ProfileActionsProps {
 }
 function ProfileActions(props: ProfileActionsProps) {
     return (
-        <div className='profile-actions'>
-            <LinkButton className="button" to={`/map/${props.record.name}`}>Open map</LinkButton>
+        <div>
+            <LinkButton className={styles.button} to={`/map/${props.record.name}`}>Open map</LinkButton>
             <button
-                className='button button--danger'
+                className={`${styles.button} ${styles.buttonDanger}`}
                 onClick={() => props.onDeletionClick(props.record.id)}
             >
                 Delete

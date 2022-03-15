@@ -1,0 +1,10 @@
+@use './sass/variables' as var;
+
+.app { // корень spa    
+}
+
+.content { // обертка для сайта, кроме страницы с картой
+    width: 100%;
+    max-width: var.$body-content-max-width;
+    margin: 0 auto;
+}

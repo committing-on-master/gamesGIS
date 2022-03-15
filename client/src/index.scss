@@ -1,15 +1,17 @@
+@use './sass/variables' as var;
 @import-normalize;
+@import "@fortawesome/fontawesome-svg-core/styles.css";
 
 * {
     box-sizing: border-box;
 }
 
 html {
-    font-size: 15px;
+    // font-size: var.$font_size * 1px;
+    // font-size: 36px;
 }
 
 body {
     font-family: 'PT Serif', serif;
-    // font-size: 15px;
     line-height: 1.6;
 }

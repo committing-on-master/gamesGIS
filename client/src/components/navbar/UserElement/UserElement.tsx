@@ -3,7 +3,8 @@ import classNames from "classnames"
 import { LoginForm } from "./LoginForm";
 import { LogoutForm } from "./LogoutForm";
 import { UserName } from "./UserName";
-import "./UserElement.scss"
+
+import styles from './UserElement.module.scss';
 
 interface UserProps {
     /**
@@ -18,9 +19,9 @@ function UserElement(props: UserProps) {
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const dropDownCSS = classNames(
-        "dropdown-menu",
+        styles.menu,
         {
-            "dropdown-menu--is-active": dropdownVisibility
+            [styles.menu_visible]: dropdownVisibility
         }
     )
 
@@ -57,7 +58,7 @@ function UserElement(props: UserProps) {
 
 
     return (
-        <div className="dropdown-container" >
+        <div className={styles.container} >
             <UserName userName={props.userName} onClick={switchDropdownVisivility} />
             <div ref={dropdownRef} className={dropDownCSS}>
                 {dropDownContent}

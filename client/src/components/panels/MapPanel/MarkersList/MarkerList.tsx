@@ -5,7 +5,7 @@ import { EditSpanComponent } from '../../../common/EditSpanComponent';
 import { useEventHub } from '../../../maps/EventHubProvider';
 import { CreationMarker } from './CreationMarker';
 
-import "./MarkerList.scss";
+import styles from './MarkerList.module.scss';
 
 interface MarkerListProps {
     editable: boolean;
@@ -17,13 +17,13 @@ function MarkerList(props: MarkerListProps) {
     const [filter, setFilter] = useState("");
 
     return (
-        <div className='marker-list'>
+        <div className={styles.container}>
+            {props.editable ? <CreationMarker onCreate={props.onCreationClick} /> : null}
             <input type="text" 
-                className='input markers-filter'
+                className={styles.input}
                 placeholder='Markers filter...'
                 onChange={(eventArg) => setFilter(eventArg.target.value)} 
             />
-            {props.editable ? <CreationMarker onCreate={props.onCreationClick} /> : null}
             <List editable={props.editable} filter={filter} onEditClick={props.onEditionClick} />
         </div>
     );
@@ -51,19 +51,20 @@ function List(props: {
     const listElements = filtered.map((value) => {
         return (
             <li 
+                className={styles.list_item}
                 key={value.id}
                 onMouseEnter={() => turnOnSpotlightArea(value.id)}
                 onMouseLeave={turnOffSpotlightArea}
                 onClick={() => handleMarkerClick(value.id)}
             >
                 {value.name}
-                {props.editable ? <EditSpanComponent id={value.id} onClick={props.onEditClick} /> : null}
+                {props.editable ? <EditSpanComponent className={styles.icon} id={value.id} onClick={props.onEditClick} /> : null}
             </li>
         )
     });
 
     return (
-        <ul>
+        <ul className={styles.list}>
             {listElements}
         </ul>
     );

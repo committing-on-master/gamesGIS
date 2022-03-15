@@ -1,0 +1,43 @@
+@use './_variables.scss' as var;
+
+%button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 2em;
+    padding: 0.4em;
+
+
+    border-radius: var.$button-corner-radius;
+    border: var.$button-border-thin solid transparent;
+    cursor: pointer;
+    
+    background-color: var.$button-color;
+
+    &:hover {
+        border: var.$button-border-thin solid black;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+    }
+}
+
+%span_icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+%input {
+    border-radius: var.$input-corner-radius;
+    border: var.$input-border-thin solid transparent;
+    background-color: var.$input-background-color;
+
+    font-size: 1rem;
+
+    &:hover {
+        border: var.$input-border-thin solid rgb(83, 83, 83);
+    }
+}

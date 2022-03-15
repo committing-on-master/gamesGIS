@@ -10,7 +10,7 @@ import { nameofPropChecker } from "../../../../generics/nameofPropChecker";
 import { AuthDTO } from "../../../../api/dto/request/AuthDTO";
 import { LinkButton } from "../../../common/LinkButton";
 
-import "./LoginForm.scss";
+import styles from './LoginForm.module.scss';
 
 type Inputs = {
     userPassword: string,
@@ -69,33 +69,29 @@ function LoginForm(props: LoginFormProps) {
     }
 
     return (
-            <form className="form-login" onSubmit={handleSubmit(onSubmit)}>
+            <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
 
-                <div className="form-input-block">
+                <div>
                     <label>Email</label>
-                    <div className="control">
-                        <span className="icon">
-                            <FontAwesomeIcon icon={faEnvelope} />
-                        </span>
-                        <input className="input" type="email" placeholder="User email ..." {...register("userEmail", SchemaValidation.Email)} />
-                    </div>
-                    {errors.userEmail && <p className="error">{errors.userEmail.message}</p>}
+                    <span className={styles.icon}>
+                        <FontAwesomeIcon icon={faEnvelope} />
+                    </span>
+                    <input className={styles.input} type="email" placeholder="User email ..." {...register("userEmail", SchemaValidation.Email)} />
+                    {errors.userEmail && <p className={styles.error}>{errors.userEmail.message}</p>}
                 </div>
 
-                <div className="form-input-block">
+                <div>
                     <label>Password</label>
-                    <div className="control">
-                        <span className="icon">
-                            <FontAwesomeIcon icon={faKey} />
-                        </span>
-                        <input className="input" type="password" placeholder="User password ..." {...register("userPassword", SchemaValidation.Password)} />
-                    </div>
-                    {errors.userPassword && <p className="error">{errors.userPassword.message}</p>}
+                    <span className={styles.icon}>
+                        <FontAwesomeIcon icon={faKey} />
+                    </span>
+                    <input className={styles.input} type="password" placeholder="User password ..." {...register("userPassword", SchemaValidation.Password)} />
+                    {errors.userPassword && <p className={styles.error}>{errors.userPassword.message}</p>}
                 </div>
 
-                <div className="form-controls">
-                    <button type="submit" className="button button--primary">Login</button>
-                    <LinkButton className="button" onClick={props.onRegistrationRedirect} to="registration">Registration</LinkButton>
+                <div className={styles.controls}>
+                    <button type="submit" className={styles.buttonPr}>Login</button>
+                    <LinkButton className={styles.button} onClick={props.onRegistrationRedirect} to="registration">Registration</LinkButton>
                 </div>
             </form>
     )

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import "./CreationMarker.scss";
+import styles from './CreationMarker.module.scss';
 
 interface CreationMarkerProps {
     onCreate(name: string): void;
@@ -14,7 +14,7 @@ function CreationMarker({ onCreate }: CreationMarkerProps) {
         :
             <CreationMode onCreate={onCreate} onCancel={() => setSlimMode(true)}/>
     return (
-        <div className='create-marker'>
+        <div>
             {body}
         </div>
     );
@@ -43,24 +43,31 @@ function CreationMode({onCreate, onCancel}: CreationModeProps) {
             onCreate(name)
     }
     return (
-        <form onSubmit={handleSubmit} onBlur={handleBlur}>
+        <form
+            className={styles.form_create}
+            onSubmit={handleSubmit}
+            onBlur={handleBlur}
+        >
             <input
                 type="text"
-                className='input'
+                className={styles.input}
                 placeholder='Markers name...'
                 autoFocus={true}
                 value={name}
                 onChange={(eventArg) => setName(eventArg.target.value)}
                 onKeyDown={handleKeyPress}
             />
-            <button className='button button--primary' type='submit'>Add</button>
+            <button 
+                className={styles.button_primary}
+                type='submit'
+            >Add</button>
         </form>
     );
 }
 
 function SlimMode({onClick}: {onClick(): void}) {
     return (
-        <button className='button'
+        <button className={styles.button}
             onClick={() => onClick()}
         >
             Add new marker

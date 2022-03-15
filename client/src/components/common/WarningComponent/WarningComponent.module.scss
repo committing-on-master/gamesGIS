@@ -1,4 +1,22 @@
-@import "@fortawesome/fontawesome-svg-core/styles.css";
+@use './../../../sass/variables' as var;
+
+
+.component {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    &_inline {
+        flex-direction: row;
+        justify-content: flex-start;
+    }
+}
+
+.icon {
+    color: var.$icon-waiters-color;
+    margin-right: 5px;
+}
 
 div.component-warning {
     display: flex;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import './AgreementText.scss';
+import styles from './AgreementText.module.scss';
 
 export type AgreementTextProps = {
     text: string
@@ -8,7 +8,7 @@ export type AgreementTextProps = {
 
 function AgreementText(props: AgreementTextProps) {
     return (
-        <article className='agreement-text'>
+        <article className={styles.agreement}>
             {props.text}
         </article>
     );

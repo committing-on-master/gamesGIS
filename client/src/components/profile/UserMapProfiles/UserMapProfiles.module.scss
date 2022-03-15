@@ -1,0 +1,71 @@
+@use './../../../sass/variables'as var;
+@use './../../../sass/components';
+
+.table {
+    border-radius: var.$common-corner-radius;
+    border: var.$common-border-thin solid #1f1f1f;    
+    max-height: 60vh;
+    overflow-y: auto;
+    
+    table {
+        width: 100%;
+        thead {
+            background-color: var.$table-header-color;
+            border-top-left-radius: var.$common-corner-radius;
+            border-top-right-radius: var.$common-corner-radius;
+
+            height: 2.5em;
+            width: 100%;
+
+            position: sticky;
+            top: 0;
+            z-index: 1;
+
+            th {
+                font-weight: normal;
+            }
+        }
+    }
+}
+
+.row {
+    height: 2.5em;
+
+    &:hover {
+        background-color: #ddd;
+    }
+}
+
+.rowExpanded {
+    td {
+        padding-bottom: 0.3em;
+        border-bottom: 2px solid black;
+    }
+}
+
+.nameFilter {
+    @extend %input;
+    background-color: inherit;
+    border: 2px solid transparent;
+    outline: none;
+
+    &:focus {
+        border-bottom: 2px solid black;
+    }
+
+    &::placeholder {
+        color: black;
+        border-width: 0px;
+        border: none;
+    }
+}
+
+.mapFilter {
+    background-color: inherit;
+    border: 0px;
+}
+
+.icon {
+    color: blue;
+    cursor: pointer;
+}

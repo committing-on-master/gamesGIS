@@ -1,0 +1,14 @@
+@use './../../../../sass/components';
+@use './../../../../sass/variables' as var;
+
+.button {
+    @extend %button;
+    width: 45%;
+    max-width: 10em;
+    display: inline-block;
+    margin-left: 1em;
+
+    &Danger {
+        background-color: var.$button-color-danger;
+    }
+}

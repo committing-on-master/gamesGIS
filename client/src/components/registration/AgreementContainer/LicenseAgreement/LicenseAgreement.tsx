@@ -1,8 +1,7 @@
 import React from 'react';
-import classNames from 'classnames';
 import { ProcessState } from '../../../../hocs/withWaiter';
 
-import './LicenseAgreement.scss';
+import styles from './LicenseAgreement.module.scss';
 
 type LicenseAgreementProps = {
     children: React.ReactChild;
@@ -14,25 +13,28 @@ type LicenseAgreementProps = {
 function LicenseAgreement(props: LicenseAgreementProps) {
     const contentLoading = props.state !== ProcessState.Succeeded;
     return (
-        <div className="license-shadow">
-            <div className="license">
-                <header className="license-header">
+        <div className={styles.shadow}>
+            <div className={styles.licenseContainer}>
+                <header className={styles.header}>
                     <h2>License agreement</h2>
-                    <button className="license-close button button--danger" aria-label="close" onClick={props.onCancel}>×</button>
+                    <button 
+                        className={`${styles.button} ${styles.buttonClose}`}
+                        aria-label="close" onClick={props.onCancel}
+                    >×</button>
                 </header>
-                <div className='license-body'>
+                <div className={styles.body}>
                     {props.children}
                 </div>
-                <footer className="license-footer">
+                <footer className={styles.footer}>
                     <button
-                        className="button button--primary" 
+                        className={`${styles.button} ${styles.buttonAgree}`}
                         disabled={contentLoading}
                         onClick={props.onConfirm}
                     >
                         Agree
                     </button>
                     <button 
-                        className="button button--danger"
+                        className={`${styles.button} ${styles.buttonDisagree}`}
                         onClick={props.onCancel}
                     >
                         Cancel

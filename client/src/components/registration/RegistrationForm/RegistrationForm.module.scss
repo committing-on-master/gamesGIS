@@ -1,3 +1,55 @@
+@use './../../../sass/components';
+@use './../../../sass/variables'as var;
+
+.form {
+    margin: auto;
+    width: 50%;
+
+    border: 2px solid black;
+    border-radius: 5px;
+
+    padding: 1em;
+}
+
+.button {
+    @extend %button;
+    background-color: var.$button-color-primary;
+    font-size: 1.1rem;
+}
+
+.input {
+    @extend %input;
+
+    padding-left: 2em;
+    height: 2em;
+    width: 100%;
+}
+
+.icon {
+    @extend %span_icon;
+
+    position: absolute;
+    height: 2em;
+    width: 2em;
+}
+
+.error {
+    color: rgb(255, 0, 0);
+    margin-top: 0;
+    font-size: 0.7rem;
+
+    &Async {
+        padding-left: 1em;
+        margin: 0;
+    }
+}
+
+.controls {
+    padding-top: 2em;
+    display: inline-flex;
+    align-items: flex-start;
+}
+
 form.registration-form {
     margin: auto;
     width: 50%;
@@ -55,9 +107,11 @@ form.registration-form {
         padding-top: 2em;
         display: inline-flex;
         align-items: flex-start;
+
         button {
             font-size: 1.2rem;
         }
+
         >p.error {
             color: rgb(255, 0, 0);
             padding-left: 1em;

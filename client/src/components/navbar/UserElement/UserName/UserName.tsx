@@ -2,7 +2,7 @@ import React, { MouseEventHandler } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser } from '@fortawesome/free-solid-svg-icons'
 
-import "./UserName.scss"
+import styles from './UserName.module.scss';
 
 export interface IUserProps {
     userName?: string;
@@ -11,11 +11,11 @@ export interface IUserProps {
 
 const UserName = (props: IUserProps) => {
     return (
-        <button className="button button--primary user-name-container" onClick={props.onClick}>
-            <span className="icon">
+        <button className={styles.button} onClick={props.onClick}>
+            <span className={styles.span}>
                 <FontAwesomeIcon icon={faUser} />
             </span>
-            <span>{props.userName ? props.userName : "Login"}</span>
+            {props.userName ? props.userName : "Login"}
         </button>
     )
 }

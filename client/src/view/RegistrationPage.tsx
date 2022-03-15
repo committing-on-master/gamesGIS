@@ -5,7 +5,7 @@ import { useAppDispatch } from '../store/hooks';
 import { loginUser } from '../store/account/thunks';
 import { useState } from 'react';
 
-import "./RegistrationPage.scss";
+import styles from './RegistrationPage.module.scss';
 
 function RegistrationPage() {
     const [confirmation, setConfirmation] = useState(true);
@@ -25,12 +25,10 @@ function RegistrationPage() {
     }
 
     return (
-        <div className="registration-container">
+        <div className={styles.container}>
             { confirmation && <AgreementContainer onCancel={handleCancel} onConfirm={() => setConfirmation(false)} /> }
             <h2>Registration form</h2>
-            <div className="message-body">
-                <RegistrationForm endPoint="users" onRegistered={handleRegistration}/>
-            </div>
+            <RegistrationForm endPoint="users" onRegistered={handleRegistration}/>
         </div>
     )
 }
