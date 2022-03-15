@@ -1,0 +1,46 @@
+@use './../../../../sass/components';
+@use './../../../../sass/variables' as var;
+
+.form {
+    position: relative;
+}
+
+.controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.button {
+    @extend %button;
+    font-size: 1rem;
+}
+
+.buttonPr {
+    @extend %button;
+    font-size: 1rem;
+    background-color: var.$button-color-primary;
+}
+
+.input {
+    @extend %input;
+    
+    padding-left: 2em;
+    height: 2em;
+    width: 100%;
+}
+
+.icon {
+    @extend %span_icon;
+
+    position: absolute;
+    height: 2em;
+    width: 2em;
+}
+
+.error {
+    color: rgb(255, 0, 0);
+    margin-top: 0;
+    font-size: 0.7rem;
+}

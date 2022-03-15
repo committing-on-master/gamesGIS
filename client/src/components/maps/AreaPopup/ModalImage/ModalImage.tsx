@@ -1,5 +1,4 @@
 import React, { KeyboardEventHandler, useEffect, useState, WheelEventHandler } from "react";
-import "./ModalImage.scss";
 
 interface ModalImageProp {
     imgUrl: string;

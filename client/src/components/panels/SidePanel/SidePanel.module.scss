@@ -1,0 +1,87 @@
+@use "./../../../sass/variables" as var;
+
+.header {
+    text-align: center;
+    width: 90%;
+    height: 2em;
+    font-size: 1rem;
+    background-color: var.$background-secondary;
+    border-radius: var.$button-corner-radius;
+    border: var.$common-border-thin solid rgb(73, 73, 73);
+
+    display: none;
+
+    &Active {
+        display: block;
+    }
+}
+
+.arrowContainer {
+    align-self: flex-start;
+    position: relative;
+    top: 0.5em;
+    right: 2rem;
+    width: 2rem;
+    min-height: 2.5rem;
+    background-color: black;
+    transition: 0.5s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    &Right {
+        right: 0;
+        background-color: white;
+    }
+}
+
+.arrow {
+    border: solid white;
+    border-width: 0 0.2rem 0.2rem 0;
+    transform: rotate(135deg);
+    cursor: pointer;
+    transition: 0.5s;
+    padding: 0.5rem;
+
+    &Right {
+        border-color: black;
+        transform: rotate(-45deg);
+    }
+}
+
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    right: 0;
+    background-color: rgb(153, 153, 153);
+    transition: 0.5s;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+
+    &Active {
+        width: 350px;
+    }
+}
+
+.navbody {
+    display: none;
+    width: 0%;
+    overflow: auto;
+
+    margin-top: 1em;
+
+    background-color: var.$background-secondary;
+    border-radius: var.$button-corner-radius;
+    border: var.$common-border-thin solid rgb(73, 73, 73);
+
+    &Visible {
+        display: block;
+        width: 90%;
+    }
+}

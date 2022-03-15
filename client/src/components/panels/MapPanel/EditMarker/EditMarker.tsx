@@ -9,7 +9,7 @@ import { CoordinatesList } from './CoordinatesList';
 import { EditingState } from '../../../../store/markers/types';
 import classNames from 'classnames';
 
-import "./EditMarker.scss";
+import styles from './EditMarker.module.scss';
 
 type Inputs = {
     name: string;
@@ -67,10 +67,12 @@ function EditMarker() {
     }
 
     const positionCss = classNames(
-        "input-position", { "input-position--active": elementFocus === FocusElement.Position }
+        styles.coordinateInput,
+        { [styles.coordinateInput_active]: elementFocus === FocusElement.Position }
     );
     const areaCss = classNames(
-        "input-area", { "input-area--active": elementFocus === FocusElement.Bound }
+        styles.coordinateInput,
+         { [styles.coordinateInput_active]: elementFocus === FocusElement.Bound }
     );
 
     const handleColorChange = (arg: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,55 +102,65 @@ function EditMarker() {
 
     const positionText = marker.position ? `x: ${marker.position.x.toFixed(3)} y: ${marker.position.y.toFixed(3)}` : "";
     return (
-        <div ref={formRef} className='markers-edition-form' >
+        <div ref={formRef} className={styles.container} >
             <h3>Marker Edition form</h3>
-            <form onSubmit={handleSubmit(onSubmit)} >
-                <label>Marker name</label>
-                <input type="text" placeholder="...marker name" {...register("name", EditSchemaValidation.MarkerName)} />
-                {errors.name && <p>{errors.name.message}</p>}
+            <form className={styles.form} onSubmit={handleSubmit(onSubmit)} >
+                <label className={styles.label} >Marker name</label>
+                <input 
+                    className={styles.input} 
+                    type="text"
+                    placeholder="...marker name"
+                    {...register("name", EditSchemaValidation.MarkerName)}
+                />
+                {errors.name && <p className={styles.error}>{errors.name.message}</p>}
 
-                <label>Description</label>
-                <textarea placeholder="...description" {...register("description", EditSchemaValidation.MarkerDescription)} />
-                {errors.description && <p>{errors.description.message}</p>}
+                <label className={styles.label} >Description</label>
+                <textarea 
+                    className={styles.textArea}
+                    placeholder="...description" 
+                    {...register("description", EditSchemaValidation.MarkerDescription)} 
+                />
+                {errors.description && <p className={styles.error}>{errors.description.message}</p>}
 
-                <label className='color-label'>Area color</label>
-                <input type="color" {...register("color", { onChange: handleColorChange, ...EditSchemaValidation.MarkerColor })} />
-                {errors.color && <p>{errors.color.message}</p>}
+                <label className={`${styles.label} ${styles.label_Colored}`}>Area color</label>
+                <input
+                    type="color"
+                    {...register("color", { onChange: handleColorChange, ...EditSchemaValidation.MarkerColor })} 
+                />
+                {errors.color && <p className={styles.error}>{errors.color.message}</p>}
 
-                <label>Marker position</label>
-                
+                <label className={styles.label}>Marker position</label>
                 <input
                     className={positionCss}
                     type={"text"}
-                    placeholder="Set focus and map click..."
+                    placeholder="set focus and map click..."
                     readOnly={true}
                     value={positionText}
                     onClick={() => setFocus(elementFocus === FocusElement.Position ? FocusElement.Another : FocusElement.Position)}
                     onBlur={handlePositionBlur}
                 />
-                    
 
-                <label>Area coordinates</label>
-                <div className='area-input-group'>
+                <label className={styles.label}>Area coordinates</label>
+                <div className={styles.coordinateInputGroup}>
                     <input
                         className={areaCss}
                         type={"text"}
-                        placeholder="...set focus and map click"
+                        placeholder="set focus and map click..."
                         readOnly={true}
                         onClick={() => setFocus(elementFocus === FocusElement.Bound ? FocusElement.Another : FocusElement.Bound)}
                     />
                     <button 
-                        className='button button--danger'
+                        className={styles.button_danger}
                         onClick={handlerAreaCoordinateDeletion}
                         title='Clear all coordinates'
                     >X</button>
                 </div>
                 <CoordinatesList />
                 
-                <div className='form-buttons'>
-                    <input className='button button--primary' type="submit" />
-                    <button className='button' onClick={onCancel}>Cancel</button>
-                    {marker.state === EditingState.Saved ? <button className='button button--danger' onClick={onDelete}>Delete</button> : null}
+                <div className={styles.controls}>
+                    <input className={styles.button_primary} type="submit" value={'Save'} />
+                    <button className={styles.button} onClick={onCancel}>Cancel</button>
+                    {marker.state === EditingState.Saved ? <button className={styles.button_danger} onClick={onDelete}>Delete</button> : null}
                 </div>
             </form>
         </div>

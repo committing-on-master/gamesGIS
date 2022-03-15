@@ -16,6 +16,8 @@ import { fetchProfileMarkers } from "../store/markers/thunks";
 import { MapPanel } from "../components/panels/MapPanel";
 import { SidePanel } from "../components/panels/SidePanel";
 
+import styles from './MapPage.module.scss';
+
 type LoadingState = {
     status: "idle" | "loading" | "succeeded" | "failed";
     msg?: string;
@@ -68,7 +70,7 @@ function MapPage() {
     }
 
     return (
-        <div className="leaflet-container">
+        <div className={styles.leafletContainer}>
         <EventHubProvider>
             <LeafletComponent />
             <SidePanel

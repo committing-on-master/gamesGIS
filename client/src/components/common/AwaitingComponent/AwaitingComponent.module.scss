@@ -1,0 +1,18 @@
+@use './../../../sass/variables' as  var;
+
+.component {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.component_inline {
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.await {
+    color: var.$icon-waiters-color;
+    margin-right: 5px;
+}

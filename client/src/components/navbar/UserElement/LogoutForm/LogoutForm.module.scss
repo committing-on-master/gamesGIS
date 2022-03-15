@@ -1,0 +1,16 @@
+@use './../../../../sass/components';
+@use './../../../../sass/variables' as var;
+
+.button {
+    @extend %button;
+    background-color: var.$button-color-danger;
+    width: 100%;
+    font-size: 1rem;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.icon {
+    @extend %span_icon;
+    margin-right: 0.5em;
+}

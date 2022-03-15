@@ -1,0 +1,101 @@
+@use './../../../../sass/components';
+@use './../../../../sass/variables'as var;
+
+.container {
+    display: inline-flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+
+    h3 {
+        text-align: center;
+    }
+}
+
+.form {
+    align-self: center;
+    border-radius: var.$common-corner-radius;
+    border: var.$common-border-thin solid rgb(48, 48, 48);
+    width: 90%;
+    padding: 0 1em 1em 1em;
+}
+
+.button {
+    @extend %button;
+}
+
+.button_primary {
+    @extend %button;
+    background-color: var.$button-color-primary;
+}
+
+.button_danger {
+    @extend %button;
+    background-color: var.$button-color-danger;
+}
+
+.controls {
+    width: 100%;
+
+    input[type=submit],
+    button {
+        width: 25%;
+        display: inline-block;
+    }
+
+    button {
+        margin-left: 0.5em;
+
+        &:last-child {
+            float: right;
+        }
+    }
+}
+
+.label {
+    display: block;
+    padding-top: 1em;
+    padding-right: 0.5rem;
+
+    &_Colored {
+        display: inline-block;
+    }
+}
+
+.input {
+    @extend %input;
+    background-color: white;
+    font-size: 0.8rem;
+    width: 100%;
+}
+
+.coordinateInputGroup {
+    display: flex;
+    button {
+        margin-left: 0.3em;
+    }
+}
+
+.coordinateInput {
+    border: 4px solid transparent;
+    border-radius: 0.3em;
+
+    &_active {
+        outline: 0;
+        border: 4px solid green;
+        border-radius: 0.3em;
+    }
+}
+
+.textArea {
+    display: block;
+    resize: vertical;
+    width: 100%;
+}
+
+.error {
+    color: rgb(255, 0, 0);
+    margin-top: 0;
+    font-size: 0.7rem;
+}

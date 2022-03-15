@@ -4,7 +4,7 @@ import { useAppDispatch } from '../../../../store/hooks'
 import { logoutUser } from '../../../../store/account/thunks';
 import { Link, useNavigate } from 'react-router-dom';
 
-import "./LogoutForm.scss";
+import styles from './LogoutForm.module.scss';
 
 interface LogoutProps {
     onLogout?(): void;
@@ -26,8 +26,8 @@ function LogoutForm(props: LogoutProps) {
         <div className="logout-form">
             <Link to={"/profile"}>Profile</Link>
             <hr />
-            <button className="button button-danger" onClick={handleLogout}>
-                <span className="icon">
+            <button className={styles.button} onClick={handleLogout}>
+                <span className={styles.icon}>
                     <FontAwesomeIcon icon={faSignOutAlt} />
                 </span>
                 Logout

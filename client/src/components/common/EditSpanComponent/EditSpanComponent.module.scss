@@ -1,0 +1,9 @@
+@use './../../../sass/variables' as var;
+
+.component {
+    text-align: center;
+}
+
+.edit {
+    color: var.$icon-waiters-color;
+}

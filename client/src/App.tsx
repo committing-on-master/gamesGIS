@@ -6,14 +6,13 @@ import { MapPage } from './view/MapPage';
 import { NoMatchPage } from './view/NoMatchPage';
 import { RegistrationPage } from './view/RegistrationPage';
 
-import "./App.scss"
+import styles from './App.module.scss';
 import MyMapsPage from './view/MyMapsPage';
 
 function App() {
   return (
-    <div className="App">
+    <div className={styles.app}>
       <Routes>
-
         <Route path="/map/:profileName" element={<MapPage />} />
         <Route path="/" element={<MainTemplate />}>
           <Route path="/" element={<HomePage />} />
@@ -28,7 +27,7 @@ function App() {
 
 function MainTemplate() {
   return (
-    <div className="content">
+    <div className={styles.content}>
       <Navbar />
       <Outlet />
     </div>

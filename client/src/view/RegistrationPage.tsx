@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router';
 import { Inputs, RegistrationForm } from '../components/registration/RegistrationForm/RegistrationForm';
-import { LicenseAgreement } from './../components/registration/LicenseAgreement';
+import { AgreementContainer } from './../components/registration/AgreementContainer';
 import { useAppDispatch } from '../store/hooks';
 import { loginUser } from '../store/account/thunks';
 import { useState } from 'react';
 
-import "./RegistrationPage.scss";
+import styles from './RegistrationPage.module.scss';
 
 function RegistrationPage() {
     const [confirmation, setConfirmation] = useState(true);
@@ -13,23 +13,22 @@ function RegistrationPage() {
     const routerNav = useNavigate();
 
     function handleCancel() {
-        routerNav("/")
+        routerNav("/", {replace: true});
     }
+    
     function handleRegistration(data: Inputs) {
         dispatch(loginUser({userEmail: data.userEmail, userPassword: data.userPassword}))
             .unwrap()
             .then(() => {
-                routerNav("../mymaps");
+                routerNav("/mymaps", {replace: true});
             });
     }
 
     return (
-        <div className="registration-container">
-            { confirmation && <LicenseAgreement endPoint="agreement" onCancel={handleCancel} onConfirm={() => setConfirmation(false)} /> }
+        <div className={styles.container}>
+            { confirmation && <AgreementContainer onCancel={handleCancel} onConfirm={() => setConfirmation(false)} /> }
             <h2>Registration form</h2>
-            <div className="message-body">
-                <RegistrationForm endPoint="users" onRegistered={handleRegistration}/>
-            </div>
+            <RegistrationForm endPoint="users" onRegistered={handleRegistration}/>
         </div>
     )
 }

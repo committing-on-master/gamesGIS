@@ -5,7 +5,7 @@ import { useAppSelector } from "../../store/hooks";
 import { accountSelectors } from "../../store/account/state";
 import { Link } from "react-router-dom";
 
-import "./Navbar.scss";
+import styles from './Navbar.module.scss';
 
 export const Navbar = () => {
   const [mNavbarPopup, setmNavbarPopup] = useState(false);
@@ -14,20 +14,18 @@ export const Navbar = () => {
   const toggleMobileNavbar = () => setmNavbarPopup(!mNavbarPopup);
 
   return (
-    <nav className="navbar" role="navigation" aria-label="main navigation">
-        <div className="navbar__start">
-          <a className="navbar__icon" href="/">
+    <nav className={styles.navbar} role="navigation" aria-label="main navigation">
+        <div className={styles.item_block}>
+          <a className={styles.icon} href="/">
             <img src={logo} width="32" height="32" alt="logo" />
           </a>
-          <Link className="navbar__item" to="/">Home</Link>
-          <Link className="navbar__item" to="about">About</Link>
+          <Link className={styles.item} to="/">Home</Link>
+          <Link className={styles.item} to="about">About</Link>
 
-          {userName && <Link className="navbar__item" to="mymaps">My maps</Link>}
+          {userName && <Link className={styles.item} to="mymaps">My maps</Link>}
         </div>
 
-        <div className="navbar__end">
-          <UserElement userName={userName} />
-        </div>
+        <UserElement userName={userName} />
     </nav>
   );
 }

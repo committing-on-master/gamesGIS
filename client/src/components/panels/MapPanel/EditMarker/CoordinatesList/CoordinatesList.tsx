@@ -1,7 +1,9 @@
 import React from 'react';
 import { useAppSelector } from '../../../../../store/hooks';
 import { selectEditableCoordinates } from '../../../../../store/markers/slice';
-import "./CoordinatesList.scss";
+
+import styles from './CoordinatesList.module.scss';
+
 
 function CoordinatesList() {
     const list = useAppSelector(state => selectEditableCoordinates(state.markers));
@@ -17,7 +19,7 @@ function CoordinatesList() {
         })
     }
 
-    return <ul className='coordinate-list'>{listBody}</ul>;
+    return <ul className={styles.list_item}>{listBody}</ul>;
 }
 
 export { CoordinatesList };

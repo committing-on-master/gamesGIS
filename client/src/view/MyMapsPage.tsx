@@ -4,7 +4,7 @@ import { UserMapProfiles } from "../components/profile/UserMapProfiles";
 import { accountSelectors } from "../store/account/state";
 import { useAppSelector } from "../store/hooks";
 
-import "./MyMapsPage.scss"
+import styles from './MyMapsPage.module.scss';
 
 function MyMapsPage() {
     const navigate = useNavigate();
@@ -17,8 +17,8 @@ function MyMapsPage() {
         return null;
     }
     return (
-        <div className="my-maps-page">
-            <div className="profile-creation">
+        <div className={styles.container}>
+            <div>
                 <h3>Create profile</h3>
                 <MapProfileCreationForm onCreated={handleProfileCreation}/>
             </div>

@@ -1,0 +1,26 @@
+@use './../../../../../sass/components';
+@use './../../../../../sass/variables' as var;
+
+$fontSize: 0.8rem;
+
+.button {
+    @extend %button;
+    font-size: $fontSize;
+}
+
+.button_primary {
+    @extend %button;
+    background-color: var.$button-color-primary;
+    font-size: $fontSize;
+}
+
+.form_create {
+    display: inline-flex;
+    width: 100%;
+}
+
+.input {
+    @extend %input;
+    font-size: $fontSize;
+    background-color: white;
+}

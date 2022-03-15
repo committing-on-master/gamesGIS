@@ -5,7 +5,7 @@ import Table from 'rc-table';
 import { RequestWrapper } from '../../../api/JsonRequestWrapper';
 import { ErrorDTO } from '../../../api/dto/response/ErrorDTO';
 
-import "./UserMapProfiles.scss";
+import styles from './UserMapProfiles.module.scss';
 import { MapType } from '../../../api/dto/types/MapType';
 import { ColumnsType, RenderExpandIconProps } from 'rc-table/lib/interface';
 import { ProfileActions } from './ProfileActions';
@@ -72,11 +72,12 @@ function UserMapProfiles(props: UserMapProfilesProps) {
     }
 
     return (
-        <div className='saved-profiles'>
+        // <div className='saved-profiles'>
+        <div>
             <h3>Saved profiles</h3>
             <Table
-                className={'profiles-table'}
-                rowClassName={"profiles-table-row"}
+                className={styles.table}
+                rowClassName={styles.row}
                 rowKey={record => record.id}
                 columns={columns}
                 data={filtered}
@@ -93,7 +94,7 @@ function UserMapProfiles(props: UserMapProfilesProps) {
                     onExpand: (expanded, record) => {
 
                     },
-                    expandedRowClassName: () => "profiles-table-expanded-row",
+                    expandedRowClassName: () => styles.rowExpanded,
                     expandIcon: CustomExpandIcon,
                 }}
             />
@@ -106,7 +107,7 @@ function CustomExpandIcon(props: RenderExpandIconProps<MapProfileReviewType>) {
 
     return (
         <span
-            className="expand-row-icon"
+            className={styles.icon}
             onClick={e => {
               props.onExpand(props.record, e);
             }}
@@ -121,7 +122,7 @@ function useFilterHook(mapProfiles: MapProfileReviewType[]): [MapProfileReviewTy
     const [mapFilter, setMapFilter] = useState(MapType.Undefined);
 
     const NameInput = <input
-        className="name-filter"
+        className={styles.nameFilter}
         type={"text"}
         placeholder={"Name filter"}
         value={nameFilter}
@@ -132,7 +133,7 @@ function useFilterHook(mapProfiles: MapProfileReviewType[]): [MapProfileReviewTy
 
     const SelectFilter =
         <select
-            className="map-filter"
+            className={styles.mapFilter}
             value={mapFilter}
             onChange={(e) => {
                 setMapFilter(Number(e.target.value));

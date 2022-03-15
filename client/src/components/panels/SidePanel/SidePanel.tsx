@@ -1,7 +1,7 @@
 import { useState } from "react";
 import classNames from "classnames";
 
-import "./SidePanel.scss";
+import styles from './SidePanel.module.scss';
 
 interface SidePanelProps {
     visibility: boolean;
@@ -12,22 +12,27 @@ interface SidePanelProps {
 function SidePanel(props: SidePanelProps) {
     const [visibility, setVisibility] = useState(props.visibility);
 
+    const headerCss = classNames(
+        styles.header,
+        { [styles.headerActive]: visibility }
+    );
+
     const navClass = classNames(
-        "sidenav",
-        { "sidenav--active": visibility }
+        styles.sidenav,
+        { [styles.sidenavActive]: visibility }
 
     )
     const arrowClass = classNames(
-        "arrow",
-        { "arrow--right": visibility }
+        styles.arrow,
+        { [styles.arrowRight]: visibility }
     );
     const arrowContainerClass = classNames(
-        "arrowContainer",
-        {"arrowContainer--right": visibility}
+        styles.arrowContainer,
+        { [styles.arrowContainerRight]: visibility }
     )
     const nabBodyClass = classNames(
-        "navbody",
-        {"navbody--visible" : visibility}
+        styles.navbody,
+        { [styles.navbodyVisible] : visibility }
     );
 
     const handleOnCLick = () => {
@@ -37,13 +42,13 @@ function SidePanel(props: SidePanelProps) {
 
     return (
         <nav className={navClass}>
-            {props.header && <h2>{props.header}</h2>}
             <div className={arrowContainerClass}>
                 <span className={arrowClass} onClick={handleOnCLick}></span>
             </div>
+            {props.header && <h2 className={headerCss}>{props.header}</h2>}
             <div className={nabBodyClass}>
                 {props.children ?? props.children}
-            </div>            
+            </div>
         </nav>
     )
 }

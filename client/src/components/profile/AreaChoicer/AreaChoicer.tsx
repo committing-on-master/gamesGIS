@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MapType } from '../../../api/dto/types/MapType';
 
-import "./AreaChoicer.scss";
+import styles from './AreaChoicer.module.scss';
 
 export type ChoicerAreaType = {
     name: string;
@@ -39,14 +39,23 @@ function AreaChoicer(props: AreaChoicerProps) {
             props.onChoiseChanged(props.areas[newIndex].map);
         }
     }
+
+    const leftArrowCss = `${styles.arrow} ${styles.arrowLeft}`;
+    const rightArrowCss = `${styles.arrow} ${styles.arrowRight}`;
     return (
-        <div className='area-choicer'>
-            <img src={props.areas[choiseIndex].url} alt="Simple area preview" width={540} height={301} />
-            <div className='area-text'>
-                <span>{props.areas[choiseIndex].name}</span>
+        <div className={styles.container}>
+            <img 
+                className={styles.image}
+                src={props.areas[choiseIndex].url}
+                alt="Simple area preview"
+                width={540}
+                height={301}
+            />
+            <div className={styles.areaNameContainer}>
+                <span className={styles.areaName}>{props.areas[choiseIndex].name}</span>
             </div>
-            <span className="prev" onClick={handlPrevious}>&#10094;</span>
-            <span className="next" onClick={handleNext}>&#10095;</span>
+            <span className={leftArrowCss} onClick={handlPrevious}>&#10094;</span>
+            <span className={rightArrowCss} onClick={handleNext}>&#10095;</span>
         </div>
     );
 }

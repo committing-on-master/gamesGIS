@@ -6,10 +6,10 @@ import { MapType } from "./../../../api/dto/types/MapType";
 import { RequestWrapper } from "./../../../api/JsonRequestWrapper";
 import { SchemaValidation } from "./schemaValidation";
 
-import "./MapProfileCreationForm.scss";
+import styles from './MapProfileCreationForm.module.scss';
 import { AreaChoicer, ChoicerAreaType } from "./../AreaChoicer";
 import { EndPoints } from "../../../api/endPoints";
-import { nameofPropChecker } from "../../../api/nameofPropChecker";
+import { nameofPropChecker } from "../../../generics/nameofPropChecker";
 
 const previewUrl = (name: string) => `${EndPoints.Protocol}://${EndPoints.Host}/img/maps/${name}.png`;
 const areas: ChoicerAreaType[] = [
@@ -65,7 +65,7 @@ interface ProfileCreationProps {
 }
 
 function MapProfileCreationForm(props: ProfileCreationProps) {
-    const { register, handleSubmit, setError, reset, setValue, formState: { errors } } = useForm<CreatingMapProfile>({defaultValues: {map: MapType.Woods}});
+    const { register, handleSubmit, setError, reset, setValue, formState: { errors } } = useForm<CreatingMapProfile>({ defaultValues: { map: MapType.Woods } });
     const [backendError, setBackendError] = useState<string | undefined>(undefined);
 
     const onSubmit: SubmitHandler<CreatingMapProfile> = (data) => {
@@ -82,11 +82,11 @@ function MapProfileCreationForm(props: ProfileCreationProps) {
                     reset();
                     return Promise.resolve();
                 }
-                if (res.failure?.errors !== undefined  && res.failure?.errors?.length !== 0) {
+                if (res.failure?.errors !== undefined && res.failure?.errors?.length !== 0) {
                     res.failure.errors.forEach((error) => {
                         switch (error.param) {
                             case nameofPropChecker<MapProfileDTO>("profileName"):
-                                setError("profileName", { message: error.msg }, { shouldFocus: true });                                                                                
+                                setError("profileName", { message: error.msg }, { shouldFocus: true });
                                 break;
                             case nameofPropChecker<MapProfileDTO>("map"):
                                 setError("map", { message: error.msg });
@@ -108,22 +108,32 @@ function MapProfileCreationForm(props: ProfileCreationProps) {
     }
 
     return (
-            <form className="profile-creation-form" onSubmit={handleSubmit(onSubmit)}>
-                <div className="form-input-block">
-                    <label>Name</label>
-                    <input className="input" type="text" placeholder="profile name ..." {...register("profileName", SchemaValidation.ProfileName)} />
-                    {errors.profileName && <p className="error">{errors.profileName.message}</p>}
-                </div>
+        <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
 
-                <div className="form-input-block">
-                    <label>Map</label>
-                    <input type="number" hidden={true} {...register("map", SchemaValidation.Map)} />
-                    <AreaChoicer areas={areas} onChoiseChanged={(map) => {setValue("map", map)}} />
-                    {errors.map && <p className="error">{errors.map.message}</p>}
-                </div>
-                <button className="button button--primary">Create</button>
-                {backendError && <p className="error">{backendError}</p>}
-            </form>
+            <label>Name</label>
+            <input
+                className={styles.input}
+                type="text"
+                placeholder="profile name ..."
+                {...register("profileName", SchemaValidation.ProfileName)}
+            />
+            {errors.profileName && <p className={styles.error}>{errors.profileName.message}</p>}
+
+            <label>Map</label>
+            <input
+                type="number"
+                hidden={true}
+                {...register("map", SchemaValidation.Map)}
+            />
+            <AreaChoicer
+                areas={areas}
+                onChoiseChanged={(map) => { setValue("map", map) }}
+            />
+            {errors.map && <p className={styles.error}>{errors.map.message}</p>}
+
+            <button className={styles.button}>Create</button>
+            {backendError && <p className={styles.error}>{backendError}</p>}
+        </form>
     )
 }
 

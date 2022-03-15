@@ -1,10 +1,11 @@
 import { EndPoints } from "../api/endPoints";
-import "./NoMatchPage.scss";
+
+import styles from './NoMatchPage.module.scss';
 
 function NoMatchPage() {
     // TODO: перепилить егеря из сборки в ссылку на статику
     return (
-        <div className="page-404">
+        <div className={styles.container}>
             <h1>404 Page</h1>
 
             <img

@@ -1,0 +1,32 @@
+@use './../../../../sass/components';
+
+.input {
+    @extend %input;
+    outline: auto;
+    width: 100%;
+    background-color: white;
+    margin-top: 0.5em;
+}
+
+.list {
+    width: 95%;
+    padding-left: 1em;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.list_item {
+    border-bottom: 2px solid black;
+    padding-top: 0.5em;
+    cursor: pointer;
+}
+
+.icon {
+    float: right;   
+}
+
+.container {
+    font-size: 0.9rem;
+    padding: 1em;
+    height: 100%;
+}
