@@ -8,6 +8,7 @@ import { RegistrationPage } from './view/RegistrationPage';
 
 import styles from './App.module.scss';
 import MyMapsPage from './view/MyMapsPage';
+import { withAuth } from './hocs/withAuth';
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
         <Route path="/" element={<MainTemplate />}>
           <Route path="/" element={<HomePage />} />
           <Route path="registration" element={<RegistrationPage />} />
-          <Route path="mymaps" element={<MyMapsPage />} />
+          <Route path="mymaps" element={ withAuth(MyMapsPage, '/')({})} />
           <Route path="*" element={<NoMatchPage />} />
         </Route>
       </Routes>

@@ -18,7 +18,7 @@
 .licenseContainer {
     background-color: rgb(218, 218, 218);
     border-radius: 5px;
-    max-width: $body-content-max-width;
+    max-width: var.$body-content-max-width;
     margin: auto;
 
     height: 80%;
@@ -82,32 +82,4 @@
     // height: 70%;
     overflow-y: auto;
     flex-grow: 1;
-}
-
-div.license-shadow {
-
-
-    div.license {
-
-
-
-        header.license-header {
-
-
-            // border: 1px solid black;
-            button.license-close {}
-        }
-
-        div.license-body {}
-
-        footer.license-footer {
-
-
-            .button {
-                font-size: 1.2rem;
-                width: 15%;
-                max-width: 200px;
-            }
-        }
-    }
 }
