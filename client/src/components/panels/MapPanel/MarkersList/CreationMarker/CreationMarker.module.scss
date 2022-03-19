@@ -1,17 +1,27 @@
 @use './../../../../../sass/components';
-@use './../../../../../sass/variables' as var;
+@use './../../../../../sass/variables'as var;
 
 $fontSize: 0.8rem;
+
+.container {
+    width: 100%;
+    transition: width 1s ease-in-out;
+}
 
 .button {
     @extend %button;
     font-size: $fontSize;
+    width: 10em;
 }
 
 .button_primary {
     @extend %button;
     background-color: var.$button-color-primary;
     font-size: $fontSize;
+    width: 4em;
+
+    animation-name: primaryAnimation;
+    animation-duration: 1s;
 }
 
 .form_create {
@@ -23,4 +33,28 @@ $fontSize: 0.8rem;
     @extend %input;
     font-size: $fontSize;
     background-color: white;
+    width: 100%;
+
+    animation-name: inputAnimation;
+    animation-duration: 1s;
+}
+
+@keyframes inputAnimation {
+    from {
+        width: 0px;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+@keyframes primaryAnimation {
+    from {
+        width: 10em;
+    }
+
+    to {
+        width: 4em;
+    }
 }

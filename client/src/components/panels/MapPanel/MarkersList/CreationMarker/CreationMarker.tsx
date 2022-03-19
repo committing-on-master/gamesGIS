@@ -14,7 +14,7 @@ function CreationMarker({ onCreate }: CreationMarkerProps) {
         :
             <CreationMode onCreate={onCreate} onCancel={() => setSlimMode(true)}/>
     return (
-        <div>
+        <div className={styles.container}>
             {body}
         </div>
     );

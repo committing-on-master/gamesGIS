@@ -7,15 +7,18 @@ import { MapLayer } from './MapLayer';
 import { MarkersLayer } from './MarkersLayer';
 import { SpotlightArea } from './SpotlightArea';
 
+import styles from './LeafletComponent.module.scss';
+
 function LeafletComponent() {
     const mapParams = useAppSelector(state => mapSelectors.containerParams(state.map));
 
     return (
         <MapContainer
+            className={styles.container}
             // Coordinates in CRS.Simple take the form of [y, x] instead of [x, y], in the same way Leaflet uses [lat, lng] instead of [lng, lat]
             crs={CRS.Simple}
             center={[mapParams.center.x, mapParams.center.y]}
-
+            
             zoom={mapParams.zoom.min}
             minZoom={mapParams.zoom.min}
             maxZoom={mapParams.zoom.max}
