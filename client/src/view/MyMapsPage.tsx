@@ -18,11 +18,14 @@ function MyMapsPage() {
     }
     return (
         <div className={styles.container}>
-            <div>
+            <div className={styles.create}>
                 <h3>Create profile</h3>
-                <MapProfileCreationForm onCreated={handleProfileCreation}/>
+                <MapProfileCreationForm onCreated={handleProfileCreation} />
             </div>
-            <UserMapProfiles userId={userId}/>
+            <div className={styles.list}>
+                <h3>Saved profiles</h3>
+                <UserMapProfiles userId={userId} />
+            </div>
         </div>
     )
 }
