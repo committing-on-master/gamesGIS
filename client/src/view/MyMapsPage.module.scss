@@ -1,6 +1,21 @@
+@import './../sass/breakpoints';
+@import 'include-media';
+
 .container {
     display: inline-flex;
     justify-content: space-between;
     width: 100%;
     align-items: stretch;
+
+    @include media('<=tablet') {
+        flex-flow: column;
+    }
+}
+
+.create {
+    flex-grow: 0;
+}
+
+.list {
+    flex-grow: 0.9;
 }

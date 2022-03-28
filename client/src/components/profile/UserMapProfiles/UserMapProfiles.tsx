@@ -72,33 +72,29 @@ function UserMapProfiles(props: UserMapProfilesProps) {
     }
 
     return (
-        // <div className='saved-profiles'>
-        <div>
-            <h3>Saved profiles</h3>
-            <Table
-                className={styles.table}
-                rowClassName={styles.row}
-                rowKey={record => record.id}
-                columns={columns}
-                data={filtered}
-                // scroll={{
-                //     y: 250
-                // }}
-                expandable={{
-                    expandRowByClick: true,
-                    expandedRowRender: record => 
-                            <ProfileActions 
-                                record={record}
-                                onDeletionClick={handleDeleteEvent}
-                            />,
-                    onExpand: (expanded, record) => {
+        <Table
+            className={styles.table}
+            rowClassName={styles.row}
+            rowKey={record => record.id}
+            columns={columns}
+            data={filtered}
+            // scroll={{
+            //     y: 250
+            // }}
+            expandable={{
+                expandRowByClick: true,
+                expandedRowRender: record =>
+                    <ProfileActions
+                        record={record}
+                        onDeletionClick={handleDeleteEvent}
+                    />,
+                onExpand: (expanded, record) => {
 
-                    },
-                    expandedRowClassName: () => styles.rowExpanded,
-                    expandIcon: CustomExpandIcon,
-                }}
-            />
-        </div>
+                },
+                expandedRowClassName: () => styles.rowExpanded,
+                expandIcon: CustomExpandIcon,
+            }}
+        />
     );
 }
 
@@ -109,7 +105,7 @@ function CustomExpandIcon(props: RenderExpandIconProps<MapProfileReviewType>) {
         <span
             className={styles.icon}
             onClick={e => {
-              props.onExpand(props.record, e);
+                props.onExpand(props.record, e);
             }}
         >
             {text}
@@ -138,7 +134,7 @@ function useFilterHook(mapProfiles: MapProfileReviewType[]): [MapProfileReviewTy
             onChange={(e) => {
                 setMapFilter(Number(e.target.value));
             }
-        }>
+            }>
             {Object.keys(MapType)
                 .filter((value) => Number.isNaN(Number(value)))
                 .map((key, index) => (
