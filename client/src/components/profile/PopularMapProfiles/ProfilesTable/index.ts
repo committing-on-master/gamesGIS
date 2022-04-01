@@ -1,0 +1,1 @@
+export { ProfilesTable } from './ProfilesTable';

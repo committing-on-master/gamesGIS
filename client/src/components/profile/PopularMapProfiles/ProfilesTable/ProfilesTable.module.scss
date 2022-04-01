@@ -1,0 +1,36 @@
+@use './../../../../sass/variables'as var;
+
+.table {
+    border-radius: var.$common-corner-radius;
+    border: var.$common-border-thin solid #1f1f1f;    
+    // max-height: 60vh;
+    overflow-y: auto;
+    
+    table {
+        width: 100%;
+        thead {
+            background-color: var.$table-header-color;
+            border-top-left-radius: var.$common-corner-radius;
+            border-top-right-radius: var.$common-corner-radius;
+
+            height: 2.5em;
+            width: 100%;
+
+            position: sticky;
+            top: 0;
+            z-index: 1;
+
+            th {
+                font-weight: normal;
+            }
+        }
+    }
+}
+
+.row {
+    height: 2.5em;
+
+    &:hover {
+        background-color: #ddd;
+    }
+}
