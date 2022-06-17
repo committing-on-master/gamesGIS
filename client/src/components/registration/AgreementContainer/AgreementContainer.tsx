@@ -1,10 +1,11 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { withWaiter, ProcessState } from '../../../hocs/withWaiter';
+import { withWaiter, ProcessState, useFetchingData } from '../../../hocs/withWaiter';
 import { AgreementText } from './AgreementText';
 import { useFetchLicenseText } from './hooks';
 import { LicenseAgreement } from './LicenseAgreement';
+import { AgreementDTO } from '../../../api/dto/response/AgreementDTO';
 
 const Content = withWaiter(AgreementText);
 
@@ -14,7 +15,7 @@ type AgreementContainerProps = {
 }
 
 function AgreementContainer(props: AgreementContainerProps) {
-    const [state, text] = useFetchLicenseText();
+    const [state, text, response] = useFetchingData<AgreementDTO>('agreement');
 
     return (
         <LicenseAgreement 
@@ -22,7 +23,7 @@ function AgreementContainer(props: AgreementContainerProps) {
             onConfirm={props.onConfirm}
             state={state}
         >
-            <Content state={state} msg={text} text={text} size={'large'}/>
+            <Content waiterState={state} waiterMsg={text} text={response?.payload?.agreementText} waiterSize={'large'}/>
         </LicenseAgreement>
     );
 }

@@ -1,14 +1,15 @@
 import Table from 'rc-table';
 import { ColumnsType } from 'rc-table/lib/interface';
 import React from 'react';
-import { ProfileInfo } from '../../../../api/dto/response/ProfileInfo';
+import { ProfileInfo } from '../../../../api/dto/response/PopularMapProfilesDTO';
 import { MapType } from '../../../../api/dto/types/MapType';
 import styles from './ProfilesTable.module.scss';
 
 type RowType = ProfileInfo & { key: React.Key };
 
-type ProfilesTableProps = {
+export type ProfilesTableProps = {
     profiles: ProfileInfo[],
+    capacity: number,
     onClick: (profileName: string) => void
 }
 
@@ -26,6 +27,9 @@ function ProfilesTable(props: ProfilesTableProps) {
             title: 'Map',
             dataIndex: 'type',
             render: (value: MapType) => {
+                if (value === MapType.Undefined) {
+                    return '-';
+                }
                 return (MapType[value])
             }
         },
@@ -35,7 +39,8 @@ function ProfilesTable(props: ProfilesTableProps) {
         },
         {
             title: 'View count',
-            dataIndex: 'views'
+            dataIndex: 'views',
+            render: (value: number | undefined) => (value && value !== 0) ? value : '-'            
         }
     ];
 
@@ -47,8 +52,16 @@ function ProfilesTable(props: ProfilesTableProps) {
             }
         });
 
+    items.push({
+        key: 55,
+        author: '-',
+        name: '-',
+        type: MapType.Undefined,
+        views: 0
+    });
+
     const onRowClick = (record: RowType | undefined) => { //, index: number | undefined, event: any) => {
-        if (record) {
+        if (record && record.name) {
             props.onClick(record.name);
         }
     };

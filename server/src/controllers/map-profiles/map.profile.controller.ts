@@ -143,6 +143,11 @@ class MapProfileController extends CommonController {
         }
         throw new httpErrors.NotAcceptable("getting all maps profiles is not currently allowed");
     }
+
+
+    public async getTopProfiles(req: express.Request, res: express.Response) {
+        throw new Error("Method not implemented.");
+    }
 }
 
 export {MapProfileController};

@@ -1,3 +1,4 @@
+import { SuccessResponse } from "../SuccessResponse";
 import { MapType } from "../types/MapType";
 
 export interface ProfileInfo {
@@ -6,3 +7,5 @@ export interface ProfileInfo {
     type: MapType;
     views: number;
 }
+
+export interface PopularMapProfiles extends SuccessResponse<ProfileInfo[]> {};

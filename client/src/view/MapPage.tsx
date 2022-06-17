@@ -62,7 +62,7 @@ const Content = withWaiter(
 function MapPage() {
     const [state, text] = useFetchMapProfile();
     return (
-        <Content state={state} msg={text} size={"large"} />
+        <Content waiterState={state} waiterMsg={text} waiterSize={"large"} />
     );
 }
 
