@@ -54,7 +54,7 @@ class MapProfileRoutes extends CommonRoutesConfig {
         route
             .param("profileCount", this.mapProfileMiddleware.extractParamToBody);
         route
-            .get('/map-profiles/most-popular/:profileCount', asyncWrapper(this.mapProfileController.getTopProfiles));
+            .get("/map-profiles/most-popular/:profileCount", asyncWrapper(this.mapProfileController.getTopProfiles));
 
         route
             .param("profileId", this.mapProfileMiddleware.extractParamToBody);

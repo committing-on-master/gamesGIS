@@ -13,8 +13,34 @@ export default {
 const Template: ComponentStory<typeof ProfilesTable> = (props) => <ProfilesTable {...props}/>;
 
 export const Primary = Template.bind({});
-Primary.storyName = 'Primary';
+Primary.storyName = 'Populate';
 Primary.args = {
+    profiles: [
+        {
+            author: 'Vasya',
+            name: 'Vasya in da woods',
+            type: MapType.Woods,
+            views: 51
+        },
+        {
+            author: 'GreenWarrior',
+            name: 'Green room',
+            type: MapType.Labs,
+            views: 13
+        },
+        {
+            author: 'Jager',
+            name: 'stashes',
+            type: MapType.Interchange,
+            views: 24
+        }
+    ],
+    capacity: 5
+};
+
+export const Overflow = Template.bind({});
+Overflow.storyName = 'Overflow';
+Overflow.args = {
     profiles: [
         {
             author: 'Vasya',
@@ -34,5 +60,6 @@ Primary.args = {
             type: MapType.Woods,
             views: 24
         }
-    ]
+    ],
+    capacity: 2
 };

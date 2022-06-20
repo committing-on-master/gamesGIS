@@ -9,8 +9,8 @@
     "TS": "cross-env G_CONNECTION_STRING=TS ts-node ./src/index.ts",
     "test": "npm run build && mocha",
     "eslint:fix": "eslint ./src/** --ext ts --fix",
-    "typeorm:create": "typeorm migration:create -n InitialSeed -c develop",
-    "typeorm:seed": "ts-node --transpile-only ./node_modules/typeorm/cli.js migration:run -c develop"
+    "typeorm:create_migration": "typeorm migration:create -n InitialSeed -c TS",
+    "typeorm:seed": "ts-node --transpile-only ./node_modules/typeorm/cli.js migration:run -c TS"
   },
   "author": "",
   "license": "MIT",

@@ -8,8 +8,9 @@ import {ServicesLayer} from "./../../services-layer/services.layer";
 import {CommonController} from "../common.controller";
 import {JwtPayload} from "../common-types/jwt.payload";
 import {MarkerDto} from "../../dto/response/marker.dto";
-import {MarkerDao} from "src/data-layer/models/marker.dao";
-import {MapProfileReviewDTO} from "src/dto/response/map.profile.review.dto";
+import {MarkerDao} from "../../data-layer/models/marker.dao";
+import {MapProfileReviewDTO} from "../../dto/response/map.profile.review.dto";
+import {ProfileInfo} from "../../dto/response/popular.map.profiles.dto";
 
 @singleton()
 class MapProfileController extends CommonController {
@@ -28,6 +29,7 @@ class MapProfileController extends CommonController {
         this.getProfiles = this.getProfiles.bind(this);
         this.getReviewProfiles = this.getReviewProfiles.bind(this);
         this.deleteMapProfile = this.deleteMapProfile.bind(this);
+        this.getTopProfiles = this.getTopProfiles.bind(this);
     }
     public async createProfile(req: express.Request, res: express.Response) {
         const userId = (res.locals.jwt as JwtPayload).userId;
@@ -146,7 +148,28 @@ class MapProfileController extends CommonController {
 
 
     public async getTopProfiles(req: express.Request, res: express.Response) {
-        throw new Error("Method not implemented.");
+        const profileCount = extractReqCount(req);
+        const statistics = await this.services.MapProfiles.getTopProfiles(profileCount);
+        const result: ProfileInfo[] = statistics.map((value) => {
+            return {
+                type: value.profile.map.mapType,
+                name: value.profile.name,
+                author: value.profile.user.name,
+                views: value.viewsCount,
+            };
+        });
+        return res.status(200).json({message: "ok", payload: result});
+
+        function extractReqCount(req: express.Request) {
+            let profileCount: number = req.body.profileCount;
+            if (profileCount > 10) {
+                profileCount = 10;
+            }
+            if (profileCount < 1) {
+                profileCount = 1;
+            }
+            return profileCount;
+        }
     }
 }
 

@@ -8,4 +8,4 @@ export interface ProfileInfo {
     views: number;
 }
 
-export interface PopularMapProfiles extends SuccessResponse<ProfileInfo[]> {};
+export interface PopularMapProfilesDTO extends SuccessResponse<ProfileInfo[]> {};

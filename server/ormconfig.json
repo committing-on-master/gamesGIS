@@ -16,6 +16,7 @@
         "name": "TS",
         "type": "sqlite",
         "database": "database/test.db",
+        "migrationsRun": true,
         "synchronize": true,
         "entities": [
             "./src/data-layer/models/*.dao.ts"

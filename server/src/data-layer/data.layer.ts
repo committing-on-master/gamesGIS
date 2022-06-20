@@ -11,6 +11,7 @@ import {GalleryRepository} from "./repositories/gallery.repository";
 import {MapProfileRepository} from "./repositories/map.profile.repository";
 import {MarkerRepository} from "./repositories/marker.repository";
 import {MapRepository} from "./repositories/map.repository";
+import {MapProfileStatisticsRepository} from "./repositories/map.profile.statistics.repository";
 
 @singleton()
 class DataLayer {
@@ -53,6 +54,10 @@ class DataLayer {
 
     public get mapRepository(): MapRepository {
         return this.dbContext.getCustomRepository(MapRepository);
+    }
+
+    public get mapProfilesStatisticsRepository(): MapProfileStatisticsRepository {
+        return this.dbContext.getCustomRepository(MapProfileStatisticsRepository);
     }
 
     public get ContextManager() {

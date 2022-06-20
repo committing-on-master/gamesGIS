@@ -1,4 +1,4 @@
-import {MapType} from "src/services-layer/map-profile/models/map.type";
+import {MapType} from "../../services-layer/map-profile/models/map.type";
 
 export interface MapProfileReviewDTO {
     id: number;

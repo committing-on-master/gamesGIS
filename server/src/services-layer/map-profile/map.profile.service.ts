@@ -58,6 +58,7 @@ class MapProfileService {
             minZoom: profile.map.minZoom,
             maxZoom: profile.map.maxZoom,
         };
+        await this.dataLayer.mapProfilesStatisticsRepository.incrementViewsCount(profile.id);
         return result;
     }
 
@@ -234,6 +235,10 @@ class MapProfileService {
             point.yCoordinate = value.y;
             return point;
         });
+    }
+
+    public async getTopProfiles(profileCount: number) {
+        return this.dataLayer.mapProfilesStatisticsRepository.getTopViewedMapProfiles(profileCount);
     }
 }
 export {MapProfileService};

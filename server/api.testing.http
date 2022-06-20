@@ -49,14 +49,14 @@ GET {{apiUrl}}/map-profiles?name=Testing HTTP/1.1
 ### получение всех профилей карт для указанного пользователя
 GET {{apiUrl}}/map-profiles/review?userId=1 HTTP/1.1
 ### get запрос на информацию о пользователе
-GET http://localhost:3000/api/users/1
+GET {{apiUrl}}/users/1
 
 
 ### delete запрос, удаления пользователя
-DELETE http://localhost:3000/api/users/2 HTTP/1.1
+DELETE {{apiUrl}}/users/2 HTTP/1.1
 
 ### put запрос на изменение данных
-PATCH http://localhost:3000/api/users/1
+PATCH {{apiUrl}}/users/1
 Content-Type: application/json
 
 {
@@ -66,7 +66,13 @@ Content-Type: application/json
     "permissionLevel": 8
 }
 ### Получить последнее пользовательское соглашение
-GET http://localhost:3000/api/agreement HTTP/1.1
+GET {{apiUrl}}/agreement HTTP/1.1
+
+### получить тестовый профиль
+GET {{apiUrl}}/map-profiles?name=testProfile
 
 ### получить все маркеры профиля testProfile
 GET {{apiUrl}}/map-profiles/testProfile/markers
+
+### получить топ самых популярных карт
+GET {{apiUrl}}/map-profiles/most-popular/4

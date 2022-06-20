@@ -13,19 +13,22 @@ export type ProfilesTableProps = {
     onClick: (profileName: string) => void
 }
 
-function ProfilesTable(props: ProfilesTableProps) {
+function ProfilesTable({capacity = 5, ...props}: ProfilesTableProps) {
     const columns: ColumnsType<RowType> = [
         {
             title: ' ',
-            dataIndex: 'key'
+            dataIndex: 'key',
+            className: styles.index
         },
         {
             title: 'Profile name',
             dataIndex: 'name',
+            className: styles.name
         },
         {
             title: 'Map',
             dataIndex: 'type',
+            className: styles.map,
             render: (value: MapType) => {
                 if (value === MapType.Undefined) {
                     return '-';
@@ -35,50 +38,63 @@ function ProfilesTable(props: ProfilesTableProps) {
         },
         {
             title: 'Author',
-            dataIndex: 'author'
+            dataIndex: 'author',
+            className: styles.author
         },
         {
             title: 'View count',
             dataIndex: 'views',
-            render: (value: number | undefined) => (value && value !== 0) ? value : '-'            
+            className: styles.count,
+            render: (value: number) => (value !== 0) ? value : '-'
         }
     ];
 
-    const items = props.profiles
-        .sort((first, second) => second.views - first.views)
-        .map<RowType>((value, index) => {
-            return {
-                key: index + 1, ...value
-            }
-        });
-
-    items.push({
-        key: 55,
-        author: '-',
-        name: '-',
-        type: MapType.Undefined,
-        views: 0
-    });
-
-    const onRowClick = (record: RowType | undefined) => { //, index: number | undefined, event: any) => {
-        if (record && record.name) {
+    const onRowClick = (record: RowType) => {
+        if (record && record.name !== '-') {
             props.onClick(record.name);
         }
     };
 
+    const content = contentMapping(props.profiles, capacity);
     return (
         <Table
             className={styles.table}
             rowClassName={styles.row}
             rowKey={record => record.key}
             columns={columns}
-            data={items}
+            data={content}
 
             onRow={(row) => ({
                 onClick: onRowClick.bind(null, row)
             })}
         />
     );
+}
+
+function contentMapping(profiles: ProfileInfo[], capacity: number): RowType[] {
+    let result = profiles
+        .sort((first, second) => second.views - first.views)
+        .map<RowType>((value, index) => {
+            return {
+                key: index + 1, ...value
+            }
+        });
+    if (result.length > capacity) {
+        result = result.slice(0, capacity);
+    } else {
+        if (result.length < capacity) {
+            for (let i = 0; i < capacity - profiles.length; i++) {
+                result.push({
+                    key: result.length + 1,
+                    author: '-',
+                    name: '-',
+                    type: MapType.Undefined,
+                    views: 0
+                });
+            }
+        }
+    }
+    return result;
 }
 
 export { ProfilesTable };
