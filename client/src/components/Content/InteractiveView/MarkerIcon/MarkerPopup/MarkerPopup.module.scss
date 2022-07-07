@@ -1,0 +1,107 @@
+$tipHeight: 17px;
+$popupWidth: 300px;
+$iconWidth: 30px;
+
+.container {
+    position: relative;
+    bottom: $tipHeight / 2;
+    left: -$popupWidth / 2 + $iconWidth / 2;
+    width: $popupWidth;
+    
+    -webkit-tap-highlight-color: transparent;
+    font: 12px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
+    cursor: auto;
+    box-sizing: border-box;
+    padding: 1px;
+    text-align: left;   
+    border-radius: 12px;
+    background: white;
+    color: #333;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+}
+.content {
+    -webkit-tap-highlight-color: transparent;
+    font: 12px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
+    cursor: auto;
+    text-align: left;
+    color: #333;
+    box-sizing: border-box;
+    margin: 13px 19px;
+    line-height: 1.4;
+}
+
+.tipContainer {
+    -webkit-tap-highlight-color: transparent;
+    font: 12px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
+    cursor: auto;
+    text-align: center;
+    box-sizing: border-box;
+    width: 40px;
+    height: 20px;
+    position: absolute;
+    left: 50%;
+    margin-left: -20px;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.tip {
+    -webkit-tap-highlight-color: transparent;
+    font: 12px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
+    cursor: auto;
+    text-align: center;
+    pointer-events: none;
+    box-sizing: border-box;
+    width: $tipHeight;
+    height: $tipHeight;
+    padding: 1px;
+    margin: -10px auto 0;
+    transform: rotate(45deg);
+    background: white;
+    color: #333;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+}
+
+.close {
+    cursor: pointer;
+
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: rgba(51, 181, 229, 0.4);
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 4px 4px 0 0;
+    border: none;
+    text-align: center;
+    width: 18px;
+    height: 14px;
+    font: 16px/14px Tahoma, Verdana, sans-serif;
+    color: #c3c3c3;
+    text-decoration: none;
+    font-weight: bold;
+    background: transparent;
+}
+
+.header {
+    -webkit-tap-highlight-color: transparent;
+    font: 12px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
+    cursor: auto;
+    text-align: left;
+    color: #333;
+    line-height: 1.4;
+    font-size: 2em;
+    margin-block-end: 0.67em;
+    margin-block-start: 0.67em;
+    box-sizing: border-box;
+}
+
+.text {
+    -webkit-tap-highlight-color: transparent;
+    font: 12px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
+    cursor: auto;
+    text-align: left;
+    color: #333;
+    line-height: 1.4;
+    box-sizing: border-box;
+    margin: 18px 0;
+}
